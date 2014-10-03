@@ -1,0 +1,53 @@
+/*
+ * Build file init'ed by 'nemonik' on '9/25/14 3:46 PM' with Gradle 2.1
+ */
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+String srcGeneratedDir = 'src/generated'
+String srcGeneratedJavaDir = srcGeneratedDir + '/java'
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+configurations {
+	xjc
+}
+ 
+dependencies {
+	xjc 'com.sun.xml.bind:jaxb-xjc:2.2.7-b41'
+    xjc 'com.sun.xml.bind:jaxb-impl:2.2.7-b41'
+    xjc 'javax.xml.bind:jaxb-api:2.2.7'
+
+}
+
+task cleanGenerate << {
+    ant.delete(dir: srcGeneratedJavaDir)
+}
+
+task generate << {
+	ant.taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.xjc.asPath)
+ 
+	ant.mkdir(dir: srcGeneratedJavaDir)
+	
+	ant.xjc(destdir: srcGeneratedJavaDir, classpath: configurations.xjc.asPath) {
+	
+        binding(dir: 'src/main/resources', includes: '*.xjb')
+        arg(line: '-readOnly -verbose')
+        schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_core.xsd')
+        schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_common.xsd')
+        schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_default_vocabularies.xsd')
+        schema(dir: 'src/main/resources/schemas', includes: 'cybox/objects/*.xsd')
+        schema(dir: 'src/main/resources/schemas', includes: '*.xsd')
+        schema(dir: 'src/main/resources/schemas', includes: 'extensions/**/*.xsd')
+		schema(dir: 'src/main/resources/schemas', includes: 'external/**/*.xsd')
+  
+  		//Doing it this way, xjc cannot find its way to all the imported schemas ...
+        //schema(dir: 'src/main/resources/schemas', includes: '**/*.xsd')
+ 	}
+}
+
+generate.dependsOn cleanGenerate
