@@ -24,3 +24,19 @@ pulling updates) you will need to run
     git submodule update
 
 again to update the schemas themselves.
+
+## Install gradle
+
+Visit 
+
+http://www.gradle.org/installation
+
+to install gradle, or if use brew:
+
+    brew install gradle
+
+## To generate the JAXB2 XML bindings
+
+Change directories to the project, and run:
+
+    gradle -q generate
