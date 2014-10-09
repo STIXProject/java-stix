@@ -31,7 +31,7 @@ Visit
 
 http://www.gradle.org/installation
 
-to install gradle, or if use brew:
+to install gradle, or if you use brew:
 
     brew install gradle
 
