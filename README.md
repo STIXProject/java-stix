@@ -1,6 +1,6 @@
 # JAVA STIX 
 
-JAXB2 generated Java bindindgs for Structured Threat Information eXpression 
+The JAXB2 Document Model for Structured Threat Information eXpression 
 (STIX), a standardized language used to represent structured cyber threat 
 information.
 
@@ -8,7 +8,7 @@ information.
 
 git clone https://github.com/nemonik/java_stix.git
 
-### Retrieve the Cybox schemas
+### Retrieve the STIX schemas
 
 A `git clone` command will not retrieve schemas project automatically,  First
 clone the project, then enter the project and run these additonal git commands
@@ -32,9 +32,10 @@ pulling updates) you will need to run
 
     git submodule update
 
-again to update the schemas themselves.
+again to update the schemas themselves, and then recreate the JAXB
+document model.
 
-## Create the JAXB2 bindings
+## Create the JAXB2 Document Model aka JAXB Bindings
 
 Change directories into the project and enter on the command-line:
 
