@@ -57,7 +57,7 @@ Success will look like this:
 	
 	Total time: 22.929 secs
     
-If build goes well you will find the JAXB Document Model in jar at
+If the build goes well you will find the JAXB Document Model in jar at
 
 	buil/libs/java-stix-${version}.jar
 
