@@ -40,6 +40,22 @@ Change directories into the project and enter on the command-line:
 
     gradle
     
+Success will look like this:
+
+	:createPrefixNamespaceBindings
+	:cleanGenerate
+	:generate
+	:compileJava
+	Note: Some input files use unchecked or unsafe operations.
+	Note: Recompile with -Xlint:unchecked for details.
+	:processResources
+	:classes
+	:jar
+
+	BUILD SUCCESSFUL
+	
+	Total time: 22.929 secs
+    
 If build goes well you will find the JAXB Document Model in jar at
 
 	buil/libs/java-stix-${version}.jar
