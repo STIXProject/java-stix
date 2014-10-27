@@ -1,0 +1,10 @@
+/build
+/src/generated
+/.classpath
+/.project
+/.settings/
+/settings.gradle
+/gradlew.bat
+/gradlew
+/gradle/wrapper
+/.gradle/2.1/taskArtifacts
