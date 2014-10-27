@@ -35,7 +35,7 @@ pulling updates) you will need to run
 again to update the schemas themselves, and then recreate the JAXB
 document model.
 
-## Create the JAXB2 Document Model aka JAXB Bindings
+## Create the JAXB2 Document Model
 
 Change directories into the project and enter on the command-line:
 
