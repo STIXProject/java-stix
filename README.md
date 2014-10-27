@@ -8,24 +8,29 @@ information.
 
 git clone https://github.com/nemonik/java_stix.git
 
+## Retrieve the schemas
+
+A `git clone` command will not retrieve schemas project automatically. 
+
 ### Retrieve the STIX schemas
 
-A `git clone` command will not retrieve schemas project automatically,  First
-clone the project, then enter the project and run these additonal git commands
-on the command line to retrieve the schema.
+First clone the project, then enter the project and run these additonal git commands
+on the command line to retrieve the STIX schemas.
 
     git submodule init
     git submodule update
 
 ### Retrieve the CybOX schemas
 
-You will also need to retrieve the CybOX schemas.
+You then will also need to retrieve the CybOX schemas.
 
 In the project:
 
     cd src/main/resources/schemas
     git submodule init
     git submodule update
+
+### Schema updates
 
 Any time you see that the schemas project has been modified (when merging or 
 pulling updates) you will need to run 
