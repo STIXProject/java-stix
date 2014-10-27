@@ -1,12 +1,140 @@
 /*
- * Build file init'ed by 'nemonik' on '9/25/14 3:46 PM' with Gradle 2.1
+ * Java-STIX Build file
+ *
+ * nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
+ *
+ * Run
+ *
+ *	gradle
+ *
+ * from the commnand-line.
+ *
+ * Jar will be built to 
+ *
+ * 	build/libs/java-stix-${version}.jar
  */
+
+import groovy.io.FileType
+import groovy.xml.StreamingMarkupBuilder
+import groovy.xml.XmlUtil
+
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+
+import javax.xml.parsers.DocumentBuilderFactory
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-String srcGeneratedDir = 'src/generated'
-String srcGeneratedJavaDir = srcGeneratedDir + '/java'
+defaultTasks 'jar'
+
+version = 1.0 // TODO: should this match the spec?
+
+// Dynamically creates the src/main/resources/namespace-prefix.xjb
+// file from the schemas otherwise XJC will dynically asign ns namespaces
+class PrefixNamespaceBindingsTask extends DefaultTask {
+    
+    // ignore these namespaces
+    def notPartOfThisCompilation = [
+        "schemas/cybox/external/cpe_2.3/cpe-naming_2.3.xsd",
+        "schemas/cybox/external/cpe_2.3/cpe-language_2.3.xsd",
+        "schemas/cybox/external/oasis_ciq_3.0/xlink-2003-12-31.xsd"]
+
+	// Returns a hashmap Binding objects parsed from the schemas.
+    def get() {
+
+        def schemaBindings = [:]
+       
+        def schemas = []
+        new File("src/main/resources/schemas").eachFileRecurse(FileType.FILES) { file ->
+            if (file.name.endsWith('.xsd')) {
+                schemas << file
+            }
+        }
+       
+       schemas.each {schema ->
+
+          def schemaLocation = new File("schemas", schema.getAbsolutePath().split("schemas")[1]).toString()
+
+          if (!(schemaLocation in notPartOfThisCompilation)) {
+
+             def document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new FileInputStream(schema))
+
+             document.getDocumentElement().normalize()
+
+             def attributes = document.getDocumentElement().getAttributes()
+                
+                def binding
+
+             for (int j = 0 ; j < attributes.getLength() ; j++) {
+
+                if (attributes.item(j).getNodeName().startsWith("xmlns:") && attributes.item(j).getNodeValue().equals(document.getDocumentElement().getAttribute("targetNamespace"))) {
+                        
+                        binding = new Binding()
+                        binding.prefix = attributes.item(j).getNodeName().split(":")[1]
+                        binding.namespace = attributes.item(j).getNodeValue()
+                        binding.schemaLocation = schemaLocation
+                        
+                    schemaBindings[schemaLocation] = binding
+                    }
+                }
+            }
+        }
+
+       schemaBindings
+    }
+
+	// Dynamically creates the src/main/resources/namespace-prefix.xjb file used by XJC jaxb2-namespace-prefix plugin
+    @TaskAction
+    def create() {
+		def schemaBindings = get()
+        
+        def dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        def date = new Date();
+		
+		def xmlBuilder = new StreamingMarkupBuilder()
+		def writer = xmlBuilder.bind {
+			mkp.comment "WARNING!!!!! Dynamically created on ${dateFormat.format(date)} by the build.gradle's createPrefixNamespaceBindings task. All changes made to this file will be lost."
+  			mkp.declareNamespace(jaxb:"http://java.sun.com/xml/ns/jaxb")
+  			mkp.declareNamespace(xsi:"http://www.w3.org/2001/XMLSchema-instance")
+  			mkp.declareNamespace(xs:"http://www.w3.org/2001/XMLSchema")
+			mkp.declareNamespace(namespace:"http://jaxb2-commons.dev.java.net/namespace-prefix")
+			'jaxb:bindings'(version: "2.1", "xsi:schemaLocation":"http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd http://jaxb2-commons.dev.java.net/namespace-prefix http://java.net/projects/jaxb2-commons/sources/svn/content/namespace-prefix/trunk/src/main/resources/prefix-namespace-schema.xsd") {
+	        	schemaBindings.each { schemaLocation, binding ->
+		            'jaxb:bindings'(schemaLocation: schemaLocation) {
+		        		'namespace:prefix'(name: binding.prefix)
+		            }
+		        }
+		    }
+	    }
+        
+        def file = new File("src/main/resources/namespace-prefix.xjb")      
+        file.setText(XmlUtil.serialize(writer)) 
+    }   
+}
+
+jar {
+    manifest {
+       attributes 'Specification-Title': 'Structured Threat Information eXpression (STIX)',
+                'Specification-Version': '1.1.1',
+                'Implementation-Title': 'Java-STIX',
+                'Implementation-Version': version,
+                'Implementation-Vendor': 'The MITRE Corporation'
+    }
+}
+
+sourceSets {
+    main {
+       java {
+          srcDirs('src/main/java', 'src/generated/java')
+       }
+       resources {
+            srcDir('src/main/resources')
+            exclude '*.xjb' // not needed in the jar
+        }
+    }
+}
 
 repositories {
     jcenter()
@@ -14,40 +142,76 @@ repositories {
 }
 
 configurations {
-	xjc
+    xjc
 }
  
 dependencies {
-	xjc 'com.sun.xml.bind:jaxb-xjc:2.2.7-b41'
-    xjc 'com.sun.xml.bind:jaxb-impl:2.2.7-b41'
-    xjc 'javax.xml.bind:jaxb-api:2.2.7'
+    xjc 'com.sun.xml.bind:jaxb-xjc:2.2.5-2'
+    xjc 'com.sun.xml.bind:jaxb-impl:2.2.5-2'
+    xjc 'javax.xml.bind:jaxb-api:2.1'
 
+    // JAXB2 Basics provides a package of plugins which can generate such 
+    // utility code
+    xjc 'org.jvnet.jaxb2_commons:jaxb2-basics:0.6.5'
+    xjc 'org.jvnet.jaxb2_commons:jaxb2-basics-ant:0.6.5'
+
+    // Causes JAXB RI 2 XJC to generate additional methods that allows method 
+    // chaining. 
+    xjc 'org.jvnet.jaxb2_commons:jaxb2-fluent-api:3.0'
+
+    // Causes JAXB RI 2 XJC to generate a value constructor, where each 
+    // embedded element is included as a constructor parameter.
+    xjc 'org.jvnet.jaxb2_commons:jaxb2-value-constructor:3.0'
+
+    // This plugin uses the XML schema "element" tag's "default" attribute to 
+    // set default values for variables in the classes generated by JAXB
+    xjc 'org.jvnet.jaxb2_commons:jaxb2-default-value:1.1'
+    
+    // This plugin adds 'javax.xml.bind.annotation.XmlNs' annotations to 
+    // 'package-info.java' file according to specific definitions in 
+    // bindings.xml file. Those annotations associate namespace prefixes 
+    // with XML namespace URIs.
+    xjc 'org.jvnet.jaxb2_commons:jaxb2-namespace-prefix:1.1'
+
+    compile 'javax.xml.bind:jaxb-api:2.1'
+    compile 'org.jvnet.jaxb2_commons:jaxb2-basics-runtime:0.6.5'
+    compile 'org.apache.httpcomponents:httpclient:4.3.5'
+    compile 'org.apache.httpcomponents:httpclient-cache:4.3.5'
+    compile 'org.apache.httpcomponents:httpmime:4.3.5'
+    compile 'org.apache.httpcomponents:fluent-hc:4.3.5'
 }
 
+// Dynamically create the prefix-namespace bindings file
+// off of the schemas
+task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask)
+
+// Clean out the generated folder
 task cleanGenerate << {
-    ant.delete(dir: srcGeneratedJavaDir)
+    ant.delete(dir: 'src/generated/java')
 }
 
+// Generate the JAXB Document Model
 task generate << {
-	ant.taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.xjc.asPath)
+    ant.taskdef(name: 'xjc', classname: 'org.jvnet.jaxb2_commons.xjc.XJC2Task', classpath: configurations.xjc.asPath)
  
-	ant.mkdir(dir: srcGeneratedJavaDir)
-	
-	ant.xjc(destdir: srcGeneratedJavaDir, classpath: configurations.xjc.asPath) {
-	
-        binding(dir: 'src/main/resources', includes: '*.xjb')
-        arg(line: '-readOnly -verbose')
-        schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_core.xsd')
-        schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_common.xsd')
-        schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_default_vocabularies.xsd')
-        schema(dir: 'src/main/resources/schemas', includes: 'cybox/objects/*.xsd')
-        schema(dir: 'src/main/resources/schemas', includes: '*.xsd')
-        schema(dir: 'src/main/resources/schemas', includes: 'extensions/**/*.xsd')
-		schema(dir: 'src/main/resources/schemas', includes: 'external/**/*.xsd')
+    ant.mkdir(dir: 'src/generated/java')
+    
+    ant.xjc(destdir: 'src/generated/java', extension: true, classpath: configurations.xjc.asPath) {
+       arg(line: '-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix')    
+       binding(dir: 'src/main/resources', includes: '*.xjb')
+       schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_core.xsd')
+       schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_common.xsd')
+       schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_default_vocabularies.xsd')
+       schema(dir: 'src/main/resources/schemas', includes: 'cybox/objects/*.xsd')
+       schema(dir: 'src/main/resources/schemas', includes: '*.xsd')
+       schema(dir: 'src/main/resources/schemas', includes: 'extensions/**/*.xsd')
+        schema(dir: 'src/main/resources/schemas', includes: 'external/**/*.xsd')
   
-  		//Doing it this way, xjc cannot find its way to all the imported schemas ...
-        //schema(dir: 'src/main/resources/schemas', includes: '**/*.xsd')
- 	}
+       //Doing it this way, xjc cannot find its way to all the imported schemas ...
+       //schema(dir: 'src/main/resources/schemas', includes: '**/*.xsd')
+     }
 }
 
 generate.dependsOn cleanGenerate
+
+compileJava.dependsOn createPrefixNamespaceBindings, generate
