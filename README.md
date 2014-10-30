@@ -8,7 +8,7 @@ information.
 
 git clone https://github.com/nemonik/java_stix.git
 
-## Retrieve the schemas
+## Retrieving the schemas
 
 A `git clone` command will not retrieve schemas project automatically. 
 
@@ -66,7 +66,7 @@ If the build goes well you will find the JAXB Document Model in jar at
 
 	buil/libs/java-stix-${version}.jar
 
-## Trouble Building?
+## Trouble building?
 
 If while building you get this error:
 
@@ -98,3 +98,12 @@ If you get this error while building:
 
  then you likely missed the step above where you must retrieved the CybOX 
  schemas.
+ 
+## Importing the project into the Eclipse IDE
+
+After running the Gradle buildscript, iI you are using a Eclipse IDE and the Gradle Plugin you will want to 
+run the following from the command-line to set up the Ecipse environment:
+
+	gradle clean cleanEclipse eclipse
+
+Then right-click on the Eclipse project and select "Refresh" to bring in the dependencies, and JAXB Doucment Model.
