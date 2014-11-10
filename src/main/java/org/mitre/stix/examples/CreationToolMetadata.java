@@ -71,7 +71,7 @@ public class CreationToolMetadata {
 									{
 										add(new ToolInformationType()
 												.withName(
-														"orr.mitre.stix.examples.CreationToolMetadata")
+														"org.mitre.stix.examples.CreationToolMetadata")
 												.withVendor(
 														"The MITRE Corporation"));
 									}
