@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) 2014, The MITRE Corporation. All rights reserved.
+ * See LICENSE for complete terms.
+ *
  * Java-STIX Build file
  *
  * nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
@@ -35,17 +38,18 @@ version = 1.0 // TODO: should this match the spec?
 // file from the schemas otherwise XJC will dynically asign ns namespaces
 class PrefixNamespaceBindingsTask extends DefaultTask {
 
-	// ignore these namespaces
+	// ignore these namespaces cuz they are orphans
 	def notPartOfThisCompilation = [
 		"schemas/cybox/external/cpe_2.3/cpe-naming_2.3.xsd",
 		"schemas/cybox/external/cpe_2.3/cpe-language_2.3.xsd",
 		"schemas/cybox/external/oasis_ciq_3.0/xlink-2003-12-31.xsd"
 	]
 
-	// Returns a hashmap Binding objects parsed from the schemas.
+	// Returns a hashmap Binding objects
 	def get() {
 		def schemaBindings = [:]
 
+		// Gather up the schemas
 		def schemas = []
 		new File("src/main/resources/schemas").eachFileRecurse(FileType.FILES) { file ->
 			if (file.name.endsWith('.xsd')) {
@@ -53,6 +57,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 			}
 		}
 
+		// Gather Binding objects parsed from the schemas.
 		schemas.each {schema ->
 
 			def schemaLocation = new File("schemas", schema.getAbsolutePath().split("schemas")[1]).toString()
@@ -82,6 +87,18 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 				}
 			}
 		}
+
+		//Add these external schemas
+		schemaBindings.put("schemas/external/oasis_ciq_3.0/xAL-types.xsd", new Binding(prefix: "xal", namespace: "urn:oasis:names:tc:ciq:xal:3", schemaLocation: "schemas/external/oasis_ciq_3.0/xAL-types.xsd"));
+		schemaBindings.put("schemas/external/oasis_ciq_3.0/xPIL.xsd", new Binding(prefix: "xpil", namespace: "urn:oasis:names:tc:ciq:xpil:3", schemaLocation: "schemas/external/oasis_ciq_3.0/xPIL.xsd"));
+		schemaBindings.put("schemas/external/oasis_ciq_3.0/xNL-types.xsd", new Binding(prefix: "xnl", namespace: "urn:oasis:names:tc:ciq:xnl:3", schemaLocation: "schemas/external/oasis_ciq_3.0/xNL-types.xsd"));
+		// The crawl would map the 'tns' prefix to both of these... fix that.
+		schemaBindings.put("schemas/external/open_ioc_2010/ioc-TR.xsd", new Binding(prefix: "ioc-tr", namespace: "urn:oasis:names:tc:ciq:xnl:3", schemaLocation: "schemas/external/open_ioc_2010/ioc-TR.xsd"));
+		schemaBindings.put("schemas/external/open_ioc_2010/ioc.xsd", new Binding(prefix: "ioc", namespace: "urn:oasis:names:tc:ciq:xnl:3", schemaLocation: "schemas/external/open_ioc_2010/ioc.xsd"));
+	
+//		schemaBindings.each{ k, v ->
+//			println "${k} : ${v.namespace}, ${v.prefix}"
+//		}
 
 		schemaBindings
 	}

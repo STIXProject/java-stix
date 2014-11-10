@@ -1,7 +1,7 @@
 # JAVA STIX 
 
-The JAXB2 Document Model for Structured Threat Information eXpression 
-(STIX), a standardized language used to represent structured cyber threat 
+The JAXB2 Document Model for Structured Threat Information eXpression
+(STIX), a standardized language used to represent structured cyber threat
 information.
 
 ## Cloning the repository
@@ -10,12 +10,12 @@ git clone https://github.com/nemonik/java_stix.git
 
 ## Retrieving the schemas
 
-A `git clone` command will not retrieve schemas project automatically. 
+A `git clone` command will not retrieve schemas project automatically.
 
 ### The STIX schemas
 
-First clone the project, then enter the project and run these additonal git commands
-on the command line to retrieve the STIX schemas.
+First clone the project, then enter the project and run these additonal git
+commands on the command line to retrieve the STIX schemas.
 
     git submodule init
     git submodule update
@@ -32,8 +32,8 @@ In the project:
 
 ### Schema updates
 
-Any time you see that the schemas project has been modified (when merging or 
-pulling updates) you will need to run 
+Any time you see that the schemas project has been modified (when merging or
+pulling updates) you will need to run
 
     git submodule update
 
@@ -101,9 +101,11 @@ If you get this error while building:
  
 ## Importing the project into the Eclipse IDE
 
-After running the Gradle buildscript, iI you are using a Eclipse IDE and the Gradle Plugin you will want to 
-run the following from the command-line to set up the Ecipse environment:
+After running the Gradle buildscript, iI you are using a Eclipse IDE and the
+Gradle Plugin you will want to run the following from the command-line to set
+up the Ecipse environment:
 
 	gradle clean cleanEclipse eclipse
 
-Then right-click on the Eclipse project and select "Refresh" to bring in the dependencies, and JAXB Doucment Model.
+Then right-click on the Eclipse project and select "Refresh" to bring in the
+dependencies, and JAXB Doucment Model.
