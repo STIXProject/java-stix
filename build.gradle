@@ -48,8 +48,14 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 		]
 
 		// fix paths for present platform
-		notPartOfThisCompilation.collect {
-			it.replaceAll("/", File.separator)
+		if (File.separator.equals("\\")) {
+			// couldn't get collect to work on windows
+			def temp = []
+			notPartOfThisCompilation.each {
+				temp.add(it.replaceAll("/", "\\\\"))
+			
+			}
+			notPartOfThisCompilation = temp
 		}
 
 		def schemaBindings = [:]
