@@ -38,15 +38,20 @@ version = 1.0 // TODO: should this match the spec?
 // file from the schemas otherwise XJC will dynically asign ns namespaces
 class PrefixNamespaceBindingsTask extends DefaultTask {
 
-	// ignore these namespaces cuz they are orphans
-	def notPartOfThisCompilation = [
-		"schemas/cybox/external/cpe_2.3/cpe-naming_2.3.xsd",
-		"schemas/cybox/external/cpe_2.3/cpe-language_2.3.xsd",
-		"schemas/cybox/external/oasis_ciq_3.0/xlink-2003-12-31.xsd"
-	]
-
 	// Returns a hashmap Binding objects
 	def get() {
+		// ignore these namespaces cuz they are orphans
+		def notPartOfThisCompilation = [
+			"schemas/cybox/external/cpe_2.3/cpe-naming_2.3.xsd",
+			"schemas/cybox/external/cpe_2.3/cpe-language_2.3.xsd",
+			"schemas/cybox/external/oasis_ciq_3.0/xlink-2003-12-31.xsd"
+		]
+
+		// fix paths for present platform
+		notPartOfThisCompilation.collect {
+			it.replaceAll("/", File.separator)
+		}
+
 		def schemaBindings = [:]
 
 		// Gather up the schemas
@@ -63,7 +68,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 			def schemaLocation = new File("schemas", schema.getAbsolutePath().split("schemas")[1]).toString()
 			
 
-			if (!("schemas" + schemaLocation.split("schemas")[1] in notPartOfThisCompilation)) {
+			if (!notPartOfThisCompilation.contains(schemaLocation)) {
 
 				def document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new FileInputStream(schema))
 
