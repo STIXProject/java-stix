@@ -34,13 +34,15 @@ public String toXML() throws javax.xml.bind.JAXBException, javax.xml.parsers.Par
 		org.w3c.dom.Element root = document.getDocumentElement();
 		root.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:" + getId().getPrefix(), getId().getNamespaceURI());
 	}
-	
+
 	return org.mitre.stix.utility.Utilities.getStringFromDocument(document);
 }
 
-public static org.mitre.stix.stix_1.STIXType fromXML(java.net.URL url) throws javax.xml.bind.JAXBException, java.io.IOException { 
-	System.out.println("Hello from inside .fromXML()!"); 
+public static org.mitre.stix.stix_1.STIXType fromXML(java.io.File file) throws javax.xml.bind.JAXBException, java.io.IOException { 
+	return fromXML(file.toURI().toURL());
+}
 
+public static org.mitre.stix.stix_1.STIXType fromXML(java.net.URL url) throws javax.xml.bind.JAXBException, java.io.IOException { 
 	javax.xml.bind.JAXBContext jaxbContext = javax.xml.bind.JAXBContext
 			.newInstance("org.mitre.stix.stix_1");
 
@@ -50,9 +52,9 @@ public static org.mitre.stix.stix_1.STIXType fromXML(java.net.URL url) throws ja
 
 	javax.xml.bind.JAXBElement<org.mitre.stix.stix_1.STIXType> element = unmarshaller.unmarshal(
 			new javax.xml.transform.stream.StreamSource(inputStream), org.mitre.stix.stix_1.STIXType.class);
-			
+
 	inputStream.close();
-	
+
 	return element.getValue();
 }
 ]]>
