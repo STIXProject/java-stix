@@ -221,7 +221,7 @@ task generate << {
 	ant.mkdir(dir: 'src/generated/java')
 
 	ant.xjc(destdir: 'src/generated/java', extension: true, classpath: configurations.xjc.asPath) {
-		arg(line: '-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix')
+		arg(line: '-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code')
 		binding(dir: 'src/main/resources', includes: '*.xjb')
 		schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_core.xsd')
 		schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_common.xsd')
