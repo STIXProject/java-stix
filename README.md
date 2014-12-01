@@ -108,4 +108,4 @@ up the Ecipse environment:
 	gradle clean cleanEclipse eclipse
 
 Then right-click on the Eclipse project and select "Refresh" to bring in the
-dependencies, and JAXB Doucment Model.
+dependencies, and JAXB Document Model.

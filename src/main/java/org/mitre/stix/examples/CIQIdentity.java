@@ -4,6 +4,7 @@
  */
 package org.mitre.stix.examples;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -55,6 +56,8 @@ import org.mitre.stix.stix_1.STIXType;
  */
 public class CIQIdentity {
 
+	private static IndicatorType i;
+
 	public CIQIdentity() {
 	}
 
@@ -71,7 +74,8 @@ public class CIQIdentity {
 
 		// Get time for now.
 		XMLGregorianCalendar now = DatatypeFactory.newInstance()
-				.newXMLGregorianCalendar(new GregorianCalendar(TimeZone.getTimeZone("UTC")));
+				.newXMLGregorianCalendar(
+						new GregorianCalendar(TimeZone.getTimeZone("UTC")));
 
 		ContactNumbers contactNumbers = new ContactNumbers()
 				.withContactNumber(new ArrayList<ContactNumbers.ContactNumber>() {
@@ -184,11 +188,15 @@ public class CIQIdentity {
 		STIXHeaderType header = new STIXHeaderType()
 				.withDescription(new StructuredTextType("Example", null));
 
-		STIXType stix = new STIXType().withSTIXHeader(header)
-				.withIndicators(indicators).withVersion("1.1.1")
-				.withTimestamp(now).withId(new QName("http://example.com/", "package-" + UUID.randomUUID().toString(), "example"));
+		STIXType stix = new STIXType()
+				.withSTIXHeader(header)
+				.withIndicators(indicators)
+				.withVersion("1.1.1")
+				.withTimestamp(now)
+				.withId(new QName("http://example.com/", "package-"
+						+ UUID.randomUUID().toString(), "example"));
 
-		System.out.println(stix.toXML());
+		System.out.println(stix.toXMLString());
 	}
 
 }

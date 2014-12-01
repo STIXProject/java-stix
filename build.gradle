@@ -1,3 +1,5 @@
+import javax.xml.namespace.QName;
+
 /*
  * Copyright (c) 2014, The MITRE Corporation. All rights reserved.
  * See LICENSE for complete terms.
@@ -21,11 +23,27 @@ import groovy.io.FileType
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
 
+import java.io.ByteArrayInputStream;
 import java.io.File
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat
 import java.util.Date
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.stream.StreamSource;
+
+import org.w3c.dom.Document;
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -34,12 +52,166 @@ defaultTasks 'jar'
 
 version = 1.0 // TODO: should this match the spec?
 
+// Add methods to generated document object model. Creating an XJC plug would
+// take too long, and adding them via bindings file is too brittle so gradle
+// to the rescue
+class AddMethodsToDOMTask extends DefaultTask {
+
+	@TaskAction
+	def modify() {
+		
+		
+		//TODO: http://groovy.codehaus.org/Tutorial+5+-+Capturing+regex+groups
+		
+		def injectCode = [
+			/(.*)/: """\
+    /**
+     * Returns XML String for JAXB Document Object Model object.
+     * 
+     * @param obj
+     * @return the XML String for the JAXB object
+     * @throws JAXBException
+     * @throws ParserConfigurationException
+     */
+    public String toXMLString() throws javax.xml.bind.JAXBException,
+            javax.xml.parsers.ParserConfigurationException {
+        org.w3c.dom.Document document = javax.xml.parsers.DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder().newDocument();
+
+        javax.xml.bind.JAXBContext jaxbContext = javax.xml.bind.JAXBContext.newInstance(this.getClass()
+                .getPackage().getName());
+
+        javax.xml.bind.Marshaller marshaller = jaxbContext.createMarshaller();
+
+        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_ENCODING, "UTF-8");
+
+        try {
+            marshaller.marshal(this, document);
+        } catch (javax.xml.bind.JAXBException e) {
+            // otherwise handle non-XMLRootElements
+            javax.xml.namespace.QName qualifiedName = new javax.xml.namespace.QName(org.mitre.stix.util.Utilities.getnamespaceURI(this), this
+                    .getClass().getSimpleName());
+
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            javax.xml.bind.JAXBElement root = new javax.xml.bind.JAXBElement(qualifiedName, this.getClass(),
+                    this);
+
+            marshaller.marshal(root, document);
+        }
+
+        org.mitre.stix.util.Utilities.removeUnusedNamespaces(document);
+
+        document = org.mitre.stix.util.Utilities.addSchemaLocations(document);
+
+        return org.mitre.stix.util.Utilities.getXMLString(document);
+    }
+
+    /**
+     * Creates JAXB Document Object Model for XML text string
+     * 
+     * @param text XML string for the document
+     * @return JAXB object
+     * @throws JAXBException
+     * @throws IOException
+     */
+    public static java.lang.Object fromXMLString(String text)
+            throws javax.xml.bind.JAXBException, java.io.IOException {
+
+        javax.xml.bind.JAXBContext jaxbContext;
+        java.io.InputStream inputStream = null;
+
+        @SuppressWarnings("rawtypes")
+        javax.xml.bind.JAXBElement root = null;
+
+        jaxbContext = javax.xml.bind.JAXBContext.newInstance(\${pkg}.\${name}.class
+                .getPackage().getName());
+
+        javax.xml.bind.Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+
+        inputStream = new java.io.ByteArrayInputStream(text.getBytes());
+
+        root = unmarshaller.unmarshal(new javax.xml.transform.stream.StreamSource(inputStream),
+                \${pkg}.\${name}.class);
+
+        inputStream.close();
+
+        return root.getValue();
+    }
+
+""",
+			/(org.mitre.stix.stix_1.STIXType) |
+		 (org.mitre.stix.indicator_2.IndicatorType) |
+		 (org.mitre.stix.incident_1.IncidentType) |
+		 (org.mitre.stix.ttp_1.TTPType) |
+		 (org.mitre.stix.threatactor_1.ThreatActorType) |
+		 (org.mitre.stix.campaign_1.CampaignType) |
+		 (org.mitre.stix.exploittarget_1.ExploitTargetType) |
+		 (org.mitre.stix.courseofaction_1.CourseOfActionType) |
+		 (org.mitre.cybox.cybox_2.ObservableType) |
+		 (org.mitre.cybox.cybox_2.ObjectType) |
+		 (org.mitre.cybox.objects.TaskActionTypeType) |
+		 (org.mitre.cybox.cybox_2.EventType)/:"""\
+    public void stixId(String nsPrefix, String constructType, String guid) {
+        org.mitre.stix.utility.Utilities.stixId(String nsPrefix, String constructType, String guid, this);
+    }
+
+"""
+		]
+
+		def dom = []
+
+		new File('src/generated/java').eachFileRecurse(FileType.FILES) { file ->
+			if (file.name.endsWith('Type.java') && !file.name.endsWith('EnumType.java')) {
+
+				def obj = new LinkedHashMap();
+				obj.uri = file.toURI()
+				obj.name = file.getName().split(/\./)[0]
+				obj.package = file.getParent().toURI().toString().split(/src\/generated\/java\//)[1].replace(/\//, ".").split(/\\//)[0]
+
+				dom << obj
+			}
+		}
+
+		def classDeclarationPattern = Pattern.compile("(public)( )(class)( )([a-zA-Z]+)( )(.*)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+		
+		dom.each() { obj ->
+
+			injectCode.each { regex, codeTemplate ->
+
+				if ( obj.package + '.' + obj.name ==~ regex) {
+
+					def lines = new File(obj.uri).readLines()
+
+					lines.remove(lines.lastIndexOf('}'))
+
+					codeTemplate.eachLine { line ->
+						lines << line.replaceAll(/(\$\{pkg\})/, obj.package).replaceAll(/(\$\{name\})/, obj.name)
+					}
+
+					lines.add("}")
+
+					new File( obj.uri ).with { outFile ->
+						outFile.setWritable(true)
+						outFile.withWriter{ out ->
+							lines.each { line -> out.println line }
+						}
+						outFile.setWritable(false)
+					}
+				}
+			}
+		}
+	}
+}
+
 // Dynamically creates the src/main/resources/namespace-prefix.xjb
-// file from the schemas otherwise XJC will dynically asign ns namespaces
+// file from the schemas otherwise XJC will dynamically assign ns namespaces
 class PrefixNamespaceBindingsTask extends DefaultTask {
 
 	// Returns a hashmap Binding objects
 	def get() {
+
 		// ignore these namespaces cuz they are orphans
 		def notPartOfThisCompilation = [
 			"schemas/cybox/external/cpe_2.3/cpe-naming_2.3.xsd",
@@ -53,7 +225,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 			def temp = []
 			notPartOfThisCompilation.each {
 				temp.add(it.replaceAll("/", "\\\\"))
-			
+
 			}
 			notPartOfThisCompilation = temp
 		}
@@ -72,7 +244,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 		schemas.each {schema ->
 
 			def schemaLocation = new File("schemas", schema.getAbsolutePath().split("schemas")[1]).toString()
-			
+
 
 			if (!notPartOfThisCompilation.contains(schemaLocation)) {
 
@@ -89,7 +261,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 
 					if (attribute.getNodeName().startsWith("xmlns:") && attribute.getNodeValue().equals(targetNamespace)) {
 
-						binding = new Binding()
+						binding = new LinkedHashMap()
 						binding.prefix = attributes.item(i).getNodeName().split(":")[1]
 						binding.namespace = attributes.item(i).getNodeValue()
 						binding.schemaLocation = schemaLocation
@@ -107,10 +279,10 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 		// The crawl would map the 'tns' prefix to both of these... fix that.
 		schemaBindings.put("schemas/external/open_ioc_2010/ioc-TR.xsd", new Binding(prefix: "ioc-tr", namespace: "urn:oasis:names:tc:ciq:xnl:3", schemaLocation: "schemas/external/open_ioc_2010/ioc-TR.xsd"));
 		schemaBindings.put("schemas/external/open_ioc_2010/ioc.xsd", new Binding(prefix: "ioc", namespace: "urn:oasis:names:tc:ciq:xnl:3", schemaLocation: "schemas/external/open_ioc_2010/ioc.xsd"));
-	
-//		schemaBindings.each{ k, v ->
-//			println "${k} : ${v.namespace}, ${v.prefix}"
-//		}
+
+		//		schemaBindings.each{ k, v ->
+		//			println "${k} : ${v.namespace}, ${v.prefix}"
+		//		}
 
 		schemaBindings
 	}
@@ -187,6 +359,11 @@ dependencies {
 	// embedded element is included as a constructor parameter.
 	xjc 'org.jvnet.jaxb2_commons:jaxb2-value-constructor:3.0'
 
+	// Causes JAXB RI 2.2 XJC to automatically generate methods for toString(),
+	// equals() and hashCode() using jakarta-commons-lang. The code that uses
+	// this plugin can still run with any JAXB2 implementation.
+	//xjc 'org.jvnet.jaxb2_commons:jaxb2-commons-lang:2.4'
+
 	// This plugin uses the XML schema "element" tag's "default" attribute to
 	// set default values for variables in the classes generated by JAXB
 	xjc 'org.jvnet.jaxb2_commons:jaxb2-default-value:1.1'
@@ -209,19 +386,22 @@ dependencies {
 // off of the schemas
 task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask)
 
+// Crawl generated document object model adding methods (e.g., toXML, fromXML)
+task addMethodsToDOM(type: AddMethodsToDOMTask)
+
 // Clean out the generated folder
 task cleanGenerate << {
 	ant.delete(dir: 'src/generated/java')
 }
 
 // Generate the JAXB Document Model
-task generate << {
+task generateJAXB << {
 	ant.taskdef(name: 'xjc', classname: 'org.jvnet.jaxb2_commons.xjc.XJC2Task', classpath: configurations.xjc.asPath)
 
 	ant.mkdir(dir: 'src/generated/java')
 
 	ant.xjc(destdir: 'src/generated/java', extension: true, classpath: configurations.xjc.asPath) {
-		arg(line: '-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code')
+		arg(line: '-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code -XtoString')
 		binding(dir: 'src/main/resources', includes: '*.xjb')
 		schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_core.xsd')
 		schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_common.xsd')
@@ -236,6 +416,9 @@ task generate << {
 	}
 }
 
-generate.dependsOn cleanGenerate
 
-compileJava.dependsOn createPrefixNamespaceBindings, generate
+generateJAXB.dependsOn cleanGenerate
+
+addMethodsToDOM.dependsOn generateJAXB
+
+compileJava.dependsOn createPrefixNamespaceBindings, addMethodsToDOM
