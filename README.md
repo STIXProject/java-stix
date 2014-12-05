@@ -29,15 +29,19 @@ roadmap.  Releases will be announced on the [STIX discussion list](http://stix.m
 git clone https://github.com/nemonik/java_stix.git
 
 A `git clone` command will not retrieve schemas project
-automatically.  You'll need to perform retrieve them separately.
+automatically.  The gradle script will attempt to retreive the 
+schemas for you, but if it cannot you many need to retrieve 
+them yourself.
 
 ## Retrieve the schemas
 
+Follow these step for retrieving the schemas if the gradle fails
+to do so on execution of the gradle build command.
+
 ### The STIX schemas
 
-First clone the project, then enter the project and run these 
-additonal git commands on the command line to retrieve the STIX
-schemas.
+Enter the project and run these  additonal git commands on
+the command line to retrieve the STIX schemas.
 
     git submodule init
     git submodule update
@@ -101,22 +105,25 @@ Change directories into the project and enter on the command-line:
 
 Success will look like this:
 
-	➜  java_stix git:(master) ✗ gradle
-	:createPrefixNamespaceBindings
-	:cleanGenerate
-	:generateJAXB
-	:generatedSourceTransformation
-	:compileJava
-	Note: Some input files use unchecked or unsafe operations.
-	Note: Recompile with -Xlint:unchecked for details.
-	:processResources UP-TO-DATE
-	:classes
-	:jar
-	
-	BUILD SUCCESSFUL
-	
-	Total time: 40.819 secs
+    ➜  java_stix git:(master) ✗ gradle
+    :createPrefixNamespaceBindings
+    :cleanGenerate
+    :retrieveSchemas
+    Retrieving STIX schemas...
+    Submodule path 'src/main/resources/schemas': checked out 'fd6ce20a62e52a7ddeb5ab0fb0e5b760778c443e'
+    Retrieving CybOX schemas...
+    Submodule 'cybox' (https://github.com/CybOXProject/schemas.git) registered for path 'cybox'
+    Submodule path 'cybox': checked out '97beb32c376a9223e91b52cb3e4c8d2af6baf786'
     
+    :generateJAXB
+    :generatedSourceTransformation
+    :compileJava
+    Note: Some input files use unchecked or unsafe operations.
+    Note: Recompile with -Xlint:unchecked for details.
+    :processResources
+    :classes
+    :jar
+
 If the build goes well you will find the JAXB Document Model in jar
 at
 

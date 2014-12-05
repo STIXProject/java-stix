@@ -1,4 +1,4 @@
-import javax.xml.namespace.QName;
+
 
 /*
  * Copyright (c) 2014, The MITRE Corporation. All rights reserved.
@@ -62,15 +62,84 @@ import org.eclipse.jface.text.Document
 import org.eclipse.text.edits.TextEdit
 import org.w3c.dom.Document
 
+import org.apache.tools.ant.taskdefs.condition.Os
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
 defaultTasks 'jar'
 
-version = 1.0 // TODO: should this match the spec?
+version = 0.1 
 
+// Will attempt to automatically retrieve the schemeas
+class RetrieveSchemasTask extends DefaultTask {
 
+	def isRetrievable() {
+		def command = """git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"""
+		def proc = command.execute()
+		proc.waitFor()
+		proc.exitValue() == 0
+	}
+
+	def pull() {
+		def command = null
+
+		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			command = """retrieve_schemas.bat"""
+		} else {
+			command = """sh ./retrieve_schemas.sh"""
+		}
+
+		def proc = command.execute()
+		proc.waitFor()
+
+		println "${proc.in.text}"
+	}
+
+	@TaskAction
+	def retrieve() {
+		def command = null
+
+		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			command = """dir src\\main\\resources\\schemas"""
+		} else {
+			command = """ls src/main/resources/schemas"""
+		}
+		
+		def proc = command.execute()
+		proc.waitFor() 
+
+		def needSchemas = true
+		
+		if (!proc.in.text.equals("")) {
+			
+			if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+				command = """dir src\\main\\resources\\schemas\\cybox"""
+			} else {
+				command = """ls src/main/resources/schemas/cybox"""
+			}
+			
+			proc = command.execute()
+			proc.waitFor()
+			
+			if (!proc.in.text.equals("")) {
+				needSchemas = false
+			}
+		}
+
+		if (needSchemas) {
+			if (isRetrievable()) {
+				pull()
+			} else {
+				throw new GradleException("Build error occurred: You will need retrieve schemas by hand. See README.md file.");
+			}
+		} else {
+			println "  - Schemas are present. Retrieval is not needed."
+		}
+	}
+}
+
+	
 // Analyze and transform the generated document object model source. Creating 
 // an XJC plug would take too long and introduce the compilation of an external
 // project as a dependency, and adding them via bindings file is too brittle. So,
@@ -542,6 +611,9 @@ task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask)
 // purpose of tranformations (e.g., adding methods)
 task generatedSourceTransformation(type: GeneratedSourceTransformationTask)
 
+// Automatically attempt to retrieve the schemas
+task retrieveSchemas(type: RetrieveSchemasTask)
+
 // Clean out the generated folder
 task cleanGenerate << {
 	ant.delete(dir: 'src/generated/java')
@@ -569,7 +641,8 @@ task generateJAXB << {
 	}
 }
 
-generateJAXB.dependsOn cleanGenerate
+
+generateJAXB.dependsOn cleanGenerate, retrieveSchemas
 
 generatedSourceTransformation.dependsOn generateJAXB
 

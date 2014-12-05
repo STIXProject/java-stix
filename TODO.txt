@@ -1,0 +1,10 @@
+ROADMAP
+=========
+0.1
+- Test and comlete Gradle buildscript's retrieval of the schemas when on Windows.
+- Verify Gradle buildscript's operation on windows
+- Complete any boiler plate (e.g., toXMLString, formXMLString) by add/replace/modify 
+	methods on jaxb2 document objectm model.
+- Complete java equivalents of the python examples.
+- Unit tests?
+- See code for various //TODO: for more.
