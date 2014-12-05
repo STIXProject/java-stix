@@ -89,13 +89,13 @@ needed.
 
     apt-cyg install gradle
     
-Otherwise, to install the Gradle command-line head over to the
-[gradle.org](http://www.gradle.org), and follow their instructions
-for installing. 
+Otherwise, to install the Gradle command-line binaries from
+[gradle.org](http://www.gradle.org) following their instructions.
 
 If you're using the Eclipse IDE consider installing the latest
-[Gradle IDE Pack](http://marketplace.eclipse.org/content/gradle-ide-pack) or use [Nodeclipse/Enide Gradle for Eclipse](http://www.nodeclipse.org/projects/gradle/). Gradle Eclipse integration is
+[Gradle IDE Pack](http://marketplace.eclipse.org/content/gradle-ide-pack) or use [Nodeclipse/Enide Gradle for Eclipse](http://marketplace.eclipse.org/content/gradle). Gradle Eclipse integration is
 somewhat emergent.  I'd advise using the Gradle command-line.
+The plugins have varying degrees of usefulness.
 
 ### Building via Gradle buildscript
 
@@ -164,11 +164,13 @@ CybOX schemas.
  
 ## Importing the project into the Eclipse IDE
 
-After running the Gradle buildscript, iI you are using a Eclipse IDE
-and the Gradle Plugin you will want to run the following from the
-command-line to set up the Ecipse environment:
+After running the Gradle buildscript, if you are using the Eclipse IDE
+you will want to run the following from the command-line to set up the
+Ecipse environment:
 
 	gradle clean cleanEclipse eclipse
 
 Then right-click on the Eclipse project and select "Refresh" to bring
-in the dependencies, and JAXB Document Model.
+in the dependencies and source of JAXB Document Model. By default the 
+generated source files are not editable to remmind you that changes to
+these files is usually a bad idea.
