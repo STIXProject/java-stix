@@ -71,7 +71,7 @@ defaultTasks 'jar'
 
 version = 0.1 
 
-// Will attempt to automatically retrieve the schemeas
+// Will attempt to automatically retrieve the schemas
 class RetrieveSchemasTask extends DefaultTask {
 
 	def isRetrievable() {
@@ -85,6 +85,7 @@ class RetrieveSchemasTask extends DefaultTask {
 		def command = null
 
 		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			//TODO: not tested
 			command = """retrieve_schemas.bat"""
 		} else {
 			command = """sh ./retrieve_schemas.sh"""
@@ -101,6 +102,7 @@ class RetrieveSchemasTask extends DefaultTask {
 		def command = null
 
 		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			//TODO: not tested
 			command = """dir src\\main\\resources\\schemas"""
 		} else {
 			command = """ls src/main/resources/schemas"""
@@ -114,6 +116,7 @@ class RetrieveSchemasTask extends DefaultTask {
 		if (!proc.in.text.equals("")) {
 			
 			if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+				//TODO: not tested
 				command = """dir src\\main\\resources\\schemas\\cybox"""
 			} else {
 				command = """ls src/main/resources/schemas/cybox"""
@@ -134,12 +137,11 @@ class RetrieveSchemasTask extends DefaultTask {
 				throw new GradleException("Build error occurred: You will need retrieve schemas by hand. See README.md file.");
 			}
 		} else {
-			println "  - Schemas are present. Retrieval is not needed."
+			println "Schemas are present. Retrieval is not needed."
 		}
 	}
 }
 
-	
 // Analyze and transform the generated document object model source. Creating 
 // an XJC plug would take too long and introduce the compilation of an external
 // project as a dependency, and adding them via bindings file is too brittle. So,

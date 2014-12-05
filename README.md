@@ -13,7 +13,7 @@ For more information, see [http://stix.mitre.org/](http://stix.mitre.org/).
 A primary goal of java-stix is to remain faithful to both the STIX
 specifications and to customary Java practices. java-stix is designed
 to be intuitive both to Java developers and JAXB XML developers, but
-it is not a one-for-one replacement for [python-stix](https://github.com/STIXProject/python-stix) API.
+it is not a one-for-one replacement for the [python-stix](https://github.com/STIXProject/python-stix) API.
 
 ## Versioning
 
@@ -29,14 +29,14 @@ roadmap.  Releases will be announced on the [STIX discussion list](http://stix.m
 git clone https://github.com/nemonik/java_stix.git
 
 A `git clone` command will not retrieve schemas project
-automatically.  The gradle script will attempt to retreive the 
-schemas for you, but if it cannot you many need to retrieve 
-them yourself.
+automatically.  The Gradle buildscript will attempt to
+retreive the schemas for you, but if it cannot you many
+need to retrieve them yourself.
 
 ## Retrieve the schemas
 
 Follow these step for retrieving the schemas if the gradle fails
-to do so on execution of the gradle build command.
+to do so on execution of the Gradle build command.
 
 ### The STIX schemas
 
