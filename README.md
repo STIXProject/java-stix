@@ -1,21 +1,43 @@
-# JAVA STIX 
+# java-stix 
 
-The JAXB2 Document Model for Structured Threat Information eXpression
-(STIX), a standardized language used to represent structured cyber threat
-information.
+A Java library for generating the JAXB2 Document Model for Structured 
+Threat Information eXpression (STIX), a standardized language used to
+represent structured cyber threat information.
 
-## Cloning the repository
+This effort is being developed under the official [STIXProject](http://stixproject.github.io/).
+
+For more information, see [http://stix.mitre.org/](http://stix.mitre.org/).
+
+## Overview
+
+A primary goal of java-stix is to remain faithful to both the STIX
+specifications and to customary Java practices. java-stix is designed
+to be intuitive both to Java developers and JAXB XML developers, but
+it is not a one-for-one replacement for [python-stix](https://github.com/STIXProject/python-stix) API.
+
+## Versioning
+
+Releases of java-stix will comply with the Semantic Versioning
+specification at [http://semver.org/](http://semver.org/). Java-stix
+is currently under active development; see TODO.txt for a tentative
+roadmap.  Releases will be announced on the [STIX discussion list](http://stix.mitre.org/community/registration.html).
+
+# Building
+
+## Clone the repository
 
 git clone https://github.com/nemonik/java_stix.git
 
-## Retrieving the schemas
+A `git clone` command will not retrieve schemas project
+automatically.  You'll need to perform retrieve them separately.
 
-A `git clone` command will not retrieve schemas project automatically.
+## Retrieve the schemas
 
 ### The STIX schemas
 
-First clone the project, then enter the project and run these additonal git
-commands on the command line to retrieve the STIX schemas.
+First clone the project, then enter the project and run these 
+additonal git commands on the command line to retrieve the STIX
+schemas.
 
     git submodule init
     git submodule update
@@ -32,37 +54,71 @@ In the project:
 
 ### Schema updates
 
-Any time you see that the schemas project has been modified (when merging or
-pulling updates) you will need to run
+Any time you see that the schemas project has been modified (when
+merging or pulling updates) you will need to run
 
     git submodule update
 
 again to update the schemas themselves, and then recreate the JAXB
 document model.
 
-## Create the JAXB2 Document Model
+## Creating the JAXB2 Document Model
+
+### You need Gradle installed
+
+This project uses a gradle buildscript.  You will need to install
+gradle.
+
+I use typially use the gradle command line interface and this can be
+installed a number of ways.  
+ 
+If you're using OS X and using brew simply install gradle via
+
+    brew install gradle
+
+If you are using Cygwin on Windows you might wanna try apt-cyg
+
+[https://code.google.com/p/apt-cyg/](https://code.google.com/p/apt-cyg/)
+
+It gives you that apt like package manager interface Cygwin always
+needed.
+
+    apt-cyg install gradle
+    
+Otherwise, to install the Gradle command-line head over to the
+[gradle.org](http://www.gradle.org), and follow their instructions
+for installing. 
+
+If you're using the Eclipse IDE consider installing the latest
+[Gradle IDE Pack](http://marketplace.eclipse.org/content/gradle-ide-pack) or use [Nodeclipse/Enide Gradle for Eclipse](http://www.nodeclipse.org/projects/gradle/). Gradle Eclipse integration is
+somewhat emergent.  I'd advise using the Gradle command-line.
+
+### Building via Gradle buildscript
 
 Change directories into the project and enter on the command-line:
 
     gradle
-    
+
 Success will look like this:
 
+	➜  java_stix git:(master) ✗ gradle
 	:createPrefixNamespaceBindings
 	:cleanGenerate
-	:generate
+	:generateJAXB
+	:generatedSourceTransformation
 	:compileJava
 	Note: Some input files use unchecked or unsafe operations.
 	Note: Recompile with -Xlint:unchecked for details.
-	:processResources
+	:processResources UP-TO-DATE
 	:classes
 	:jar
-
+	
 	BUILD SUCCESSFUL
 	
-	Total time: 22.929 secs
+	Total time: 40.819 secs
     
-If the build goes well you will find the JAXB Document Model in jar at
+If the build goes well you will find the JAXB Document Model in jar
+at
 
 	buil/libs/java-stix-${version}.jar
 
@@ -84,7 +140,7 @@ If while building you get this error:
 
  You likely didn't retrieve the schema decribed in the section above.
 
-If you get this error while building:
+Or if you get this error while building:
 
     [ant:xjc] [ERROR] src-resolve: Cannot resolve the name 'cyboxCommon:ToolInformationType' to a(n) 'type definition' component.
     [ant:xjc]   line 907 of file:/Users/walsh/Development/workspace/STIXProject/java_stix/src/main/resources/schemas/stix_common.xsd
@@ -96,16 +152,16 @@ If you get this error while building:
     [ant:xjc]   line 149 of file:/Users/walsh/Development/workspace/STIXProject/java_stix/src/main/resources/schemas/external/maec_4.1/maec_package_schema.xsd
     -- snip --
 
- then you likely missed the step above where you must retrieved the CybOX 
- schemas.
+then you likely missed the step above where you must retrieved the
+CybOX schemas.
  
 ## Importing the project into the Eclipse IDE
 
-After running the Gradle buildscript, iI you are using a Eclipse IDE and the
-Gradle Plugin you will want to run the following from the command-line to set
-up the Ecipse environment:
+After running the Gradle buildscript, iI you are using a Eclipse IDE
+and the Gradle Plugin you will want to run the following from the
+command-line to set up the Ecipse environment:
 
 	gradle clean cleanEclipse eclipse
 
-Then right-click on the Eclipse project and select "Refresh" to bring in the
-dependencies, and JAXB Document Model.
+Then right-click on the Eclipse project and select "Refresh" to bring
+in the dependencies, and JAXB Document Model.

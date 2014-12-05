@@ -71,9 +71,9 @@ defaultTasks 'jar'
 version = 1.0 // TODO: should this match the spec?
 
 
-// Analyze and transform the generated document object model. Creating an XJC
-// plug would take too long and introduce the compilation of an external project
-// as a dependency, and adding them via bindings file is too brittle.  So,
+// Analyze and transform the generated document object model source. Creating 
+// an XJC plug would take too long and introduce the compilation of an external
+// project as a dependency, and adding them via bindings file is too brittle. So,
 // gradle to the rescue.
 class GeneratedSourceTransformationTask extends DefaultTask {
 
@@ -568,7 +568,6 @@ task generateJAXB << {
 		//schema(dir: 'src/main/resources/schemas', includes: '**/*.xsd')
 	}
 }
-
 
 generateJAXB.dependsOn cleanGenerate
 
