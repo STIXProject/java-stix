@@ -1,8 +1,9 @@
 # java-stix 
 
-A Java library for generating the JAXB2 Document Model for Structured 
-Threat Information eXpression (STIX), a standardized language used to
-represent structured cyber threat information.
+The JAXB generated Java bindings for STIX with additional convenience
+methods.  STIX is the Structured Threat Information eXpression (STIX),
+a standardized language used to represent structured cyber threat
+information.
 
 This effort is being developed under the official [STIXProject](http://stixproject.github.io/).
 
