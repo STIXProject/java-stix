@@ -19,8 +19,8 @@
  * 	build/libs/java-stix-${version}.jar
  */
 
-import groovy.text.SimpleTemplateEngine
 import groovy.io.FileType
+import groovy.text.SimpleTemplateEngine
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
 
@@ -64,6 +64,7 @@ import org.w3c.dom.Document
 
 import org.apache.tools.ant.taskdefs.condition.Os
 
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
@@ -99,6 +100,7 @@ class RetrieveSchemasTask extends DefaultTask {
 
 	@TaskAction
 	def retrieve() {
+		
 		def command = null
 
 		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
@@ -344,7 +346,10 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 			}
 		}
 
+		def engine = new SimpleTemplateEngine()
+		
 		dom.each() { obj ->
+			def templateBindings = ["pkg":obj.package, "name":obj.name]
 
 			addMethods.each { regex, methodDeclarations ->
 
@@ -353,11 +358,8 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 					def source = new File(obj.uri).readLines().iterator().join(lineSeperator)
 
 					methodDeclarations.each { methodDeclaration ->
-						def methodSource = ""
-
-						methodDeclaration.eachLine { line ->
-							methodSource += line.replaceAll(/(\$\{pkg\})/, obj.package).replaceAll(/(\$\{name\})/, obj.name) + lineSeperator
-						}
+						def template = engine.createTemplate(methodDeclaration).make(templateBindings)
+						def methodSource = template.toString()
 
 						try {
 							source = addMethodToClass(source, methodSource)
