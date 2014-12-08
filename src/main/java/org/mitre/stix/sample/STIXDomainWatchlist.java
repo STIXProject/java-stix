@@ -32,7 +32,7 @@ public class STIXDomainWatchlist {
 						"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml")
 						.openStream(), "UTF-8").useDelimiter("\\A").next();
 
-		STIXType stix = (STIXType) STIXType.fromXMLString(text);
+		STIXType stix = STIXType.fromXMLString(text);
 
 		System.out.println(stix.toXMLString());
 	}

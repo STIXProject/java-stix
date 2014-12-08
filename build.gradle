@@ -4,7 +4,7 @@
  * Copyright (c) 2014, The MITRE Corporation. All rights reserved.
  * See LICENSE for complete terms.
  *
- * Java-STIX Build file
+ * Java-STIX Gradle Buildscript
  *
  * nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
  *
@@ -146,8 +146,8 @@ class RetrieveSchemasTask extends DefaultTask {
 
 // Analyze and transform the generated document object model source. Creating 
 // an XJC plug would take too long and introduce the compilation of an external
-// project as a dependency, and adding them via bindings file is too brittle. So,
-// gradle to the rescue.
+// project as a dependency, and adding them via bindings file is too brittle.
+// So, gradle to the rescue.
 class GeneratedSourceTransformationTask extends DefaultTask {
 
 	def lineSeperator = System.getProperty("line.separator")
@@ -275,7 +275,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
      * @throws JAXBException
      * @throws IOException
      */
-    public static java.lang.Object fromXMLString(String text)
+    public static \${name} fromXMLString(String text)
             throws javax.xml.bind.JAXBException, java.io.IOException {
 
         javax.xml.bind.JAXBContext jaxbContext;
@@ -284,7 +284,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
         @SuppressWarnings("rawtypes")
         javax.xml.bind.JAXBElement root = null;
 
-        jaxbContext = javax.xml.bind.JAXBContext.newInstance(\${pkg}.\${name}.class
+        jaxbContext = javax.xml.bind.JAXBContext.newInstance(\${name}.class
                 .getPackage().getName());
 
         javax.xml.bind.Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
@@ -292,11 +292,11 @@ class GeneratedSourceTransformationTask extends DefaultTask {
         inputStream = new java.io.ByteArrayInputStream(text.getBytes());
 
         root = unmarshaller.unmarshal(new javax.xml.transform.stream.StreamSource(inputStream),
-                \${pkg}.\${name}.class);
+                \${name}.class);
 
         inputStream.close();
 
-        return root.getValue();
+        return (\${name}) root.getValue();
     }
 """
 			]]
@@ -535,7 +535,7 @@ configurations { xjc }
 dependencies {
 	xjc 'com.sun.xml.bind:jaxb-xjc:2.2.5-2'
 	xjc 'com.sun.xml.bind:jaxb-impl:2.2.5-2'
-	xjc 'javax.xml.bind:jaxb-api:2.1'
+	xjc 'javax.xml.bind:jaxb-api:2.2.+'
 
 	// JAXB2 Basics provides a package of plugins which can generate such
 	// utility code
@@ -565,7 +565,7 @@ dependencies {
 	// with XML namespace URIs.
 	xjc 'org.jvnet.jaxb2_commons:jaxb2-namespace-prefix:1.1'
 
-	compile 'javax.xml.bind:jaxb-api:2.1'
+	compile 'javax.xml.bind:jaxb-api:2.2.+'
 	compile 'org.jvnet.jaxb2_commons:jaxb2-basics-runtime:0.6.5'
 	compile 'org.apache.httpcomponents:httpclient:4.3.5'
 	compile 'org.apache.httpcomponents:httpclient-cache:4.3.5'
