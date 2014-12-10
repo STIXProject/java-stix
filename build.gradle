@@ -89,7 +89,7 @@ class RetrieveSchemasTask extends DefaultTask {
 
 		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 			//TODO: not tested
-			command = """retrieve_schemas.bat"""
+			command = """cmd /c start retrieve_schemas.bat"""
 		} else {
 			command = """sh ./retrieve_schemas.sh"""
 		}
