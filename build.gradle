@@ -423,7 +423,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 				def obj = new LinkedHashMap();
 				obj.uri = file.toURI()
 				obj.name = file.getName().split(/\./)[0]
-				obj.package = file.getParent().split(File.separator)[3..-1].join('.')
+				obj.package = file.getParent().split(Pattern.quote(System.getProperty("file.separator")))[3..-1].join('.')
 
 				dom << obj
 			}
