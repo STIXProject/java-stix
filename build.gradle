@@ -29,6 +29,7 @@ import java.io.File
 import java.nio.file.FileSystems
 import java.io.InputStream
 import java.text.SimpleDateFormat
+import java.util.ArrayList;
 import java.util.Date
 import java.util.Hashtable;
 import java.util.List
@@ -53,6 +54,7 @@ import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTNode
 import org.eclipse.jdt.core.dom.ASTParser
 import org.eclipse.jdt.core.dom.CompilationUnit
+import org.eclipse.jdt.core.dom.ImportDeclaration
 import org.eclipse.jdt.core.dom.TypeDeclaration
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite
@@ -60,8 +62,8 @@ import org.eclipse.jdt.core.formatter.CodeFormatter
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
 import org.eclipse.jface.text.Document
 import org.eclipse.text.edits.TextEdit
-import org.w3c.dom.Document
 
+import org.w3c.dom.Document
 import org.apache.tools.ant.taskdefs.condition.Os
 
 
@@ -70,7 +72,7 @@ apply plugin: 'eclipse'
 
 defaultTasks 'jar'
 
-version = 0.1 
+version = 0.1
 
 // Will attempt to automatically retrieve the schemas
 class RetrieveSchemasTask extends DefaultTask {
@@ -100,7 +102,7 @@ class RetrieveSchemasTask extends DefaultTask {
 
 	@TaskAction
 	def retrieve() {
-		
+
 		def command = null
 
 		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
@@ -109,24 +111,24 @@ class RetrieveSchemasTask extends DefaultTask {
 		} else {
 			command = """ls src/main/resources/schemas"""
 		}
-		
+
 		def proc = command.execute()
-		proc.waitFor() 
+		proc.waitFor()
 
 		def needSchemas = true
-		
+
 		if (!proc.in.text.equals("")) {
-			
+
 			if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 				//TODO: not tested
 				command = """dir src\\main\\resources\\schemas\\cybox"""
 			} else {
 				command = """ls src/main/resources/schemas/cybox"""
 			}
-			
+
 			proc = command.execute()
 			proc.waitFor()
-			
+
 			if (!proc.in.text.equals("")) {
 				needSchemas = false
 			}
@@ -144,7 +146,7 @@ class RetrieveSchemasTask extends DefaultTask {
 	}
 }
 
-// Analyze and transform the generated document object model source. Creating 
+// Analyze and transform the generated document object model source. Creating
 // an XJC plug would take too long and introduce the compilation of an external
 // project as a dependency, and adding them via bindings file is too brittle.
 // So, gradle to the rescue.
@@ -182,9 +184,9 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		document.get()
 	}
 
-	// Add a methodSrc to classSrc
-	def addMethodToClass(String classSrc, String methodSrc) {
-		def document = new org.eclipse.jface.text.Document(classSrc)
+	// Add a imports to source and organizes them
+	def addImportsToSrc(source, importsToAdd) {
+		def document = new org.eclipse.jface.text.Document(source)
 
 		def parser = ASTParser.newParser(AST.JLS8)
 
@@ -197,18 +199,84 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		parser.setKind(ASTParser.K_COMPILATION_UNIT)
 
 		def cu = (CompilationUnit) parser.createAST(null)
-		cu.recordModifications()
-
-		if (cu.types().get(0) instanceof org.eclipse.jdt.core.dom.EnumDeclaration) {
-			throw RuntimeException("don't handle enums yet")
+		
+		if (!(cu.types().get(0) instanceof org.eclipse.jdt.core.dom.EnumDeclaration)) {
+			cu.recordModifications()
+	
+			def ast = cu.getAST();
+	
+			def importMembers = []
+	
+			cu.imports().each { importDecl ->
+				importMembers << importDecl.getName().toString()
+			}
+	
+			cu.imports().clear()
+	
+			importsToAdd.each { member ->
+				if (!importMembers.contains(member)) {
+					importMembers << member
+				}
+			}
+	
+			importMembers.sort()
+	
+			importMembers.each { member ->
+				def importDeclaration = ast.newImportDeclaration();
+				importDeclaration.setName(ast.newName(member.split("\\.")))
+	
+				cu.imports().add(importDeclaration)
+			}
+	
+			TextEdit edits = cu.rewrite(document, null)
+			edits.apply(document)
 		}
 
-		def rewriter = ASTRewrite.create(cu.getAST())
-		def lrw = rewriter.getListRewrite((TypeDeclaration) cu.types().get(0), TypeDeclaration.BODY_DECLARATIONS_PROPERTY)
-		lrw.insertLast(rewriter.createStringPlaceholder(methodSrc, ASTNode.METHOD_DECLARATION), null)
+		document.get()
+	}
 
-		def edits = rewriter.rewriteAST(document, null)
-		edits.apply(document)
+	// Add methods to source
+	def addMethodsToSrc(source, methodTemplates, templateBindings) {
+
+		def document = new org.eclipse.jface.text.Document(source)
+		def parser = ASTParser.newParser(AST.JLS8)
+
+		def options = JavaCore.getOptions()
+		options.put(JavaCore.COMPILER_COMPLIANCE, "1.5")
+		options.put(JavaCore.COMPILER_SOURCE, "1.5")
+
+		parser.setCompilerOptions(options)
+
+		parser.setSource(document.get().toCharArray())
+		parser.setKind(ASTParser.K_COMPILATION_UNIT)
+
+		def cu = (CompilationUnit) parser.createAST(null)
+		
+		if (!(cu.types().get(0) instanceof org.eclipse.jdt.core.dom.EnumDeclaration)) {
+			cu.recordModifications()
+	
+			def rewriter = ASTRewrite.create(cu.getAST())
+	
+			def engine = new SimpleTemplateEngine()
+
+			methodTemplates.each { methodTemplate ->
+				def template = engine.createTemplate(methodTemplate).make(templateBindings)
+				def methodSource = template.toString()
+
+				def lrw = rewriter.getListRewrite((TypeDeclaration) cu.types().get(0),
+						TypeDeclaration.BODY_DECLARATIONS_PROPERTY)
+
+				lrw.insertLast(rewriter.createStringPlaceholder(methodSource,
+						ASTNode.METHOD_DECLARATION), null)
+
+			}
+
+			def edits = rewriter.rewriteAST(document, null)
+			edits.apply(document)
+			
+		} else {
+			println cu.getPackage().getName().getFullyQualifiedName() 
+		}
 
 		document.get()
 	}
@@ -218,7 +286,24 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 
 		def addMethods = [
 			/(.*)/: [
-				"""\
+				imports: [
+					'java.io.ByteArrayInputStream',
+					'java.io.IOException',
+					'java.io.InputStream',
+					'javax.xml.bind.JAXBContext',
+					'javax.xml.bind.JAXBElement',
+					'javax.xml.bind.JAXBException',
+					'javax.xml.bind.Marshaller',
+					'javax.xml.bind.Unmarshaller',
+					'javax.xml.namespace.QName',
+					'javax.xml.parsers.DocumentBuilderFactory',
+					'javax.xml.parsers.ParserConfigurationException',
+					'javax.xml.transform.stream.StreamSource',
+					'org.mitre.stix.util.Utilities',
+					'org.w3c.dom.Document'
+				],
+				methodTemplates: [
+					"""\
     /**
      * Returns XML String for JAXB Document Object Model object.
      * 
@@ -227,45 +312,45 @@ class GeneratedSourceTransformationTask extends DefaultTask {
      * @throws JAXBException
      * @throws ParserConfigurationException
      */
-    public String toXMLString() throws javax.xml.bind.JAXBException,
-            javax.xml.parsers.ParserConfigurationException {
-        org.w3c.dom.Document document = javax.xml.parsers.DocumentBuilderFactory
+    public String toXMLString() throws JAXBException,
+            ParserConfigurationException {
+        Document document = DocumentBuilderFactory
                 .newInstance().newDocumentBuilder().newDocument();
 
-        javax.xml.bind.JAXBContext jaxbContext = javax.xml.bind.JAXBContext
+        JAXBContext jaxbContext = JAXBContext
                 .newInstance(this.getClass().getPackage().getName());
 
-        javax.xml.bind.Marshaller marshaller = jaxbContext.createMarshaller();
+        Marshaller marshaller = jaxbContext.createMarshaller();
 
-        marshaller.setProperty(javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT,
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                 true);
 
         marshaller
-                .setProperty(javax.xml.bind.Marshaller.JAXB_ENCODING, "UTF-8");
+                .setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 
         try {
             marshaller.marshal(this, document);
-        } catch (javax.xml.bind.JAXBException e) {
+        } catch (JAXBException e) {
             // otherwise handle non-XMLRootElements
-            javax.xml.namespace.QName qualifiedName = new javax.xml.namespace.QName(
-                    org.mitre.stix.util.Utilities.getnamespaceURI(this), this
+            QName qualifiedName = new QName(
+                    Utilities.getnamespaceURI(this), this
                             .getClass().getSimpleName());
 
             @SuppressWarnings({ "rawtypes", "unchecked" })
-            javax.xml.bind.JAXBElement root = new javax.xml.bind.JAXBElement(
+            JAXBElement root = new JAXBElement(
                     qualifiedName, this.getClass(), this);
 
             marshaller.marshal(root, document);
         }
 
-        org.mitre.stix.util.Utilities.removeUnusedNamespaces(document);
+        Utilities.removeUnusedNamespaces(document);
 
-        document = org.mitre.stix.util.Utilities.addSchemaLocations(document);
+        document = Utilities.addSchemaLocations(document);
 
-        return org.mitre.stix.util.Utilities.getXMLString(document);
+        return Utilities.getXMLString(document);
     }
 """,
-				"""\
+					"""\
     /**
      * Creates JAXB Document Object Model for XML text string
      * 
@@ -276,22 +361,22 @@ class GeneratedSourceTransformationTask extends DefaultTask {
      * @throws IOException
      */
     public static \${name} fromXMLString(String text)
-            throws javax.xml.bind.JAXBException, java.io.IOException {
+            throws JAXBException, IOException {
 
-        javax.xml.bind.JAXBContext jaxbContext;
-        java.io.InputStream inputStream = null;
+        JAXBContext jaxbContext;
+        InputStream inputStream = null;
 
         @SuppressWarnings("rawtypes")
-        javax.xml.bind.JAXBElement root = null;
+        JAXBElement root = null;
 
-        jaxbContext = javax.xml.bind.JAXBContext.newInstance(\${name}.class
+        jaxbContext = JAXBContext.newInstance(\${name}.class
                 .getPackage().getName());
 
-        javax.xml.bind.Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-        inputStream = new java.io.ByteArrayInputStream(text.getBytes());
+        inputStream = new ByteArrayInputStream(text.getBytes());
 
-        root = unmarshaller.unmarshal(new javax.xml.transform.stream.StreamSource(inputStream),
+        root = unmarshaller.unmarshal(new StreamSource(inputStream),
                 \${name}.class);
 
         inputStream.close();
@@ -299,7 +384,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
         return (\${name}) root.getValue();
     }
 """
-			]]
+				]]]
 
 		//		def replaceCode = [
 		//			/(org.mitre.stix.stix_1.STIXType) |
@@ -340,14 +425,14 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 				def obj = new LinkedHashMap();
 				obj.uri = file.toURI()
 				obj.name = file.getName().split(/\./)[0]
-				obj.package = file.getParent().toURI().toString().split(/src\/generated\/java\//)[1].replace(/\//, ".").split(/\\//)[0]
+				obj.package = file.getParent().toURI().toString()
+						.split(/src\/generated\/java\//)[1]
+						.replace(/\//, ".").split(/\\//)[0]
 
 				dom << obj
 			}
 		}
 
-		def engine = new SimpleTemplateEngine()
-		
 		dom.each() { obj ->
 			def templateBindings = ["pkg":obj.package, "name":obj.name]
 
@@ -355,18 +440,14 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 
 				if ( obj.package + '.' + obj.name ==~ regex) {
 
-					def source = new File(obj.uri).readLines().iterator().join(lineSeperator)
+					def source = new File(obj.uri).readLines().iterator()
+							.join(lineSeperator)
 
-					methodDeclarations.each { methodDeclaration ->
-						def template = engine.createTemplate(methodDeclaration).make(templateBindings)
-						def methodSource = template.toString()
+					source = addImportsToSrc(source,
+							methodDeclarations['imports'])
 
-						try {
-							source = addMethodToClass(source, methodSource)
-						} catch (RuntimeException re) {
-							// do nothin
-						}
-					}
+					source = addMethodsToSrc(source,
+							methodDeclarations['methodTemplates'], templateBindings)
 
 					//			replaceCode.each { regex, replace ->
 					//				if ( obj.package + '.' + obj.name ==~ regex) {
@@ -432,11 +513,13 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 		// Gather Binding objects parsed from the schemas.
 		schemas.each {schema ->
 
-			def schemaLocation = new File("schemas", schema.getAbsolutePath().split("schemas")[1]).toString()
+			def schemaLocation = new File("schemas",
+					schema.getAbsolutePath().split("schemas")[1]).toString()
 
 			if (!notPartOfThisCompilation.contains(schemaLocation)) {
 
-				def document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new FileInputStream(schema))
+				def document = DocumentBuilderFactory.newInstance()
+						.newDocumentBuilder().parse(new FileInputStream(schema))
 
 				document.getDocumentElement().normalize()
 
@@ -461,12 +544,22 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 		}
 
 		//Add these external schemas
-		schemaBindings.put("schemas/external/oasis_ciq_3.0/xAL-types.xsd", new Binding(prefix: "xal", namespace: "urn:oasis:names:tc:ciq:xal:3", schemaLocation: "schemas/external/oasis_ciq_3.0/xAL-types.xsd"));
-		schemaBindings.put("schemas/external/oasis_ciq_3.0/xPIL.xsd", new Binding(prefix: "xpil", namespace: "urn:oasis:names:tc:ciq:xpil:3", schemaLocation: "schemas/external/oasis_ciq_3.0/xPIL.xsd"));
-		schemaBindings.put("schemas/external/oasis_ciq_3.0/xNL-types.xsd", new Binding(prefix: "xnl", namespace: "urn:oasis:names:tc:ciq:xnl:3", schemaLocation: "schemas/external/oasis_ciq_3.0/xNL-types.xsd"));
+		schemaBindings.put("schemas/external/oasis_ciq_3.0/xAL-types.xsd",
+				new Binding(prefix: "xal", namespace: "urn:oasis:names:tc:ciq:xal:3",
+				schemaLocation: "schemas/external/oasis_ciq_3.0/xAL-types.xsd"));
+		schemaBindings.put("schemas/external/oasis_ciq_3.0/xPIL.xsd",
+				new Binding(prefix: "xpil", namespace: "urn:oasis:names:tc:ciq:xpil:3",
+				schemaLocation: "schemas/external/oasis_ciq_3.0/xPIL.xsd"));
+		schemaBindings.put("schemas/external/oasis_ciq_3.0/xNL-types.xsd",
+				new Binding(prefix: "xnl", namespace: "urn:oasis:names:tc:ciq:xnl:3",
+				schemaLocation: "schemas/external/oasis_ciq_3.0/xNL-types.xsd"));
 		// The crawl would map the 'tns' prefix to both of these... fix that.
-		schemaBindings.put("schemas/external/open_ioc_2010/ioc-TR.xsd", new Binding(prefix: "ioc-tr", namespace: "urn:oasis:names:tc:ciq:xnl:3", schemaLocation: "schemas/external/open_ioc_2010/ioc-TR.xsd"));
-		schemaBindings.put("schemas/external/open_ioc_2010/ioc.xsd", new Binding(prefix: "ioc", namespace: "urn:oasis:names:tc:ciq:xnl:3", schemaLocation: "schemas/external/open_ioc_2010/ioc.xsd"));
+		schemaBindings.put("schemas/external/open_ioc_2010/ioc-TR.xsd",
+				new Binding(prefix: "ioc-tr", namespace: "urn:oasis:names:tc:ciq:xnl:3",
+				schemaLocation: "schemas/external/open_ioc_2010/ioc-TR.xsd"));
+		schemaBindings.put("schemas/external/open_ioc_2010/ioc.xsd",
+				new Binding(prefix: "ioc", namespace: "urn:oasis:names:tc:ciq:xnl:3",
+				schemaLocation: "schemas/external/open_ioc_2010/ioc.xsd"));
 
 		//		schemaBindings.each{ k, v ->
 		//			println "${k} : ${v.namespace}, ${v.prefix}"
@@ -498,7 +591,8 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 				}
 			}
 		}
-		new File("src/main/resources/namespace-prefix.xjb").setText(XmlUtil.serialize(writer.toString()))
+		new File("src/main/resources/namespace-prefix.xjb")
+				.setText(XmlUtil.serialize(writer.toString()))
 	}
 }
 
@@ -644,7 +738,6 @@ task generateJAXB << {
 		//schema(dir: 'src/main/resources/schemas', includes: '**/*.xsd')
 	}
 }
-
 
 generateJAXB.dependsOn cleanGenerate, retrieveSchemas
 
