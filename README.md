@@ -30,34 +30,40 @@ roadmap.  Releases will be announced on the [STIX discussion list](http://stix.m
 git clone https://github.com/nemonik/java_stix.git
 
 A `git clone` command will not retrieve schemas project
-automatically.  The Gradle buildscript will attempt to
-retreive the schemas for you, but if it cannot you many
-need to retrieve them yourself.
+automatically, but the Gradle Buildscript will attempt to
+retrieve them on execution.
 
 ## Retrieve the schemas
 
-Follow these step for retrieving the schemas if the gradle fails
-to do so on execution of the Gradle build command.
+The Gradle buildscript will attempt to retreive the schemas for 
+you, but if it cannot for some reason you will need to retrieve 
+them yourself.
+
+The Buildscript executes either the retrieve_schemas.sh shell script
+or the retreieve_schemas.bat batch script as appopriate for your 
+platform.  You can find these in the root of the project, and try
+executing them yourself or you can follow the steps enumerated in
+the next section for retrieving the schemas.
 
 ### The STIX schemas
 
-Enter the project and run these  additonal git commands on
-the command line to retrieve the STIX schemas.
+To manually retrieve the schemas, enter the project and run 
+these  additonal git commands on the command line:
 
     git submodule init
     git submodule update
+    
+Your not done.  You'll also need to retrieve the CybOX schemas.
 
 ### The CybOX schemas
 
-You then will also need to retrieve the CybOX schemas.
-
-In the project:
+While in the project:
 
     cd src/main/resources/schemas
     git submodule init
     git submodule update
 
-### Schema updates
+### Handling schema updates
 
 Any time you see that the schemas project has been modified (when
 merging or pulling updates) you will need to run
@@ -71,32 +77,23 @@ document model.
 
 ### You need Gradle installed
 
-This project uses a gradle buildscript.  You will need to install
-gradle.
+This project uses a Gradle Buildscript.  You will need to install
+Gradle.
 
-I use typially use the gradle command line interface and this can be
+I use typially use the Gradle command-line interface and this can be
 installed a number of ways.  
  
 If you're using OS X and using brew simply install gradle via
 
     brew install gradle
 
-If you are using Cygwin on Windows you might wanna try apt-cyg
-
-[https://code.google.com/p/apt-cyg/](https://code.google.com/p/apt-cyg/)
-
-It gives you that apt like package manager interface Cygwin always
-needed.
-
-    apt-cyg install gradle
-    
-Otherwise, to install the Gradle command-line binaries from
+Otherwise, install the Gradle command-line binaries from
 [gradle.org](http://www.gradle.org) following their instructions.
 
 If you're using the Eclipse IDE consider installing the latest
-[Gradle IDE Pack](http://marketplace.eclipse.org/content/gradle-ide-pack) or use [Nodeclipse/Enide Gradle for Eclipse](http://marketplace.eclipse.org/content/gradle). Gradle Eclipse integration is
-somewhat emergent.  I'd advise using the Gradle command-line.
-The plugins have varying degrees of usefulness.
+[Gradle IDE Pack](http://marketplace.eclipse.org/content/gradle-ide-pack) 
+or use [Nodeclipse/Enide Gradle for Eclipse](http://marketplace.eclipse.org/content/gradle). 
+Gradle Eclipse integration is somewhat emergent.  I'd advise using the Gradle command-line.
 
 ### Building via Gradle buildscript
 
@@ -132,6 +129,10 @@ at
 
 ## Trouble building?
 
+`You are less likely to see the following happen now that the Gradle 
+Buildscript will attempt to retreive the scheas, and if not will
+continue.`
+
 If while building you get this error:
 
     FAILURE: Build failed with an exception.
@@ -162,8 +163,15 @@ Or if you get this error while building:
 
 then you likely missed the step above where you must retrieved the
 CybOX schemas.
- 
-## Importing the project into the Eclipse IDE
+
+### Importing the project into Eclipse
+
+As Eclipse's various Gradle plugins have varying degrees of usefulness,
+I usually import the project as a `Java Project` and not a `Gradle Project`.
+
+You can still use `Gradle EnIDE` plugin to run the buildscript 
+from the IDE, but you'll need to configure your `Gradle Home to use` 
+via the Eclipse IDE preference panel.
 
 After running the Gradle buildscript, if you are using the Eclipse IDE
 you will want to run the following from the command-line to set up the
@@ -175,3 +183,7 @@ Then right-click on the Eclipse project and select "Refresh" to bring
 in the dependencies and source of JAXB Document Model. By default the 
 generated source files are not editable to remmind you that changes to
 these files is usually a bad idea.
+
+I haven't yet tried working with the project in NetBeans so until
+I do I'd welcome feedback from you NetNeans use on how things worked 
+for you.

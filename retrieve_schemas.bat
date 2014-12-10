@@ -6,3 +6,4 @@ cd src\main\resources\schemas
 echo Retrieving CybOX schemas...
 git submodule init
 git submodule update --force
+exit 0
