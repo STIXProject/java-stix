@@ -107,11 +107,16 @@ class RetrieveSchemasTask extends DefaultTask {
 
 		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 			//TODO: not tested
-			command = """dir src\\main\\resources\\schemas"""
+			command = "dir"
 		} else {
-			command = """ls src/main/resources/schemas"""
+			command = "ls"
 		}
-
+		
+		command += " " + ["src", "main", "resources", "schemas"]
+				.join(System.getProperty("file.separator"))
+				
+		println command
+	
 		def proc = command.execute()
 		proc.waitFor()
 
@@ -121,10 +126,15 @@ class RetrieveSchemasTask extends DefaultTask {
 
 			if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 				//TODO: not tested
-				command = """dir src\\main\\resources\\schemas\\cybox"""
+				command = "dir"
 			} else {
-				command = """ls src/main/resources/schemas/cybox"""
+				command = "ls"
 			}
+			
+			command += " " + ["src","main","resources","schemas","cybox"]
+					.join(System.getProperty("file.separator"))
+					
+			println command
 
 			proc = command.execute()
 			proc.waitFor()
