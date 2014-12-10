@@ -274,8 +274,6 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 			def edits = rewriter.rewriteAST(document, null)
 			edits.apply(document)
 			
-		} else {
-			println cu.getPackage().getName().getFullyQualifiedName() 
 		}
 
 		document.get()
@@ -425,9 +423,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 				def obj = new LinkedHashMap();
 				obj.uri = file.toURI()
 				obj.name = file.getName().split(/\./)[0]
-				obj.package = file.getParent().toURI().toString()
-						.split(/src\/generated\/java\//)[1]
-						.replace(/\//, ".").split(/\\//)[0]
+				obj.package = file.getParent().split(File.separator)[3..-1].join('.')
 
 				dom << obj
 			}
