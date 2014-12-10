@@ -122,11 +122,17 @@ Success will look like this on UNIX:
     :processResources
     :classes
     :jar
+    
+	BUILD SUCCESSFUL
+	
+	Total time: 2 mins 31.743 secs
 
 If the build goes well you will find the JAXB Document Model in jar
 at
 
 	buil/libs/java-stix-${version}.jar
+
+where `${version}` is replaced with the `version` number in the Gradle Buildscript.
 
 A build will go like so on Windows:
 
@@ -173,6 +179,8 @@ If the build goes well you will find the JAXB Document Model in jar
 at
 
 	build\libs\java-stix-${version}.jar
+	
+where `${version}` is replaced with the `version` number in the Gradle Buildscript.
 
 ## Trouble building?
 
