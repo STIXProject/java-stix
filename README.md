@@ -101,9 +101,10 @@ Change directories into the project and enter on the command-line:
 
     gradle
 
-Success will look like this:
+Success will look like this on UNIX:
 
     ➜  java_stix git:(master) ✗ gradle
+    To honour the JVM settings for this build a new JVM will be forked. Please consider using the daemon: http://gradle.org/docs/2.2/userguide/gradle_daemon.html.
     :createPrefixNamespaceBindings
     :cleanGenerate
     :retrieveSchemas
@@ -127,6 +128,52 @@ at
 
 	buil/libs/java-stix-${version}.jar
 
+A build will go like so on Windows:
+
+	$ gradle
+	To honour the JVM settings for this build a new JVM will be forked. Please consider using the daemon: http://gradle.org/docs/2.2/userguide/gradle_daemon.html.
+	:createPrefixNamespaceBindings
+	:cleanGenerate
+	:retrieveSchemas
+	
+	C:\cygwin64\home\nemonik\Development\workplace\java_stix>echo Retrieving STIX schemas... 
+	Retrieving STIX schemas...
+	
+	C:\cygwin64\home\nemonik\Development\workplace\java_stix>git submodule init 
+	Submodule 'src/main/resources/schemas' (https://github.com/STIXProject/schemas.git) registered for path 'src/main/resources/schemas'
+	
+	C:\cygwin64\home\nemonik\Development\workplace\java_stix>git submodule update --force 
+	Submodule path 'src/main/resources/schemas': checked out 'fd6ce20a62e52a7ddeb5ab0fb0e5b760778c443e'
+	
+	C:\cygwin64\home\nemonik\Development\workplace\java_stix>cd src\main\resources\schemas 
+	
+	C:\cygwin64\home\nemonik\Development\workplace\java_stix\src\main\resources\schemas>echo Retrieving CybOX schemas... 
+	Retrieving CybOX schemas...
+	
+	C:\cygwin64\home\nemonik\Development\workplace\java_stix\src\main\resources\schemas>git submodule init 
+	Submodule 'cybox' (https://github.com/CybOXProject/schemas.git) registered for path 'cybox'
+	
+	C:\cygwin64\home\nemonik\Development\workplace\java_stix\src\main\resources\schemas>git submodule update --force 
+	Submodule path 'cybox': checked out '97beb32c376a9223e91b52cb3e4c8d2af6baf786'
+	
+	C:\cygwin64\home\nemonik\Development\workplace\java_stix\src\main\resources\schemas>exit 0 
+	
+	:generateJAXB
+	:generatedSourceTransformation
+	:compileJava
+	:processResources
+	:classes
+	:jar
+	
+	BUILD SUCCESSFUL
+	
+	Total time: 3 mins 21.132 secs
+
+If the build goes well you will find the JAXB Document Model in jar
+at
+
+	build\libs\java-stix-${version}.jar
+
 ## Trouble building?
 
 `You are less likely to see the following happen now that the Gradle 
@@ -138,7 +185,7 @@ If while building you get this error:
     FAILURE: Build failed with an exception.
     
     * Where:
-    Build file '/Users/walsh/Development/workspace/STIXProject/java_stix/build.gradle' line: 52
+    Build file '/Users/nemonik/Development/workspace/STIXProject/java_stix/build.gradle' line: 52
     
     * What went wrong:
     Execution failed for task ':generate'.
@@ -152,13 +199,13 @@ If while building you get this error:
 Or if you get this error while building:
 
     [ant:xjc] [ERROR] src-resolve: Cannot resolve the name 'cyboxCommon:ToolInformationType' to a(n) 'type definition' component.
-    [ant:xjc]   line 907 of file:/Users/walsh/Development/workspace/STIXProject/java_stix/src/main/resources/schemas/stix_common.xsd
+    [ant:xjc]   line 907 of file:/Users/nemonik/Development/workspace/STIXProject/java_stix/src/main/resources/schemas/stix_common.xsd
     [ant:xjc] 
     [ant:xjc] [ERROR] src-resolve: Cannot resolve the name 'cybox:ObservableType' to a(n) 'type definition' component.
-    [ant:xjc]   line 439 of file:/Users/walsh/Development/workspace/STIXProject/java_stix/src/main/resources/schemas/stix_common.xsd
+    [ant:xjc]   line 439 of file:/Users/nemonik/Development/workspace/STIXProject/java_stix/src/main/resources/schemas/stix_common.xsd
     [ant:xjc] 
     [ant:xjc] [ERROR] src-resolve: Cannot resolve the name 'SystemObj:SystemObjectType' to a(n) 'type definition' component.
-    [ant:xjc]   line 149 of file:/Users/walsh/Development/workspace/STIXProject/java_stix/src/main/resources/schemas/external/maec_4.1/maec_package_schema.xsd
+    [ant:xjc]   line 149 of file:/Users/nemonik/Development/workspace/STIXProject/java_stix/src/main/resources/schemas/external/maec_4.1/maec_package_schema.xsd
     -- snip --
 
 then you likely missed the step above where you must retrieved the
