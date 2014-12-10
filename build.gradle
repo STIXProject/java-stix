@@ -89,9 +89,9 @@ class RetrieveSchemasTask extends DefaultTask {
 
 		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
 			//TODO: not tested
-			command = """cmd /c start retrieve_schemas.bat"""
+			command = "cmd /c start retrieve_schemas.bat"
 		} else {
-			command = """sh ./retrieve_schemas.sh"""
+			command = "sh ./retrieve_schemas.sh"
 		}
 
 		def proc = command.execute()
@@ -114,9 +114,7 @@ class RetrieveSchemasTask extends DefaultTask {
 		
 		command += " " + ["src", "main", "resources", "schemas"]
 				.join(System.getProperty("file.separator"))
-				
-		println command
-	
+
 		def proc = command.execute()
 		proc.waitFor()
 
@@ -133,8 +131,6 @@ class RetrieveSchemasTask extends DefaultTask {
 			
 			command += " " + ["src","main","resources","schemas","cybox"]
 					.join(System.getProperty("file.separator"))
-					
-			println command
 
 			proc = command.execute()
 			proc.waitFor()
