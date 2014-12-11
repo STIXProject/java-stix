@@ -73,17 +73,13 @@ defaultTasks 'jar'
 version = 0.1
 
 
-class PatchCyboxObjectsArchiveFileObjectTask extends DefaultTask {
-
-	@TaskAction
-	def patch() {
-		ant.patch(patchfile: 'cybox_object_archive_file_object.patch', originalfile: 'src/main/resources/schemas/cybox/objects/Archive_File_Object.xsd')
-	}
-}
-
 // Will attempt to automatically retrieve the schemas
 class RetrieveSchemasTask extends DefaultTask {
 
+	def patch() {
+		ant.patch(patchfile: 'cybox_object_archive_file_object.patch', originalfile: 'src/main/resources/schemas/cybox/objects/Archive_File_Object.xsd')
+	}
+	
 	def isRetrievable() {
 		def command = """git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"""
 		def proc = command.execute()
@@ -92,6 +88,7 @@ class RetrieveSchemasTask extends DefaultTask {
 	}
 
 	def pull() {
+	
 		def command = null
 
 		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
@@ -108,46 +105,12 @@ class RetrieveSchemasTask extends DefaultTask {
 
 	@TaskAction
 	def retrieve() {
+	
+		if ((project.file('src/main/resources/schemas').list().size() == 0) || (project.file('src/main/resources/schemas/cybox').list() == null)) {
 
-		def command = null
-
-		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-			command = "dir"
-		} else {
-			command = "ls"
-		}
-		
-		command += " " + ["src", "main", "resources", "schemas"]
-				.join(System.getProperty("file.separator"))
-
-		def proc = command.execute()
-		proc.waitFor()
-
-		def needSchemas = true
-
-		if (!proc.in.text.equals("")) {
-
-			if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-				//TODO: not tested
-				command = "dir"
-			} else {
-				command = "ls"
-			}
-			
-			command += " " + ["src","main","resources","schemas","cybox"]
-					.join(System.getProperty("file.separator"))
-
-			proc = command.execute()
-			proc.waitFor()
-
-			if (!proc.in.text.equals("")) {
-				needSchemas = false
-			}
-		}
-
-		if (needSchemas) {
 			if (isRetrievable()) {
 				pull()
+				patch()
 			} else {
 				throw new GradleException("Build error occurred: You will need retrieve schemas by hand. See README.md file.");
 			}
@@ -427,7 +390,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 
 		def dom = []
 
-		new File('src/generated/java').eachFileRecurse(FileType.FILES) { file ->
+		project.file('src/generated/java').eachFileRecurse(FileType.FILES) { file ->
 			if (!file.name.endsWith('package-info.java') && !file.name.endsWith('EnumType.java') && !file.name.endsWith('TypeEnum.java')) {
 
 				def obj = new LinkedHashMap();
@@ -510,7 +473,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 
 		// Gather up the schemas
 		def schemas = []
-		new File("src/main/resources/schemas").eachFileRecurse(FileType.FILES) { file ->
+		project.file("src/main/resources/schemas").eachFileRecurse(FileType.FILES) { file ->
 			if (file.name.endsWith('.xsd')) {
 				schemas << file
 			}
@@ -519,8 +482,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 		// Gather Binding objects parsed from the schemas.
 		schemas.each {schema ->
 
-			def schemaLocation = new File("schemas",
-					schema.getAbsolutePath().split("schemas")[1]).toString()
+			def schemaLocation = "schemas" + schema.getAbsolutePath().split("schemas")[1]
 
 			if (!notPartOfThisCompilation.contains(schemaLocation)) {
 
@@ -715,8 +677,6 @@ task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask)
 // purpose of tranformations (e.g., adding methods)
 task generatedSourceTransformation(type: GeneratedSourceTransformationTask)
 
-task patchCyboxObjectsArchiveFileObject(type: PatchCyboxObjectsArchiveFileObjectTask)
-
 // Automatically attempt to retrieve the schemas
 task retrieveSchemas(type: RetrieveSchemasTask)
 
@@ -747,8 +707,12 @@ task generateJAXB << {
 	}
 }
 
-generateJAXB.dependsOn cleanGenerate, patchCyboxObjectsArchiveFileObject, retrieveSchemas
+retrieveSchemas.dependsOn cleanGenerate
+
+generateJAXB.dependsOn retrieveSchemas
 
 generatedSourceTransformation.dependsOn generateJAXB
 
-compileJava.dependsOn createPrefixNamespaceBindings, generatedSourceTransformation
+createPrefixNamespaceBindings.dependsOn generatedSourceTransformation
+
+compileJava.dependsOn createPrefixNamespaceBindings
