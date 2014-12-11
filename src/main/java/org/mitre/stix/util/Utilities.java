@@ -359,17 +359,24 @@ public class Utilities {
 		}
 	}
 
-
 	/**
-	 * 
 	 * Returns a String for a JAXBElement
 	 * 
 	 * @param jaxbElement
 	 * @return
-	 * @throws ParserConfigurationException
-	 * @throws JAXBException
 	 */
 	public static String getXMLString(JAXBElement<?> jaxbElement) {
+		return getXMLString(jaxbElement, true);
+	}
+	
+	/**
+	 * Returns a String for a JAXBElement
+	 * 
+	 * @param jaxbElement
+	 * @param prettyPrint
+	 * @return
+	 */
+	public static String getXMLString(JAXBElement<?> jaxbElement, boolean prettyPrint) {
 		
 		try {
 	        Document document = DocumentBuilderFactory
@@ -404,7 +411,7 @@ public class Utilities {
 	
 	        document = Utilities.addSchemaLocations(document);
 
-	        return Utilities.getXMLString(document);
+	        return Utilities.getXMLString(document, prettyPrint);
         
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -420,7 +427,6 @@ public class Utilities {
 	public static String getXMLString(Document document) {
 		return getXMLString(document, true);
 	}
-	
 	
 	/**
 	 * Returns a String for a Document.
