@@ -65,10 +65,10 @@ import org.w3c.dom.Document
 import org.apache.tools.ant.taskdefs.condition.Os
 
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
+apply plugin: "java"
+apply plugin: "eclipse"
 
-defaultTasks 'jar'
+defaultTasks "jar"
 
 version = 0.1
 
@@ -77,11 +77,20 @@ version = 0.1
 class RetrieveSchemasTask extends DefaultTask {
 
 	def patch() {
-		ant.patch(patchfile: 'cybox_object_archive_file_object.patch', originalfile: 'src/main/resources/schemas/cybox/objects/Archive_File_Object.xsd')
+		println ("Patching src/main/resources/schemas/cybox/objects/Archive_File_Object.xsd")
+		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: 'src/main/resources/schemas/cybox/objects/Archive_File_Object.xsd')
 	}
 	
 	def isRetrievable() {
-		def command = """git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"""
+	
+		def command = null
+		
+		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+			command = ["cmd", "/c", "git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"]
+		} else {
+			command = ["sh", "-c", "git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"]
+		}
+		
 		def proc = command.execute(null, project.rootDir)
 		proc.waitFor()
 		proc.exitValue() == 0
@@ -105,7 +114,7 @@ class RetrieveSchemasTask extends DefaultTask {
 
 	@TaskAction
 	def retrieve() {
-		if ((project.file('src/main/resources/schemas').list().size() == 0) || (project.file('src/main/resources/schemas/cybox').list() == null)) {
+		if ((project.file("src/main/resources/schemas").list().size() == 0) || (project.file("src/main/resources/schemas/cybox").list() == null)) {
 			if (isRetrievable()) {
 				pull()
 				patch()
@@ -257,19 +266,19 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		def addMethods = [
 			/(.*)/: [
 				imports: [
-					'java.io.ByteArrayInputStream',
-					'java.io.IOException',
-					'java.io.InputStream',
-					'javax.xml.bind.JAXBContext',
-					'javax.xml.bind.JAXBElement',
-					'javax.xml.bind.JAXBException',
-					'javax.xml.bind.Marshaller',
-					'javax.xml.bind.Unmarshaller',
-					'javax.xml.namespace.QName',
-					'javax.xml.parsers.DocumentBuilderFactory',
-					'javax.xml.parsers.ParserConfigurationException',
-					'javax.xml.transform.stream.StreamSource',
-					'org.mitre.stix.util.Utilities',
+					"java.io.ByteArrayInputStream",
+					"java.io.IOException",
+					"java.io.InputStream",
+					"javax.xml.bind.JAXBContext",
+					"javax.xml.bind.JAXBElement",
+					"javax.xml.bind.JAXBException",
+					"javax.xml.bind.Marshaller",
+					"javax.xml.bind.Unmarshaller",
+					"javax.xml.namespace.QName",
+					"javax.xml.parsers.DocumentBuilderFactory",
+					"javax.xml.parsers.ParserConfigurationException",
+					"javax.xml.transform.stream.StreamSource",
+					"org.mitre.stix.util.Utilities",
 				],
 				methodTemplates: [
 					"""\
@@ -388,8 +397,8 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 
 		def dom = []
 
-		project.file('src/generated/java').eachFileRecurse(FileType.FILES) { file ->
-			if (!file.name.endsWith('package-info.java') && !file.name.endsWith('EnumType.java') && !file.name.endsWith('TypeEnum.java')) {
+		project.file("src/generated/java").eachFileRecurse(FileType.FILES) { file ->
+			if (!file.name.endsWith("package-info.java") && !file.name.endsWith("EnumType.java") && !file.name.endsWith("TypeEnum.java")) {
 
 				def obj = new LinkedHashMap();
 				obj.uri = file.toURI()
@@ -405,21 +414,21 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 
 			addMethods.each { regex, methodDeclarations ->
 
-				if ( obj.package + '.' + obj.name ==~ regex) {
+				if ( obj.package + "." + obj.name ==~ regex) {
 
-					def source = new File(obj.uri).readLines().iterator()
+					def source = project.file(obj.uri).readLines().iterator()
 							.join(lineSeperator)
 
 					source = addImportsToSrc(source,
-							methodDeclarations['imports'])
+							methodDeclarations["imports"])
 
 					source = addMethodsToSrc(source,
-							methodDeclarations['methodTemplates'], templateBindings)
+							methodDeclarations["methodTemplates"], templateBindings)
 
 					//			replaceCode.each { regex, replace ->
-					//				if ( obj.package + '.' + obj.name ==~ regex) {
+					//				if ( obj.package + "." + obj.name ==~ regex) {
 					//					if (lines == null) {
-					//						lines = new File(obj.uri).readLines().iterator().join("\n")
+					//						lines = project.file(obj.uri).readLines().iterator().join("\n")
 					//					}
 					//
 					//					def replacementCode = ""
@@ -427,11 +436,11 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 					//						replacementCode += line.replaceAll(/(\$\{pkg\})/, obj.package).replaceAll(/(\$\{name\})/, obj.name) + "\n"
 					//					}
 					//
-					//					lines.replaceAll(replace['regex'], replacementCode)
+					//					lines.replaceAll(replace["regex"], replacementCode)
 					//				}
 					//			}
 
-					new File( obj.uri ).with { outFile ->
+					project.file( obj.uri ).with { outFile ->
 						outFile.setWritable(true)
 						outFile.withWriter{ out -> out.println format(source) }
 						outFile.setWritable(false)
@@ -472,7 +481,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 		// Gather up the schemas
 		def schemas = []
 		project.file("src/main/resources/schemas").eachFileRecurse(FileType.FILES) { file ->
-			if (file.name.endsWith('.xsd')) {
+			if (file.name.endsWith(".xsd")) {
 				schemas << file
 			}
 		}
@@ -557,7 +566,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 				}
 			}
 		}
-		new File("src/main/resources/namespace-prefix.xjb")
+		project.file("src/main/resources/namespace-prefix.xjb")
 				.setText(XmlUtil.serialize(writer.toString()))
 	}
 }
@@ -574,10 +583,10 @@ jar {
 
 sourceSets {
 	main {
-		java { srcDirs('src/main/java', 'src/generated/java') }
+		java { srcDirs("src/main/java", "src/generated/java") }
 		resources {
-			srcDir('src/main/resources')
-			exclude '*.xjb' // not needed in the jar
+			srcDir("src/main/resources")
+			exclude "*.xjb" // not needed in the jar
 		}
 	}
 }
@@ -587,62 +596,62 @@ repositories {
 	mavenCentral()
 
 	// TODO: Used for prototyping groovy code. strip out later.
-	flatDir { dirs 'libs' }
+	flatDir { dirs "libs" }
 }
 
 configurations { xjc }
 
 dependencies {
-	xjc 'com.sun.xml.bind:jaxb-xjc:2.2.5-2'
-	xjc 'com.sun.xml.bind:jaxb-impl:2.2.5-2'
-	xjc 'javax.xml.bind:jaxb-api:2.2.+'
+	xjc "com.sun.xml.bind:jaxb-xjc:2.2.5-2"
+	xjc "com.sun.xml.bind:jaxb-impl:2.2.5-2"
+	xjc "javax.xml.bind:jaxb-api:2.2.+"
 
 	// JAXB2 Basics provides a package of plugins which can generate such
 	// utility code
-	xjc 'org.jvnet.jaxb2_commons:jaxb2-basics:0.6.5'
-	xjc 'org.jvnet.jaxb2_commons:jaxb2-basics-ant:0.6.5'
+	xjc "org.jvnet.jaxb2_commons:jaxb2-basics:0.6.5"
+	xjc "org.jvnet.jaxb2_commons:jaxb2-basics-ant:0.6.5"
 
 	// Causes JAXB RI 2 XJC to generate additional methods that allows method
 	// chaining.
-	xjc 'org.jvnet.jaxb2_commons:jaxb2-fluent-api:3.0'
+	xjc "org.jvnet.jaxb2_commons:jaxb2-fluent-api:3.0"
 
 	// Causes JAXB RI 2 XJC to generate a value constructor, where each
 	// embedded element is included as a constructor parameter.
-	xjc 'org.jvnet.jaxb2_commons:jaxb2-value-constructor:3.0'
+	xjc "org.jvnet.jaxb2_commons:jaxb2-value-constructor:3.0"
 
 	// Causes JAXB RI 2.2 XJC to automatically generate methods for toString(),
 	// equals() and hashCode() using jakarta-commons-lang. The code that uses
 	// this plugin can still run with any JAXB2 implementation.
-	//xjc 'org.jvnet.jaxb2_commons:jaxb2-commons-lang:2.4'
+	//xjc "org.jvnet.jaxb2_commons:jaxb2-commons-lang:2.4"
 
 	// This plugin uses the XML schema "element" tag's "default" attribute to
 	// set default values for variables in the classes generated by JAXB
-	xjc 'org.jvnet.jaxb2_commons:jaxb2-default-value:1.1'
+	xjc "org.jvnet.jaxb2_commons:jaxb2-default-value:1.1"
 
 	// This plugin adds 'javax.xml.bind.annotation.XmlNs' annotations to
 	// 'package-info.java' file according to specific definitions in
 	// bindings.xml file. Those annotations associate namespace prefixes
 	// with XML namespace URIs.
-	xjc 'org.jvnet.jaxb2_commons:jaxb2-namespace-prefix:1.1'
+	xjc "org.jvnet.jaxb2_commons:jaxb2-namespace-prefix:1.1"
 
-	compile 'javax.xml.bind:jaxb-api:2.2.+'
-	compile 'org.jvnet.jaxb2_commons:jaxb2-basics-runtime:0.6.5'
-	compile 'org.apache.httpcomponents:httpclient:4.3.5'
-	compile 'org.apache.httpcomponents:httpclient-cache:4.3.5'
-	compile 'org.apache.httpcomponents:httpmime:4.3.5'
-	compile 'org.apache.httpcomponents:fluent-hc:4.3.5'
+	compile "javax.xml.bind:jaxb-api:2.2.+"
+	compile "org.jvnet.jaxb2_commons:jaxb2-basics-runtime:0.6.5"
+	compile "org.apache.httpcomponents:httpclient:4.3.5"
+	compile "org.apache.httpcomponents:httpclient-cache:4.3.5"
+	compile "org.apache.httpcomponents:httpmime:4.3.5"
+	compile "org.apache.httpcomponents:fluent-hc:4.3.5"
 
 	// TODO: This block used for prototyping AST code. Strip out later.
-	compile name: 'org.eclipse.core.runtime_3.10.0.v20140318-2214'
-	compile name: 'org.eclipse.osgi_3.10.0.v20140606-1445'
-	compile name: 'org.eclipse.core.contenttype_3.4.200.v20140207-1251'
-	compile name: 'org.eclipse.equinox.common_3.6.200.v20130402-1505'
-	compile name: 'org.eclipse.text_3.5.300.v20130515-1451'
-	compile name: 'org.eclipse.core.jobs_3.6.0.v20140424-0053'
-	compile name: 'org.eclipse.equinox.preferences_3.5.200.v20140224-1527'
-	compile name: 'org.eclipse.core.resources_3.9.0.v20140514-1307'
-	compile name: 'org.eclipse.jdt.core_3.10.0.v20140604-1726'
-	compile name: 'org.eclipse.equinox.registry_3.5.400.v20140428-1507'
+	compile name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
+	compile name: "org.eclipse.osgi_3.10.0.v20140606-1445"
+	compile name: "org.eclipse.core.contenttype_3.4.200.v20140207-1251"
+	compile name: "org.eclipse.equinox.common_3.6.200.v20130402-1505"
+	compile name: "org.eclipse.text_3.5.300.v20130515-1451"
+	compile name: "org.eclipse.core.jobs_3.6.0.v20140424-0053"
+	compile name: "org.eclipse.equinox.preferences_3.5.200.v20140224-1527"
+	compile name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
+	compile name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
+	compile name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
 }
 
 buildscript {
@@ -650,20 +659,20 @@ buildscript {
 		jcenter()
 		mavenCentral()
 
-		flatDir { dirs 'libs' }
+		flatDir { dirs "libs" }
 	}
 
 	dependencies {
-		classpath name: 'org.eclipse.core.runtime_3.10.0.v20140318-2214'
-		classpath name: 'org.eclipse.osgi_3.10.0.v20140606-1445'
-		classpath name: 'org.eclipse.core.contenttype_3.4.200.v20140207-1251'
-		classpath name: 'org.eclipse.equinox.common_3.6.200.v20130402-1505'
-		classpath name: 'org.eclipse.text_3.5.300.v20130515-1451'
-		classpath name: 'org.eclipse.core.jobs_3.6.0.v20140424-0053'
-		classpath name: 'org.eclipse.equinox.preferences_3.5.200.v20140224-1527'
-		classpath name: 'org.eclipse.core.resources_3.9.0.v20140514-1307'
-		classpath name: 'org.eclipse.jdt.core_3.10.0.v20140604-1726'
-		classpath name: 'org.eclipse.equinox.registry_3.5.400.v20140428-1507'
+		classpath name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
+		classpath name: "org.eclipse.osgi_3.10.0.v20140606-1445"
+		classpath name: "org.eclipse.core.contenttype_3.4.200.v20140207-1251"
+		classpath name: "org.eclipse.equinox.common_3.6.200.v20130402-1505"
+		classpath name: "org.eclipse.text_3.5.300.v20130515-1451"
+		classpath name: "org.eclipse.core.jobs_3.6.0.v20140424-0053"
+		classpath name: "org.eclipse.equinox.preferences_3.5.200.v20140224-1527"
+		classpath name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
+		classpath name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
+		classpath name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
 	}
 }
 
@@ -680,28 +689,28 @@ task retrieveSchemas(type: RetrieveSchemasTask)
 
 // Clean out the generated folder
 task cleanGenerate << {
-	ant.delete(dir: 'src/generated/java')
+	ant.delete(dir: "src/generated/java")
 }
 
 // Generate the JAXB Document Model
 task generateJAXB << {
-	ant.taskdef(name: 'xjc', classname: 'org.jvnet.jaxb2_commons.xjc.XJC2Task', classpath: configurations.xjc.asPath)
+	ant.taskdef(name: "xjc", classname: "org.jvnet.jaxb2_commons.xjc.XJC2Task", classpath: configurations.xjc.asPath)
 
-	ant.mkdir(dir: 'src/generated/java')
+	ant.mkdir(dir: "src/generated/java")
 
-	ant.xjc(destdir: 'src/generated/java', extension: true, classpath: configurations.xjc.asPath) {
-		arg(line: '-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code -XtoString')
-		binding(dir: 'src/main/resources', includes: '*.xjb')
-		schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_core.xsd')
-		schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_common.xsd')
-		schema(dir: 'src/main/resources/schemas', includes: 'cybox/cybox_default_vocabularies.xsd')
-		schema(dir: 'src/main/resources/schemas', includes: 'cybox/objects/*.xsd')
-		schema(dir: 'src/main/resources/schemas', includes: '*.xsd')
-		schema(dir: 'src/main/resources/schemas', includes: 'extensions/**/*.xsd')
-		schema(dir: 'src/main/resources/schemas', includes: 'external/**/*.xsd')
+	ant.xjc(destdir: "src/generated/java", extension: true, classpath: configurations.xjc.asPath) {
+		arg(line: "-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code -XtoString")
+		binding(dir: "src/main/resources", includes: "*.xjb")
+		schema(dir: "src/main/resources/schemas", includes: "cybox/cybox_core.xsd")
+		schema(dir: "src/main/resources/schemas", includes: "cybox/cybox_common.xsd")
+		schema(dir: "src/main/resources/schemas", includes: "cybox/cybox_default_vocabularies.xsd")
+		schema(dir: "src/main/resources/schemas", includes: "cybox/objects/*.xsd")
+		schema(dir: "src/main/resources/schemas", includes: "*.xsd")
+		schema(dir: "src/main/resources/schemas", includes: "extensions/**/*.xsd")
+		schema(dir: "src/main/resources/schemas", includes: "external/**/*.xsd")
 
 		//Doing it this way, xjc cannot find its way to all the imported schemas ...
-		//schema(dir: 'src/main/resources/schemas', includes: '**/*.xsd')
+		//schema(dir: "src/main/resources/schemas", includes: "**/*.xsd")
 	}
 }
 
