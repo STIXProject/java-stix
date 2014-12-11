@@ -369,40 +369,46 @@ public class Utilities {
 	 * @throws ParserConfigurationException
 	 * @throws JAXBException
 	 */
-	public static String getXMLString(JAXBElement<?> jaxbElement) throws ParserConfigurationException, JAXBException {
-        Document document = DocumentBuilderFactory
-                .newInstance().newDocumentBuilder().newDocument();
+	public static String getXMLString(JAXBElement<?> jaxbElement) {
 		
-        JAXBContext jaxbContext = JAXBContext
-                .newInstance(jaxbElement.getDeclaredType().getPackage().getName());
+		try {
+	        Document document = DocumentBuilderFactory
+	                .newInstance().newDocumentBuilder().newDocument();
+			
+	        JAXBContext jaxbContext = JAXBContext
+	                .newInstance(jaxbElement.getDeclaredType().getPackage().getName());
+	
+	        Marshaller marshaller = jaxbContext.createMarshaller();
+	
+	        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+	                true);
+	
+	        marshaller
+	                .setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+	
+	        try {
+	            marshaller.marshal(jaxbElement, document);
+	        } catch (JAXBException e) {
+	            // otherwise handle non-XMLRootElements
+	            QName qualifiedName = new QName(
+	                    Utilities.getnamespaceURI(jaxbElement), jaxbElement.getClass().getSimpleName());
+	
+	            @SuppressWarnings({ "rawtypes", "unchecked" })
+	            JAXBElement root = new JAXBElement(
+	                    qualifiedName, jaxbElement.getClass(), jaxbElement);
+	
+	            marshaller.marshal(root, document);
+	        }
+	
+	        Utilities.removeUnusedNamespaces(document);
+	
+	        document = Utilities.addSchemaLocations(document);
 
-        Marshaller marshaller = jaxbContext.createMarshaller();
-
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                true);
-
-        marshaller
-                .setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-
-        try {
-            marshaller.marshal(jaxbElement, document);
-        } catch (JAXBException e) {
-            // otherwise handle non-XMLRootElements
-            QName qualifiedName = new QName(
-                    Utilities.getnamespaceURI(jaxbElement), jaxbElement.getClass().getSimpleName());
-
-            @SuppressWarnings({ "rawtypes", "unchecked" })
-            JAXBElement root = new JAXBElement(
-                    qualifiedName, jaxbElement.getClass(), jaxbElement);
-
-            marshaller.marshal(root, document);
-        }
-
-        Utilities.removeUnusedNamespaces(document);
-
-        document = Utilities.addSchemaLocations(document);
-
-        return Utilities.getXMLString(document);
+	        return Utilities.getXMLString(document);
+        
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
