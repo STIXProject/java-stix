@@ -4,12 +4,12 @@
  */
 package org.mitre.stix.examples;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.UUID;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -43,6 +43,8 @@ import org.mitre.stix.indicator_2.IndicatorType;
 import org.mitre.stix.stix_1.IndicatorsType;
 import org.mitre.stix.stix_1.STIXHeaderType;
 import org.mitre.stix.stix_1.STIXType;
+import org.mitre.stix.stix_1.ObjectFactory;
+import org.mitre.stix.util.Utilities;
 
 /**
  * An example of how to add CIQ Identity information to a STIX Indicator.
@@ -55,8 +57,6 @@ import org.mitre.stix.stix_1.STIXType;
  *
  */
 public class CIQIdentity {
-
-	private static IndicatorType i;
 
 	public CIQIdentity() {
 	}
@@ -89,7 +89,6 @@ public class CIQIdentity {
 												.withValue("555-555-5556"));
 									}
 								}));
-						;
 					}
 				});
 
@@ -184,19 +183,22 @@ public class CIQIdentity {
 						add(indicator);
 					}
 				});
-
+		
 		STIXHeaderType header = new STIXHeaderType()
 				.withDescription(new StructuredTextType("Example", null));
 
-		STIXType stix = new STIXType()
+		STIXType stixType = new STIXType()
 				.withSTIXHeader(header)
 				.withIndicators(indicators)
 				.withVersion("1.1.1")
 				.withTimestamp(now)
 				.withId(new QName("http://example.com/", "package-"
 						+ UUID.randomUUID().toString(), "example"));
-
-		System.out.println(stix.toXMLString());
+		
+		ObjectFactory factory = new ObjectFactory();
+		
+		JAXBElement<STIXType> stixPackage = factory.createSTIXPackage(stixType);
+		
+		System.out.println(Utilities.getXMLString(stixPackage));
 	}
-
 }

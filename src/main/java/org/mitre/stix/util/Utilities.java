@@ -14,11 +14,13 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlSchema;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
@@ -357,6 +359,52 @@ public class Utilities {
 		}
 	}
 
+
+	/**
+	 * 
+	 * Returns a String for a JAXBElement
+	 * 
+	 * @param jaxbElement
+	 * @return
+	 * @throws ParserConfigurationException
+	 * @throws JAXBException
+	 */
+	public static String getXMLString(JAXBElement<?> jaxbElement) throws ParserConfigurationException, JAXBException {
+        Document document = DocumentBuilderFactory
+                .newInstance().newDocumentBuilder().newDocument();
+		
+        JAXBContext jaxbContext = JAXBContext
+                .newInstance(jaxbElement.getDeclaredType().getPackage().getName());
+
+        Marshaller marshaller = jaxbContext.createMarshaller();
+
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+                true);
+
+        marshaller
+                .setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+
+        try {
+            marshaller.marshal(jaxbElement, document);
+        } catch (JAXBException e) {
+            // otherwise handle non-XMLRootElements
+            QName qualifiedName = new QName(
+                    Utilities.getnamespaceURI(jaxbElement), jaxbElement.getClass().getSimpleName());
+
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            JAXBElement root = new JAXBElement(
+                    qualifiedName, jaxbElement.getClass(), jaxbElement);
+
+            marshaller.marshal(root, document);
+        }
+
+        Utilities.removeUnusedNamespaces(document);
+
+        document = Utilities.addSchemaLocations(document);
+
+        return Utilities.getXMLString(document);
+	}
+
 	/**
 	 * Returns a String for a Document.
 	 * 
@@ -366,7 +414,8 @@ public class Utilities {
 	public static String getXMLString(Document document) {
 		return getXMLString(document, true);
 	}
-
+	
+	
 	/**
 	 * Returns a String for a Document.
 	 * 
