@@ -81,20 +81,20 @@ class RetrieveSchemasTask extends DefaultTask {
 		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: 'src/main/resources/schemas/cybox/objects/Archive_File_Object.xsd')
 	}
 	
-	def isRetrievable() {
-	
-		def command = null
-		
-		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-			command = ["cmd", "/c", "git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"]
-		} else {
-			command = ["sh", "-c", "git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"]
-		}
-		
-		def proc = command.execute(null, project.rootDir)
-		proc.waitFor()
-		proc.exitValue() == 0
-	}
+//	def isRetrievable() {
+//	
+//		def command = null
+//		
+//		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+//			command = ["cmd", "/c", "git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"]
+//		} else {
+//			command = ["sh", "-c", "git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"]
+//		}
+//		
+//		def proc = command.execute(null, project.rootDir)
+//		proc.waitFor()
+//		proc.exitValue() == 0
+//	}
 
 	def pull() {
 	
@@ -115,10 +115,9 @@ class RetrieveSchemasTask extends DefaultTask {
 	@TaskAction
 	def retrieve() {
 		if ((project.file("src/main/resources/schemas").list().size() == 0) || (project.file("src/main/resources/schemas/cybox").list() == null)) {
-			if (isRetrievable()) {
-				pull()
-				patch()
-			} else {
+			pull()
+			patch()
+			if ((project.file("src/main/resources/schemas").list().size() == 0) || (project.file("src/main/resources/schemas/cybox").list() == null)) {
 				throw new GradleException("Build error occurred: You will need retrieve schemas by hand. See README.md file.");
 			}
 		} else {
