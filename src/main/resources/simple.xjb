@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+               xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+               xmlns:namespace="http://jaxb2-commons.dev.java.net/namespace-prefix"
+               version="2.1">
+  <!-- global bindings -->
+  <jaxb:globalBindings>
+    <!-- 
+      Use a simple binding mode, an extension provided by the RI XJC compiler.
+      This mode gets rid of a lot of singleton types from the generated code,
+      streamlining it greatly.
+    -->
+    <xjc:simple/>
+  </jaxb:globalBindings>
+</jaxb:bindings>

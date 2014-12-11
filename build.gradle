@@ -72,6 +72,15 @@ defaultTasks 'jar'
 
 version = 0.1
 
+
+class PatchCyboxObjectsArchiveFileObjectTask extends DefaultTask {
+
+	@TaskAction
+	def patch() {
+		ant.patch(patchfile: 'cybox_object_archive_file_object.patch', originalfile: 'src/main/resources/schemas/cybox/objects/Archive_File_Object.xsd')
+	}
+}
+
 // Will attempt to automatically retrieve the schemas
 class RetrieveSchemasTask extends DefaultTask {
 
@@ -300,7 +309,6 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 					'javax.xml.parsers.ParserConfigurationException',
 					'javax.xml.transform.stream.StreamSource',
 					'org.mitre.stix.util.Utilities',
-					'org.w3c.dom.Document'
 				],
 				methodTemplates: [
 					"""\
@@ -314,7 +322,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
      */
     public String toXMLString() throws JAXBException,
             ParserConfigurationException {
-        Document document = DocumentBuilderFactory
+        org.w3c.dom.Document document = DocumentBuilderFactory
                 .newInstance().newDocumentBuilder().newDocument();
 
         JAXBContext jaxbContext = JAXBContext
@@ -420,7 +428,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		def dom = []
 
 		new File('src/generated/java').eachFileRecurse(FileType.FILES) { file ->
-			if (file.name.endsWith('Type.java') && !file.name.endsWith('EnumType.java')) {
+			if (!file.name.endsWith('package-info.java') && !file.name.endsWith('EnumType.java') && !file.name.endsWith('TypeEnum.java')) {
 
 				def obj = new LinkedHashMap();
 				obj.uri = file.toURI()
@@ -707,6 +715,8 @@ task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask)
 // purpose of tranformations (e.g., adding methods)
 task generatedSourceTransformation(type: GeneratedSourceTransformationTask)
 
+task patchCyboxObjectsArchiveFileObject(type: PatchCyboxObjectsArchiveFileObjectTask)
+
 // Automatically attempt to retrieve the schemas
 task retrieveSchemas(type: RetrieveSchemasTask)
 
@@ -737,7 +747,7 @@ task generateJAXB << {
 	}
 }
 
-generateJAXB.dependsOn cleanGenerate, retrieveSchemas
+generateJAXB.dependsOn cleanGenerate, patchCyboxObjectsArchiveFileObject, retrieveSchemas
 
 generatedSourceTransformation.dependsOn generateJAXB
 

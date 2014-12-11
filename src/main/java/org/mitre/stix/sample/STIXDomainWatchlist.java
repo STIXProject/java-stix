@@ -4,13 +4,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Scanner;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.mitre.stix.stix_1.ObjectFactory;
-import org.mitre.stix.stix_1.STIXType;
-import org.mitre.stix.util.Utilities;
+import org.mitre.stix.stix_1.STIXPackage;
 
 /**
  * Reads in
@@ -35,12 +32,8 @@ public class STIXDomainWatchlist {
 						"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml")
 						.openStream(), "UTF-8").useDelimiter("\\A").next();
 
-		STIXType stixType = STIXType.fromXMLString(text);
+		STIXPackage stixPackage = STIXPackage.fromXMLString(text);
 		
-		ObjectFactory factory = new ObjectFactory();
-		
-		JAXBElement<STIXType> stixPackage = factory.createSTIXPackage(stixType);
-		
-		System.out.println(Utilities.getXMLString(stixPackage));
+		System.out.println(stixPackage.toXMLString());
 	}
 }

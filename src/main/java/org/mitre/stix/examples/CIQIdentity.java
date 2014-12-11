@@ -9,7 +9,6 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.UUID;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -31,7 +30,7 @@ import org.mitre.cybox.common_2.HashType;
 import org.mitre.cybox.common_2.SimpleHashValueType;
 import org.mitre.cybox.common_2.TimeType;
 import org.mitre.cybox.cybox_2.ObjectType;
-import org.mitre.cybox.cybox_2.ObservableType;
+import org.mitre.cybox.cybox_2.Observable;
 import org.mitre.cybox.default_vocabularies_2.HashNameVocab10;
 import org.mitre.cybox.objects.FileObjectType;
 import org.mitre.stix.common_1.IndicatorBaseType;
@@ -39,12 +38,10 @@ import org.mitre.stix.common_1.InformationSourceType;
 import org.mitre.stix.common_1.StructuredTextType;
 import org.mitre.stix.extensions.identity.CIQIdentity30InstanceType;
 import org.mitre.stix.extensions.identity.STIXCIQIdentity30Type;
-import org.mitre.stix.indicator_2.IndicatorType;
+import org.mitre.stix.indicator_2.Indicator;
 import org.mitre.stix.stix_1.IndicatorsType;
 import org.mitre.stix.stix_1.STIXHeaderType;
-import org.mitre.stix.stix_1.STIXType;
-import org.mitre.stix.stix_1.ObjectFactory;
-import org.mitre.stix.util.Utilities;
+import org.mitre.stix.stix_1.STIXPackage;
 
 /**
  * An example of how to add CIQ Identity information to a STIX Indicator.
@@ -78,10 +75,10 @@ public class CIQIdentity {
 						new GregorianCalendar(TimeZone.getTimeZone("UTC")));
 
 		ContactNumbers contactNumbers = new ContactNumbers()
-				.withContactNumber(new ArrayList<ContactNumbers.ContactNumber>() {
+				.withContactNumbers(new ArrayList<ContactNumbers.ContactNumber>() {
 					{
 						add(new ContactNumbers.ContactNumber()
-								.withContactNumberElement(new ArrayList<ContactNumbers.ContactNumber.ContactNumberElement>() {
+								.withContactNumberElements(new ArrayList<ContactNumbers.ContactNumber.ContactNumberElement>() {
 									{
 										add(new ContactNumbers.ContactNumber.ContactNumberElement()
 												.withValue("555-555-5555"));
@@ -93,7 +90,7 @@ public class CIQIdentity {
 				});
 
 		ElectronicAddressIdentifiers electronicAddressIdentifiers = new ElectronicAddressIdentifiers()
-				.withElectronicAddressIdentifier(new ArrayList<ElectronicAddressIdentifiers.ElectronicAddressIdentifier>() {
+				.withElectronicAddressIdentifiers(new ArrayList<ElectronicAddressIdentifiers.ElectronicAddressIdentifier>() {
 					{
 						add(new ElectronicAddressIdentifiers.ElectronicAddressIdentifier()
 								.withValue("jsmith@example.com"));
@@ -101,7 +98,7 @@ public class CIQIdentity {
 				});
 
 		FreeTextLines freeTextLines = new FreeTextLines()
-				.withFreeTextLine(new ArrayList<FreeTextLines.FreeTextLine>() {
+				.withFreeTextLines(new ArrayList<FreeTextLines.FreeTextLine>() {
 					{
 						add(new FreeTextLines.FreeTextLine()
 								.withValue("Demonstrating Free Text!"));
@@ -109,27 +106,27 @@ public class CIQIdentity {
 				});
 
 		PartyNameType partyName = new PartyNameType()
-				.withNameLine(new ArrayList<NameLine>() {
+				.withNameLines(new ArrayList<NameLine>() {
 					{
 						add(new NameLine().withValue("Foo"));
 						add(new NameLine().withValue("Bar"));
 					}
-				}).withPersonName(new ArrayList<PersonName>() {
+				}).withPersonNames(new ArrayList<PersonName>() {
 					{
 						add(new PersonName()
-								.withNameElement(new oasis.names.tc.ciq.xnl._3.PersonNameType.NameElement()
+								.withNameElements(new oasis.names.tc.ciq.xnl._3.PersonNameType.NameElement()
 										.withValue("John Smith")));
 						add(new PersonName()
-								.withNameElement(new oasis.names.tc.ciq.xnl._3.PersonNameType.NameElement()
+								.withNameElements(new oasis.names.tc.ciq.xnl._3.PersonNameType.NameElement()
 										.withValue("Jill Smith")));
 					}
-				}).withOrganisationName(new ArrayList<OrganisationName>() {
+				}).withOrganisationNames(new ArrayList<OrganisationName>() {
 					{
 						add(new OrganisationName()
-								.withNameElement(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
+								.withNameElements(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
 										.withValue("Foo Inc.")));
 						add(new OrganisationName()
-								.withNameElement(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
+								.withNameElements(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
 										.withValue("Bar Corp.")));
 					}
 				});
@@ -166,10 +163,10 @@ public class CIQIdentity {
 
 		ObjectType obj = new ObjectType().withProperties(fileObject);
 
-		ObservableType observable = new org.mitre.cybox.cybox_2.ObservableType();
+		Observable observable = new org.mitre.cybox.cybox_2.Observable();
 		observable.setObject(obj);
 
-		final IndicatorType indicator = new IndicatorType()
+		final Indicator indicator = new Indicator()
 				.withTitle("File Hash Example")
 				.withDescription(
 						new StructuredTextType(
@@ -187,18 +184,14 @@ public class CIQIdentity {
 		STIXHeaderType header = new STIXHeaderType()
 				.withDescription(new StructuredTextType("Example", null));
 
-		STIXType stixType = new STIXType()
+		STIXPackage stixPackage = new STIXPackage()
 				.withSTIXHeader(header)
 				.withIndicators(indicators)
 				.withVersion("1.1.1")
 				.withTimestamp(now)
 				.withId(new QName("http://example.com/", "package-"
 						+ UUID.randomUUID().toString(), "example"));
-		
-		ObjectFactory factory = new ObjectFactory();
-		
-		JAXBElement<STIXType> stixPackage = factory.createSTIXPackage(stixType);
-		
-		System.out.println(Utilities.getXMLString(stixPackage));
+
+		System.out.println(stixPackage.toXMLString());
 	}
 }
