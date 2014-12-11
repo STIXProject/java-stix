@@ -82,7 +82,7 @@ class RetrieveSchemasTask extends DefaultTask {
 	
 	def isRetrievable() {
 		def command = """git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"""
-		def proc = command.execute()
+		def proc = command.execute(null, project.rootDir)
 		proc.waitFor()
 		proc.exitValue() == 0
 	}
@@ -97,7 +97,7 @@ class RetrieveSchemasTask extends DefaultTask {
 			command = "sh ./retrieve_schemas.sh"
 		}
 
-		def proc = command.execute()
+		def proc = command.execute(null, project.rootDir)
 		proc.waitFor()
 
 		println "${proc.in.text}"
@@ -105,9 +105,7 @@ class RetrieveSchemasTask extends DefaultTask {
 
 	@TaskAction
 	def retrieve() {
-	
 		if ((project.file('src/main/resources/schemas').list().size() == 0) || (project.file('src/main/resources/schemas/cybox').list() == null)) {
-
 			if (isRetrievable()) {
 				pull()
 				patch()
