@@ -63,6 +63,14 @@ While in the project:
     git submodule init
     git submodule update
 
+When the Buildscript first runs it will also patch the CybOX so 
+that the JAXB2 Simple Document Object Model can be generated.
+Once patched, it will remained patched locally.  If the Buildscript
+fails to retrieve the schemas, you will need to patch the schemas
+by hand from the command-line.  The patch file, `cybox_object_archive_object_patch` 
+is in  the root of the project.  NetBeans can apply patches via
+`Team` -> `Patches` -> `Apply Diff Patch`. 
+
 ### Handling schema updates
 
 Any time you see that the schemas project has been modified (when
@@ -229,16 +237,23 @@ from the IDE, but you'll need to configure your `Gradle Home to use`
 via the Eclipse IDE preference panel.
 
 After running the Gradle buildscript, if you are using the Eclipse IDE
-you will want to run the following from the command-line to set up the
+you may want to run the following from the command-line to set up the
 Ecipse environment:
 
 	gradle clean cleanEclipse eclipse
 
-Then right-click on the Eclipse project and select "Refresh" to bring
-in the dependencies and source of JAXB Document Model. By default the 
-generated source files are not editable to remmind you that changes to
-these files is usually a bad idea.
+It entirely depends on how smart yoour Eclipse Gradle plugin is and how
+you imported the project.  The above command will change your prject to
+essentially a Java Project. If you run the command, then right-click on
+the Eclipse project and select "Refresh" to bring in the dependencies and 
+source of JAXB Document Model. By default the generated source files are 
+not editable to remmind you that changes to these files is usually a bad 
+idea.
 
-I haven't yet tried working with the project in NetBeans so until
-I do I'd welcome feedback from you NetNeans use on how things worked 
-for you.
+### Opening the project into NetBeans
+
+I've tested the project with NetBeans 8.0.1 and it works great with the
+[Gradle JavaEE Support plugin](http://plugins.netbeans.org/plugin/55529/gradle-javaee-support).
+With the plugin installed, open the project and right-click on the project 
+root and select `build` from the `task` panel.
+
