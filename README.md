@@ -63,8 +63,8 @@ While in the project:
     git submodule init
     git submodule update
 
-When the Buildscript first runs it will also patch the CybOX so 
-that the JAXB2 Simple Document Object Model can be generated.
+When the Buildscript first runs it will also patch the CybOX schemas 
+so  that the JAXB2 Simple Document Object Model can be generated.
 Once patched, it will remained patched locally.  If the Buildscript
 fails to retrieve the schemas, you will need to patch the schemas
 by hand from the command-line.  The patch file, `cybox_object_archive_object_patch` 
