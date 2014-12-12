@@ -81,21 +81,6 @@ class RetrieveSchemasTask extends DefaultTask {
 		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: 'src/main/resources/schemas/cybox/objects/Archive_File_Object.xsd')
 	}
 	
-//	def isRetrievable() {
-//	
-//		def command = null
-//		
-//		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-//			command = ["cmd", "/c", "git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"]
-//		} else {
-//			command = ["sh", "-c", "git ls-remote --exit-code -h https://github.com/nemonik/java_stix.git"]
-//		}
-//		
-//		def proc = command.execute(null, project.rootDir)
-//		proc.waitFor()
-//		proc.exitValue() == 0
-//	}
-
 	def pull() {
 	
 		def command = null
