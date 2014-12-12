@@ -68,7 +68,7 @@ so  that the JAXB2 Simple Document Object Model can be generated.
 Once patched, it will remained patched locally.  If the Buildscript
 fails to retrieve the schemas, you will need to patch the schemas
 by hand from the command-line.  The patch file, `cybox_object_archive_object_patch` 
-is in  the root of the project.  NetBeans can apply patches via
+is in  the root of the project.  NetBeans can also apply patches via
 `Team` -> `Patches` -> `Apply Diff Patch`. 
 
 ### Handling schema updates
