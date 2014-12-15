@@ -75,61 +75,36 @@ public class CIQIdentity {
 						new GregorianCalendar(TimeZone.getTimeZone("UTC")));
 
 		ContactNumbers contactNumbers = new ContactNumbers()
-				.withContactNumbers(new ArrayList<ContactNumbers.ContactNumber>() {
-					{
-						add(new ContactNumbers.ContactNumber()
-								.withContactNumberElements(new ArrayList<ContactNumbers.ContactNumber.ContactNumberElement>() {
-									{
-										add(new ContactNumbers.ContactNumber.ContactNumberElement()
-												.withValue("555-555-5555"));
-										add(new ContactNumbers.ContactNumber.ContactNumberElement()
-												.withValue("555-555-5556"));
-									}
-								}));
-					}
-				});
+				.withContactNumbers(new ContactNumbers.ContactNumber()
+						.withContactNumberElements(
+								new ContactNumbers.ContactNumber.ContactNumberElement()
+										.withValue("555-555-5555"),
+								new ContactNumbers.ContactNumber.ContactNumberElement()
+										.withValue("555-555-5556")));
 
 		ElectronicAddressIdentifiers electronicAddressIdentifiers = new ElectronicAddressIdentifiers()
-				.withElectronicAddressIdentifiers(new ArrayList<ElectronicAddressIdentifiers.ElectronicAddressIdentifier>() {
-					{
-						add(new ElectronicAddressIdentifiers.ElectronicAddressIdentifier()
-								.withValue("jsmith@example.com"));
-					}
-				});
+				.withElectronicAddressIdentifiers(new ElectronicAddressIdentifiers.ElectronicAddressIdentifier()
+						.withValue("jsmith@example.com"));
 
 		FreeTextLines freeTextLines = new FreeTextLines()
-				.withFreeTextLines(new ArrayList<FreeTextLines.FreeTextLine>() {
-					{
-						add(new FreeTextLines.FreeTextLine()
-								.withValue("Demonstrating Free Text!"));
-					}
-				});
+				.withFreeTextLines(new FreeTextLines.FreeTextLine()
+						.withValue("Demonstrating Free Text!"));
 
 		PartyNameType partyName = new PartyNameType()
-				.withNameLines(new ArrayList<NameLine>() {
-					{
-						add(new NameLine().withValue("Foo"));
-						add(new NameLine().withValue("Bar"));
-					}
-				}).withPersonNames(new ArrayList<PersonName>() {
-					{
-						add(new PersonName()
+				.withNameLines(new NameLine().withValue("Foo"),
+						new NameLine().withValue("Bar"))
+				.withPersonNames(
+						new PersonName().withNameElements(new oasis.names.tc.ciq.xnl._3.PersonNameType.NameElement()
+								.withValue("John Smith")),
+						new PersonName()
 								.withNameElements(new oasis.names.tc.ciq.xnl._3.PersonNameType.NameElement()
-										.withValue("John Smith")));
-						add(new PersonName()
-								.withNameElements(new oasis.names.tc.ciq.xnl._3.PersonNameType.NameElement()
-										.withValue("Jill Smith")));
-					}
-				}).withOrganisationNames(new ArrayList<OrganisationName>() {
-					{
-						add(new OrganisationName()
-								.withNameElements(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
-										.withValue("Foo Inc.")));
-						add(new OrganisationName()
+										.withValue("Jill Smith")))
+				.withOrganisationNames(
+						new OrganisationName().withNameElements(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
+								.withValue("Foo Inc.")),
+						new OrganisationName()
 								.withNameElements(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
 										.withValue("Bar Corp.")));
-					}
-				});
 
 		STIXCIQIdentity30Type specification = new STIXCIQIdentity30Type()
 				.withContactNumbers(contactNumbers)
@@ -180,7 +155,7 @@ public class CIQIdentity {
 						add(indicator);
 					}
 				});
-		
+
 		STIXHeaderType header = new STIXHeaderType()
 				.withDescription(new StructuredTextType("Example", null));
 

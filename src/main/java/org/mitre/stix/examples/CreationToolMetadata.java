@@ -60,15 +60,11 @@ public class CreationToolMetadata {
 				new StructuredTextType("Example", null)).withInformationSource(
 				new InformationSourceType()
 						.withTools(new ToolsInformationType()
-								.withTools(new ArrayList<ToolInformationType>() {
-									{
-										add(new ToolInformationType()
+								.withTools(new ToolInformationType()
 												.withName(
 														"org.mitre.stix.examples.CreationToolMetadata")
 												.withVendor(
-														"The MITRE Corporation"));
-									}
-								})));
+														"The MITRE Corporation"))));
 
 		STIXPackage stixPackage = new STIXPackage()
 				.withSTIXHeader(header)
