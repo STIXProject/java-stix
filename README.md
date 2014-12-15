@@ -35,15 +35,19 @@ retrieve them on execution.
 
 ## Retrieve the schemas
 
-The Gradle buildscript will attempt to retreive the schemas for 
-you, but if it cannot for some reason you will need to retrieve 
-them yourself.
+The Gradle buildscript will attempt to retreive and patch the 
+schemas for you, but if it cannot for some reason you will need
+to retrieve them yourself.
 
 The Buildscript executes either the retrieve_schemas.sh shell script
 or the retreieve_schemas.bat batch script as appopriate for your 
 platform.  You can find these in the root of the project, and try
 executing them yourself or you can follow the steps enumerated in
 the next section for retrieving the schemas.
+
+Afterward, the cybOX schemas are patched for the flaw described in (cybOX Schema issue #340)[https://github.com/CybOXProject/schemas/issues/340].
+Until the issue is resolved please be aware of the patch.  The
+(patch)[https://raw.githubusercontent.com/nemonik/java_stix/master/cybox_object_archive_file_object.patch] is found at the root of the project.
 
 ### The STIX schemas
 
