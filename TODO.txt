@@ -2,7 +2,12 @@ ROADMAP
 =========
 0.1
 - Complete any boiler plate (e.g., toXMLString, formXMLString) by add/replace/modify 
-	methods on jaxb2 document objectm model.
+	methods on jaxb2 document object model.
 - Complete java equivalents of the python examples.
 - Unit tests?
+- validation
+- handle prior tagged releases 
+- give example of working with two or move versions
+- make sure manifest contains versioning
+- gradle push to public maven repo
 - See code for various //TODO: for more.
