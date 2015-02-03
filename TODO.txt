@@ -7,7 +7,7 @@ ROADMAP
 - Unit tests?
 - validation
 - handle prior tagged releases 
-- give example of working with two or move versions
+- give example of working with two or more versions
 - make sure manifest contains versioning
 - gradle push to public maven repo
 - See code for various //TODO: for more.
