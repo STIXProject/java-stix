@@ -70,15 +70,15 @@ apply plugin: "eclipse"
 
 defaultTasks "jar"
 
-version = 0.1
+version = "1.1.1"
 
 
 // Will attempt to automatically retrieve the schemas
 class RetrieveSchemasTask extends DefaultTask {
 
 	def patch() {
-		println ("Patching src/main/resources/schemas/cybox/objects/Archive_File_Object.xsd")
-		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: 'src/main/resources/schemas/cybox/objects/Archive_File_Object.xsd')
+		logger.info("    Patching src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd")
+		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: 'src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd')
 	}
 	
 	def pull() {
@@ -94,19 +94,19 @@ class RetrieveSchemasTask extends DefaultTask {
 		def proc = command.execute(null, project.rootDir)
 		proc.waitFor()
 
-		println "${proc.in.text}"
+		logger.info("    ${proc.in.text}")
 	}
 
 	@TaskAction
 	def retrieve() {
-		if ((project.file("src/main/resources/schemas").list().size() == 0) || (project.file("src/main/resources/schemas/cybox").list() == null)) {
+		if ((project.file("src/main/resources/schemas/v1.1.1").list().size() == 0) || (project.file("src/main/resources/schemas/v1.1.1/cybox").list() == null)) {
 			pull()
 			patch()
-			if ((project.file("src/main/resources/schemas").list().size() == 0) || (project.file("src/main/resources/schemas/cybox").list() == null)) {
-				throw new GradleException("Build error occurred: You will need retrieve schemas by hand. See README.md file.");
+			if ((project.file("src/main/resources/schemas/v1.1.1").list().size() == 0) || (project.file("src/main/resources/schemas/v1.1.1/cybox").list() == null)) {
+				throw new GradleException("    Build error occurred: You will need retrieve schemas by hand. See README.md file.");
 			}
 		} else {
-			println "Schemas are present. Retrieval is not needed."
+			logger.info("    Schemas are present. Retrieval is not needed.")
 		}
 	}
 }
@@ -304,10 +304,8 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 
             marshaller.marshal(root, document);
         }
-
+        
         Utilities.removeUnusedNamespaces(document);
-
-        document = Utilities.addSchemaLocations(document);
 
         return Utilities.getXMLString(document);
     }
@@ -435,18 +433,25 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	}
 }
 
-// Dynamically creates the src/main/resources/namespace-prefix.xjb
-// file from the schemas otherwise XJC will dynamically assign ns namespaces
+// Dynamically creates both the 
+//      src/main/resources/namespace-prefix.xjb
+// and
+//      src/main/resources/catalog.xml
+//  
+// files from the schemas.
+//
+// namespace-prefix.xjb prevents XJC from dynamically assigning ns namespaces
+// and catalog.xml is used for parsing and validation.
 class PrefixNamespaceBindingsTask extends DefaultTask {
 
 	// Returns a hashmap Binding objects
 	def get() {
-
+	
 		// ignore these namespaces cuz they are orphans
 		def notPartOfThisCompilation = [
-			"schemas/cybox/external/cpe_2.3/cpe-naming_2.3.xsd",
-			"schemas/cybox/external/cpe_2.3/cpe-language_2.3.xsd",
-			"schemas/cybox/external/oasis_ciq_3.0/xlink-2003-12-31.xsd"
+			"schemas/v1.1.1/cybox/external/cpe_2.3/cpe-naming_2.3.xsd",
+			"schemas/v1.1.1/cybox/external/cpe_2.3/cpe-language_2.3.xsd",
+			"schemas/v1.1.1/cybox/external/oasis_ciq_3.0/xlink-2003-12-31.xsd"
 		]
 
 		// fix paths for present platform
@@ -460,77 +465,78 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 			notPartOfThisCompilation = temp
 		}
 
-		def schemaBindings = [:]
+		def prefixSchemaBindings = [:]
 
 		// Gather up the schemas
 		def schemas = []
-		project.file("src/main/resources/schemas").eachFileRecurse(FileType.FILES) { file ->
+		project.file("src/main/resources/schemas/v1.1.1").eachFileRecurse(FileType.FILES) { file ->
 			if (file.name.endsWith(".xsd")) {
 				schemas << file
 			}
-		}
-
-		// Gather Binding objects parsed from the schemas.
+		}	
+		
 		schemas.each {schema ->
 
-			def schemaLocation = "schemas" + schema.getAbsolutePath().split("schemas")[1]
-
+			def schemaLocation = "schemas/v1.1.1" + schema.getAbsolutePath().split("schemas/v1.1.1")[1]
+			
 			if (!notPartOfThisCompilation.contains(schemaLocation)) {
-
+	
 				def document = DocumentBuilderFactory.newInstance()
 						.newDocumentBuilder().parse(new FileInputStream(schema))
-
+	
 				document.getDocumentElement().normalize()
-
+	
 				def attributes = document.getDocumentElement().getAttributes()
-
-				def binding, attribute, targetNamespace
+	
+				def attribute, targetNamespace, prefix
 				for (int i = 0 ; i < attributes.getLength() ; i++) {
 					attribute = attributes.item(i)
 					targetNamespace = document.getDocumentElement().getAttribute("targetNamespace")
-
+	
 					if (attribute.getNodeName().startsWith("xmlns:") && attribute.getNodeValue().equals(targetNamespace)) {
-
-						binding = new LinkedHashMap()
-						binding.prefix = attributes.item(i).getNodeName().split(":")[1]
-						binding.namespace = attributes.item(i).getNodeValue()
-						binding.schemaLocation = schemaLocation
-
-						schemaBindings[schemaLocation] = binding
+	
+						prefix = attributes.item(i).getNodeName().split(":")[1]
+						
+						if (prefixSchemaBindings.containsKey(prefix)) {
+							//TODO: change to logging.
+							println("  " + schemaLocation + " claims the same prefix " + prefix + " as " + prefixSchemaBindings[prefix])
+						} else {
+							prefixSchemaBindings[prefix] = schemaLocation
+						}
 					}
 				}
 			}
 		}
 
 		//Add these external schemas
-		schemaBindings.put("schemas/external/oasis_ciq_3.0/xAL-types.xsd",
-				new Binding(prefix: "xal", namespace: "urn:oasis:names:tc:ciq:xal:3",
-				schemaLocation: "schemas/external/oasis_ciq_3.0/xAL-types.xsd"));
-		schemaBindings.put("schemas/external/oasis_ciq_3.0/xPIL.xsd",
-				new Binding(prefix: "xpil", namespace: "urn:oasis:names:tc:ciq:xpil:3",
-				schemaLocation: "schemas/external/oasis_ciq_3.0/xPIL.xsd"));
-		schemaBindings.put("schemas/external/oasis_ciq_3.0/xNL-types.xsd",
-				new Binding(prefix: "xnl", namespace: "urn:oasis:names:tc:ciq:xnl:3",
-				schemaLocation: "schemas/external/oasis_ciq_3.0/xNL-types.xsd"));
+		prefixSchemaBindings["xal"] = "schemas/v1.1.1/external/oasis_ciq_3.0/xAL-types.xsd"	
+		prefixSchemaBindings["xpil"] = "schemas/v1.1.1/external/oasis_ciq_3.0/xPIL.xsd"
+		prefixSchemaBindings["xnl"] = "schemas/v1.1.1/external/oasis_ciq_3.0/xNL-types.xsd"
+		
+		// Rename "maecPackage" to "maec"
+		prefixSchemaBindings.remove("maecPackage")
+		prefixSchemaBindings["maec"] = "schemas/v1.1.1/external/maec_4.1/maec_package_schema.xsd"
+		
+		//prefixSchemaBindings["TestMe"] = prefixSchemaBindings["idicator"]
+		//prefixSchemaBindings.remove("idicator")
+
 		// The crawl would map the 'tns' prefix to both of these... fix that.
-		schemaBindings.put("schemas/external/open_ioc_2010/ioc-TR.xsd",
-				new Binding(prefix: "ioc-tr", namespace: "urn:oasis:names:tc:ciq:xnl:3",
-				schemaLocation: "schemas/external/open_ioc_2010/ioc-TR.xsd"));
-		schemaBindings.put("schemas/external/open_ioc_2010/ioc.xsd",
-				new Binding(prefix: "ioc", namespace: "urn:oasis:names:tc:ciq:xnl:3",
-				schemaLocation: "schemas/external/open_ioc_2010/ioc.xsd"));
+		prefixSchemaBindings.remove("tns")
+		prefixSchemaBindings["ioc-tr"] = "schemas/v1.1.1/external/open_ioc_2010/ioc-TR.xsd"
+		prefixSchemaBindings["ioc"] = "schemas/v1.1.1/external/open_ioc_2010/ioc.xsd"
 
-		//		schemaBindings.each{ k, v ->
-		//			println "${k} : ${v.namespace}, ${v.prefix}"
-		//		}
+//		prefixSchemaBindings.each{ k, v ->
+//			println "---> ${k} : ${v}"
+//		}
 
-		schemaBindings
+		prefixSchemaBindings
 	}
 
 	// Dynamically creates the src/main/resources/namespace-prefix.xjb file used by XJC jaxb2-namespace-prefix plugin
 	@TaskAction
 	def create() {
-		def schemaBindings = get()
+
+		def prefixSchemaBindings = get()
 
 		def dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		def date = new Date();
@@ -543,16 +549,23 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 			mkp.declareNamespace(xs:"http://www.w3.org/2001/XMLSchema")
 			mkp.declareNamespace(namespace:"http://jaxb2-commons.dev.java.net/namespace-prefix")
 			'jaxb:bindings'(version: "2.1", "xsi:schemaLocation":"http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd http://jaxb2-commons.dev.java.net/namespace-prefix http://java.net/projects/jaxb2-commons/sources/svn/content/namespace-prefix/trunk/src/main/resources/prefix-namespace-schema.xsd") {
-				schemaBindings.each { schemaLocation, binding ->
-					'jaxb:bindings'(schemaLocation: schemaLocation) {
-						'namespace:prefix'(name: binding.prefix)
+				prefixSchemaBindings.each { prefix, schemaLocation ->
+					'jaxb:bindings'(schemaLocation:schemaLocation) {
+						'namespace:prefix'(name: prefix)
 					}
 				}
 			}
 		}
 		project.file("src/main/resources/namespace-prefix.xjb")
 				.setText(XmlUtil.serialize(writer.toString()))
+				
 	}
+}
+
+clean {
+	println("  cleaning generated and namespace-prefix file")
+	delete("src/generated/java")
+	delete("src/main/resources/namespace-prefix.xjb")
 }
 
 jar {
@@ -624,7 +637,17 @@ dependencies {
 	compile "org.apache.httpcomponents:httpclient-cache:4.3.5"
 	compile "org.apache.httpcomponents:httpmime:4.3.5"
 	compile "org.apache.httpcomponents:fluent-hc:4.3.5"
-
+	
+	//compile "xerces:xercesImpl:2.11.0"
+	//compile "xml-apis:xml-apis:2.0.2"
+	//compile "xml-resolver:xml-resolver:1.2"
+	
+	compile "org.springframework:spring-core:4.1.4.RELEASE"
+	
+	compile "commons-io:commons-io:2.4"
+	
+	//compile "xerces:xercesImpl:2.11.0"
+	
 	// TODO: This block used for prototyping AST code. Strip out later.
 	compile name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
 	compile name: "org.eclipse.osgi_3.10.0.v20140606-1445"
@@ -671,11 +694,6 @@ task generatedSourceTransformation(type: GeneratedSourceTransformationTask)
 // Automatically attempt to retrieve the schemas
 task retrieveSchemas(type: RetrieveSchemasTask)
 
-// Clean out the generated folder
-task cleanGenerate << {
-	ant.delete(dir: "src/generated/java")
-}
-
 // Generate the JAXB Document Model
 task generateJAXB << {
 	ant.taskdef(name: "xjc", classname: "org.jvnet.jaxb2_commons.xjc.XJC2Task", classpath: configurations.xjc.asPath)
@@ -683,27 +701,26 @@ task generateJAXB << {
 	ant.mkdir(dir: "src/generated/java")
 
 	ant.xjc(destdir: "src/generated/java", extension: true, classpath: configurations.xjc.asPath) {
-		arg(line: "-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code -XtoString")
+		arg(line: "-debug -readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code -XtoString")
 		binding(dir: "src/main/resources", includes: "*.xjb")
-		schema(dir: "src/main/resources/schemas", includes: "cybox/cybox_core.xsd")
-		schema(dir: "src/main/resources/schemas", includes: "cybox/cybox_common.xsd")
-		schema(dir: "src/main/resources/schemas", includes: "cybox/cybox_default_vocabularies.xsd")
-		schema(dir: "src/main/resources/schemas", includes: "cybox/objects/*.xsd")
-		schema(dir: "src/main/resources/schemas", includes: "*.xsd")
-		schema(dir: "src/main/resources/schemas", includes: "extensions/**/*.xsd")
-		schema(dir: "src/main/resources/schemas", includes: "external/**/*.xsd")
-
+		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "cybox/cybox_core.xsd")
+		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "cybox/cybox_common.xsd")
+		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "cybox/cybox_default_vocabularies.xsd")
+		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "cybox/objects/*.xsd")
+		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "*.xsd")
+		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "extensions/**/*.xsd")
+		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "external/**/*.xsd")
 		//Doing it this way, xjc cannot find its way to all the imported schemas ...
 		//schema(dir: "src/main/resources/schemas", includes: "**/*.xsd")
 	}
 }
 
-retrieveSchemas.dependsOn cleanGenerate
+retrieveSchemas.dependsOn clean
 
-generateJAXB.dependsOn retrieveSchemas
+createPrefixNamespaceBindings.dependsOn retrieveSchemas
+
+generateJAXB.dependsOn createPrefixNamespaceBindings
 
 generatedSourceTransformation.dependsOn generateJAXB
 
-createPrefixNamespaceBindings.dependsOn generatedSourceTransformation
-
-compileJava.dependsOn createPrefixNamespaceBindings
+compileJava.dependsOn generatedSourceTransformation 
