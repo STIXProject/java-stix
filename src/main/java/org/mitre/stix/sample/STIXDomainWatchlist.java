@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2015, The MITRE Corporation. All rights reserved.
+ * See LICENSE for complete terms.
+ */
 package org.mitre.stix.sample;
 
 import java.io.IOException;
@@ -8,6 +12,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.mitre.stix.stix_1.STIXPackage;
+import org.mitre.stix.util.Schema;
 
 /**
  * Reads in
@@ -35,5 +40,8 @@ public class STIXDomainWatchlist {
 		STIXPackage stixPackage = STIXPackage.fromXMLString(text);
 		
 		System.out.println(stixPackage.toXMLString());
+		
+		System.out.println(Schema.getInstance().validate(stixPackage.toXMLString()));
+	
 	}
 }

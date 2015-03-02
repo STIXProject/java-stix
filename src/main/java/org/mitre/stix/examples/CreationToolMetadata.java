@@ -1,10 +1,9 @@
 /**
- * Copyright (c) 2014, The MITRE Corporation. All rights reserved.
+ * Copyright (c) 2015, The MITRE Corporation. All rights reserved.
  * See LICENSE for complete terms.
  */
 package org.mitre.stix.examples;
 
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -22,6 +21,7 @@ import org.mitre.stix.common_1.InformationSourceType;
 import org.mitre.stix.common_1.StructuredTextType;
 import org.mitre.stix.stix_1.STIXHeaderType;
 import org.mitre.stix.stix_1.STIXPackage;
+import org.mitre.stix.util.Schema;
 
 /**
  * Build a STIX Document with Tool Information
@@ -35,9 +35,6 @@ import org.mitre.stix.stix_1.STIXPackage;
  */
 public class CreationToolMetadata {
 
-	/**
-	 * 
-	 */
 	public CreationToolMetadata() {
 	}
 
@@ -45,9 +42,8 @@ public class CreationToolMetadata {
 	 * @param args
 	 * @throws JAXBException
 	 * @throws ParserConfigurationException
-	 * @throws DatatypeConfigurationException 
+	 * @throws DatatypeConfigurationException
 	 */
-	@SuppressWarnings("serial")
 	public static void main(String[] args) throws JAXBException,
 			ParserConfigurationException, DatatypeConfigurationException {
 
@@ -56,24 +52,26 @@ public class CreationToolMetadata {
 				.newXMLGregorianCalendar(
 						new GregorianCalendar(TimeZone.getTimeZone("UTC")));
 
-		STIXHeaderType header = new STIXHeaderType().withDescription(
-				new StructuredTextType("Example", null)).withInformationSource(
-				new InformationSourceType()
-						.withTools(new ToolsInformationType()
+		STIXHeaderType header = new STIXHeaderType()
+				.withDescription(new StructuredTextType("Example", null))
+				.withInformationSource(
+						new InformationSourceType().withTools(new ToolsInformationType()
 								.withTools(new ToolInformationType()
-												.withName(
-														"org.mitre.stix.examples.CreationToolMetadata")
-												.withVendor(
-														"The MITRE Corporation"))));
+										.withName(
+												"org.mitre.stix.examples.CreationToolMetadata")
+										.withVendor("The MITRE Corporation"))));
 
 		STIXPackage stixPackage = new STIXPackage()
 				.withSTIXHeader(header)
 				.withVersion("1.1.1")
 				.withTimestamp(now)
-				.withId(new QName("http://example.com/", "package-" + UUID.randomUUID()
-						.toString(), "example"));
-		
-		System.out.println(stixPackage.toXMLString());
-	}
+				.withId(new QName("http://example.com/", "package-"
+						+ UUID.randomUUID().toString(), "example"));
 
+		System.out.println(stixPackage.toXMLString());
+
+		System.out.println(Schema.getInstance().validate(
+				stixPackage.toXMLString()));
+
+	}
 }

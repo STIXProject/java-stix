@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2014, The MITRE Corporation. All rights reserved.
+ * Copyright (c) 2015, The MITRE Corporation. All rights reserved.
  * See LICENSE for complete terms.
  */
 package org.mitre.stix.examples;
@@ -42,6 +42,7 @@ import org.mitre.stix.indicator_2.Indicator;
 import org.mitre.stix.stix_1.IndicatorsType;
 import org.mitre.stix.stix_1.STIXHeaderType;
 import org.mitre.stix.stix_1.STIXPackage;
+import org.mitre.stix.util.Schema;
 
 /**
  * An example of how to add CIQ Identity information to a STIX Indicator.
@@ -168,5 +169,8 @@ public class CIQIdentity {
 						+ UUID.randomUUID().toString(), "example"));
 
 		System.out.println(stixPackage.toXMLString());
+		
+		System.out.println(Schema.getInstance().validate(stixPackage.toXMLString()));
+	
 	}
 }
