@@ -2,7 +2,7 @@
           xmlns:xsi="http://www.w3.org/2000/10/XMLSchema-instance"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
           version="2.1">
-    <jaxb:bindings schemaLocation="schemas/external/oasis_ciq_3.0/xAL.xsd" version="1.0">
+    <jaxb:bindings schemaLocation="schemas/v1.1.1/external/oasis_ciq_3.0/xAL.xsd" version="1.0">
         <!-- rename the value element -->
         <jaxb:bindings node="//xs:complexType[@name='AddressType']">
             <jaxb:bindings node=".//xs:attribute[@type='AddressTypeList']">
@@ -10,7 +10,7 @@
             </jaxb:bindings>
         </jaxb:bindings>
     </jaxb:bindings>
-	<jaxb:bindings schemaLocation="schemas/external/oasis_ciq_3.0/xNL.xsd" version="1.0">
+	<jaxb:bindings schemaLocation="schemas/v1.1.1/external/oasis_ciq_3.0/xNL.xsd" version="1.0">
         <!-- rename the value element -->
         <jaxb:bindings node="//xs:complexType[@name='PersonNameType']">
             <jaxb:bindings node=".//xs:attribute[@type='PersonNameTypeList']">
@@ -23,7 +23,7 @@
             </jaxb:bindings>
         </jaxb:bindings>
     </jaxb:bindings>
-	<jaxb:bindings schemaLocation="schemas/external/oasis_ciq_3.0/xNAL.xsd" version="1.0">
+	<jaxb:bindings schemaLocation="schemas/v1.1.1/external/oasis_ciq_3.0/xNAL.xsd" version="1.0">
         <!-- rename the value element -->
         <jaxb:bindings node="//xs:element[@name='DependencyName']">
             <jaxb:bindings node=".//xs:attribute[@type='DependencyTypeList']">

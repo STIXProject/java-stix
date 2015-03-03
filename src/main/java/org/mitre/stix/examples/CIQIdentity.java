@@ -42,7 +42,6 @@ import org.mitre.stix.indicator_2.Indicator;
 import org.mitre.stix.stix_1.IndicatorsType;
 import org.mitre.stix.stix_1.STIXHeaderType;
 import org.mitre.stix.stix_1.STIXPackage;
-import org.mitre.stix.util.Schema;
 
 /**
  * An example of how to add CIQ Identity information to a STIX Indicator.
@@ -66,111 +65,121 @@ public class CIQIdentity {
 	 * @throws ParserConfigurationException
 	 */
 	@SuppressWarnings("serial")
-	public static void main(String[] args)
-			throws DatatypeConfigurationException, JAXBException,
-			ParserConfigurationException {
+	public static void main(String[] args)  {
 
-		// Get time for now.
-		XMLGregorianCalendar now = DatatypeFactory.newInstance()
-				.newXMLGregorianCalendar(
-						new GregorianCalendar(TimeZone.getTimeZone("UTC")));
-
-		ContactNumbers contactNumbers = new ContactNumbers()
-				.withContactNumbers(new ContactNumbers.ContactNumber()
-						.withContactNumberElements(
-								new ContactNumbers.ContactNumber.ContactNumberElement()
-										.withValue("555-555-5555"),
-								new ContactNumbers.ContactNumber.ContactNumberElement()
-										.withValue("555-555-5556")));
-
-		ElectronicAddressIdentifiers electronicAddressIdentifiers = new ElectronicAddressIdentifiers()
-				.withElectronicAddressIdentifiers(new ElectronicAddressIdentifiers.ElectronicAddressIdentifier()
-						.withValue("jsmith@example.com"));
-
-		FreeTextLines freeTextLines = new FreeTextLines()
-				.withFreeTextLines(new FreeTextLines.FreeTextLine()
-						.withValue("Demonstrating Free Text!"));
-
-		PartyNameType partyName = new PartyNameType()
-				.withNameLines(new NameLine().withValue("Foo"),
-						new NameLine().withValue("Bar"))
-				.withPersonNames(
-						new PersonName().withNameElements(new oasis.names.tc.ciq.xnl._3.PersonNameType.NameElement()
-								.withValue("John Smith")),
-						new PersonName()
-								.withNameElements(new oasis.names.tc.ciq.xnl._3.PersonNameType.NameElement()
-										.withValue("Jill Smith")))
-				.withOrganisationNames(
-						new OrganisationName().withNameElements(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
-								.withValue("Foo Inc.")),
-						new OrganisationName()
-								.withNameElements(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
-										.withValue("Bar Corp.")));
-
-		STIXCIQIdentity30Type specification = new STIXCIQIdentity30Type()
-				.withContactNumbers(contactNumbers)
-				.withElectronicAddressIdentifiers(electronicAddressIdentifiers)
-				.withFreeTextLines(freeTextLines).withPartyName(partyName);
-
-		CIQIdentity30InstanceType identity = new CIQIdentity30InstanceType()
-				.withSpecification(specification);
-
-		InformationSourceType producer = new InformationSourceType()
-				.withDescription(
-						new StructuredTextType(
-								"An indicator containing a File observable with an associated hash",
-								null))
-				.withTime(
-						new TimeType()
-								.withProducedTime(new DateTimeWithPrecisionType(
-										now, null))).withIdentity(identity);
-
-		FileObjectType fileObject = new org.mitre.cybox.objects.FileObjectType()
-				.withHashes(new HashListType(new ArrayList<HashType>() {
-					{
-						add(new HashType()
-								.withType(
-										new HashNameVocab10().withValue("MD5"))
-								.withSimpleHashValue(
-										new SimpleHashValueType()
-												.withValue("4EC0027BEF4D7E1786A04D021FA8A67F")));
-					}
-				}));
-
-		ObjectType obj = new ObjectType().withProperties(fileObject);
-
-		Observable observable = new org.mitre.cybox.cybox_2.Observable();
-		observable.setObject(obj);
-
-		final Indicator indicator = new Indicator()
-				.withTitle("File Hash Example")
-				.withDescription(
-						new StructuredTextType(
-								"An indicator containing a File observable with an associated hash",
-								null)).withProducer(producer)
-				.withObservable(observable);
-
-		IndicatorsType indicators = new IndicatorsType(
-				new ArrayList<IndicatorBaseType>() {
-					{
-						add(indicator);
-					}
-				});
-
-		STIXHeaderType header = new STIXHeaderType()
-				.withDescription(new StructuredTextType("Example", null));
-
-		STIXPackage stixPackage = new STIXPackage()
-				.withSTIXHeader(header)
-				.withIndicators(indicators)
-				.withVersion("1.1.1")
-				.withTimestamp(now)
-				.withId(new QName("http://example.com/", "package-"
-						+ UUID.randomUUID().toString(), "example"));
-
-		System.out.println(stixPackage.toXMLString());
-		
-		System.out.println(Schema.getInstance().validate(stixPackage.toXMLString()));
+		try {
+			// Get time for now.
+			XMLGregorianCalendar now = DatatypeFactory.newInstance()
+					.newXMLGregorianCalendar(
+							new GregorianCalendar(TimeZone.getTimeZone("UTC")));
 	
+			ContactNumbers contactNumbers = new ContactNumbers()
+					.withContactNumbers(new ContactNumbers.ContactNumber()
+							.withContactNumberElements(
+									new ContactNumbers.ContactNumber.ContactNumberElement()
+											.withValue("555-555-5555"),
+									new ContactNumbers.ContactNumber.ContactNumberElement()
+											.withValue("555-555-5556")));
+	
+			ElectronicAddressIdentifiers electronicAddressIdentifiers = new ElectronicAddressIdentifiers()
+					.withElectronicAddressIdentifiers(new ElectronicAddressIdentifiers.ElectronicAddressIdentifier()
+							.withValue("jsmith@example.com"));
+	
+			FreeTextLines freeTextLines = new FreeTextLines()
+					.withFreeTextLines(new FreeTextLines.FreeTextLine()
+							.withValue("Demonstrating Free Text!"));
+	
+			PartyNameType partyName = new PartyNameType()
+					.withNameLines(new NameLine().withValue("Foo"),
+							new NameLine().withValue("Bar"))
+					.withPersonNames(
+							new PersonName().withNameElements(new oasis.names.tc.ciq.xnl._3.PersonNameType.NameElement()
+									.withValue("John Smith")),
+							new PersonName()
+									.withNameElements(new oasis.names.tc.ciq.xnl._3.PersonNameType.NameElement()
+											.withValue("Jill Smith")))
+					.withOrganisationNames(
+							new OrganisationName().withNameElements(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
+									.withValue("Foo Inc.")),
+							new OrganisationName()
+									.withNameElements(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
+											.withValue("Bar Corp.")));
+	
+			STIXCIQIdentity30Type specification = new STIXCIQIdentity30Type()
+					.withContactNumbers(contactNumbers)
+					.withElectronicAddressIdentifiers(electronicAddressIdentifiers)
+					.withFreeTextLines(freeTextLines).withPartyName(partyName);
+	
+			CIQIdentity30InstanceType identity = new CIQIdentity30InstanceType()
+					.withSpecification(specification);
+	
+			InformationSourceType producer = new InformationSourceType()
+					.withDescription(
+							new StructuredTextType(
+									"An indicator containing a File observable with an associated hash",
+									null))
+					.withTime(
+							new TimeType()
+									.withProducedTime(new DateTimeWithPrecisionType(
+											now, null))).withIdentity(identity);
+	
+			FileObjectType fileObject = new FileObjectType()
+					.withHashes(new HashListType(new ArrayList<HashType>() {
+						{
+							add(new HashType()
+									.withType(
+											new HashNameVocab10().withValue("MD5"))
+									.withSimpleHashValue(
+											new SimpleHashValueType()
+													.withValue("4EC0027BEF4D7E1786A04D021FA8A67F")));
+						}
+					}));
+	
+			ObjectType obj = new ObjectType().withProperties(fileObject).withId(
+					new QName("http://example.com/", "file-"
+							+ UUID.randomUUID().toString(), "example"));
+	
+			Observable observable = new Observable().withId(new QName(
+					"http://example.com/", "observable-"
+							+ UUID.randomUUID().toString(), "example"));
+	
+			observable.setObject(obj);
+	
+			Indicator indicator = new Indicator()
+					.withId(new QName("http://example.com/", "indicator-"
+							+ UUID.randomUUID().toString(), "example"))
+					.withTimestamp(now)
+					.withTitle("File Hash Example")
+					.withDescription(
+							new StructuredTextType(
+									"An indicator containing a File observable with an associated hash",
+									null)).withProducer(producer)
+					.withObservable(observable);
+	
+			IndicatorsType indicators = new IndicatorsType(
+					new ArrayList<IndicatorBaseType>() {
+						{
+							add(indicator);
+						}
+					});
+	
+			STIXHeaderType header = new STIXHeaderType()
+					.withDescription(new StructuredTextType().withValue("Example"));
+	
+			STIXPackage stixPackage = new STIXPackage()
+					.withSTIXHeader(header)
+					.withIndicators(indicators)
+					.withVersion("1.1.1")
+					.withTimestamp(now)
+					.withId(new QName("http://example.com/", "package-"
+							+ UUID.randomUUID().toString(), "example"));
+	
+			System.out.println(stixPackage.toXMLString());
+	
+			System.out.println("Validates: " + stixPackage.validate());
+			
+		} catch (DatatypeConfigurationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

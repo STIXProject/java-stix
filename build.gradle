@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, The MITRE Corporation. All rights reserved.
+ * Copyright (c) 2015, The MITRE Corporation. All rights reserved.
  * See LICENSE for complete terms.
  *
  * Java-STIX Gradle Buildscript
@@ -262,86 +262,108 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 					"javax.xml.parsers.DocumentBuilderFactory",
 					"javax.xml.parsers.ParserConfigurationException",
 					"javax.xml.transform.stream.StreamSource",
-					"org.mitre.stix.util.Utilities",
+					"org.mitre.stix.Utilities",
+					"org.mitre.stix.Schema"
 				],
 				methodTemplates: [
 					"""\
-    /**
-     * Returns XML String for JAXB Document Object Model object.
-     * 
-     * @param obj
-     * @return the XML String for the JAXB object
-     * @throws JAXBException
-     * @throws ParserConfigurationException
-     */
-    public String toXMLString() throws JAXBException,
-            ParserConfigurationException {
-        org.w3c.dom.Document document = DocumentBuilderFactory
-                .newInstance().newDocumentBuilder().newDocument();
+	/**
+	 * Returns XML String for JAXB Document Object Model object.
+	 * 
+	 * @param obj
+	 * @return the XML String for the JAXB object
+	 */
+	public String toXMLString() {
+		org.w3c.dom.Document document;
+		Marshaller marshaller;
+		
+		try {
+			document = DocumentBuilderFactory.newInstance()
+					.newDocumentBuilder().newDocument();
 
-        JAXBContext jaxbContext = JAXBContext
-                .newInstance(this.getClass().getPackage().getName());
+			JAXBContext jaxbContext = JAXBContext.newInstance(this.getClass()
+					.getPackage().getName());
+	
+			marshaller = jaxbContext.createMarshaller();
+	
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+	
+			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		} catch (JAXBException e) {
+			throw new RuntimeException(e);
+		}
 
-        Marshaller marshaller = jaxbContext.createMarshaller();
+		try {
+			marshaller.marshal(this, document);
+		} catch (JAXBException e) {
+			// otherwise handle non-XMLRootElements
+			QName qualifiedName = new QName(Utilities.getnamespaceURI(this),
+					this.getClass().getSimpleName());
 
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                true);
+			@SuppressWarnings({ "rawtypes", "unchecked" })
+			JAXBElement root = new JAXBElement(qualifiedName, this.getClass(),
+					this);
 
-        marshaller
-                .setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+			try {
+				marshaller.marshal(root, document);
+			} catch (JAXBException e1) {
+				throw new RuntimeException(e1);
+			}
+		}
 
-        try {
-            marshaller.marshal(this, document);
-        } catch (JAXBException e) {
-            // otherwise handle non-XMLRootElements
-            QName qualifiedName = new QName(
-                    Utilities.getnamespaceURI(this), this
-                            .getClass().getSimpleName());
+		Utilities.removeUnusedNamespaces(document);
 
-            @SuppressWarnings({ "rawtypes", "unchecked" })
-            JAXBElement root = new JAXBElement(
-                    qualifiedName, this.getClass(), this);
+		return Utilities.getXMLString(document);
+	}
+""",
+					"""\
+	/**
+	 * Creates JAXB Document Object Model for XML text string
+	 * 
+	 * @param text
+	 *            XML string for the document
+	 * @return JAXB object
+	 */
+	public static \${name} fromXMLString(String text) {
 
-            marshaller.marshal(root, document);
-        }
-        
-        Utilities.removeUnusedNamespaces(document);
+		JAXBContext jaxbContext;
+		InputStream inputStream = null;
 
-        return Utilities.getXMLString(document);
-    }
+		JAXBElement<?> root = null;
+
+		try {
+			jaxbContext = JAXBContext.newInstance(\${name}.class.getPackage()
+					.getName());
+
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+	
+			inputStream = new ByteArrayInputStream(text.getBytes());
+	
+			root = unmarshaller.unmarshal(new StreamSource(inputStream),
+					\${name}.class);
+	
+			inputStream.close();
+		} catch (JAXBException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		return (\${name}) root.getValue();
+	}
 """,
 					"""\
     /**
-     * Creates JAXB Document Object Model for XML text string
+     * Validates the XML representation of this JAXB Document 
+     * Object Model object. Returning true indicating a successful
+     * validation, false if not.
      * 
-     * @param text
-     *            XML string for the document
-     * @return JAXB object
-     * @throws JAXBException
-     * @throws IOException
+     * @return boolean
      */
-    public static \${name} fromXMLString(String text)
-            throws JAXBException, IOException {
-
-        JAXBContext jaxbContext;
-        InputStream inputStream = null;
-
-        @SuppressWarnings("rawtypes")
-        JAXBElement root = null;
-
-        jaxbContext = JAXBContext.newInstance(\${name}.class
-                .getPackage().getName());
-
-        Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-
-        inputStream = new ByteArrayInputStream(text.getBytes());
-
-        root = unmarshaller.unmarshal(new StreamSource(inputStream),
-                \${name}.class);
-
-        inputStream.close();
-
-        return (\${name}) root.getValue();
+    public boolean validate() {
+        return Schema.getInstance().validate(toXMLString());
     }
 """
 				]]]
@@ -433,12 +455,10 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	}
 }
 
-// Dynamically creates both the 
+// Dynamically creates the 
 //      src/main/resources/namespace-prefix.xjb
-// and
-//      src/main/resources/catalog.xml
-//  
-// files from the schemas.
+
+// file from the schemas.
 //
 // namespace-prefix.xjb prevents XJC from dynamically assigning ns namespaces
 // and catalog.xml is used for parsing and validation.
@@ -499,7 +519,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 						
 						if (prefixSchemaBindings.containsKey(prefix)) {
 							//TODO: change to logging.
-							println("  " + schemaLocation + " claims the same prefix " + prefix + " as " + prefixSchemaBindings[prefix])
+							logger.warn("  " + schemaLocation + " claims the same prefix \"" + prefix + "\" as " + prefixSchemaBindings[prefix])
 						} else {
 							prefixSchemaBindings[prefix] = schemaLocation
 						}
@@ -516,9 +536,6 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 		// Rename "maecPackage" to "maec"
 		prefixSchemaBindings.remove("maecPackage")
 		prefixSchemaBindings["maec"] = "schemas/v1.1.1/external/maec_4.1/maec_package_schema.xsd"
-		
-		//prefixSchemaBindings["TestMe"] = prefixSchemaBindings["idicator"]
-		//prefixSchemaBindings.remove("idicator")
 
 		// The crawl would map the 'tns' prefix to both of these... fix that.
 		prefixSchemaBindings.remove("tns")
@@ -526,7 +543,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 		prefixSchemaBindings["ioc"] = "schemas/v1.1.1/external/open_ioc_2010/ioc.xsd"
 
 //		prefixSchemaBindings.each{ k, v ->
-//			println "---> ${k} : ${v}"
+//			log.info("---> ${k} : ${v}")
 //		}
 
 		prefixSchemaBindings
@@ -535,7 +552,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 	// Dynamically creates the src/main/resources/namespace-prefix.xjb file used by XJC jaxb2-namespace-prefix plugin
 	@TaskAction
 	def create() {
-
+	
 		def prefixSchemaBindings = get()
 
 		def dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -556,6 +573,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 				}
 			}
 		}
+		
 		project.file("src/main/resources/namespace-prefix.xjb")
 				.setText(XmlUtil.serialize(writer.toString()))
 				
@@ -563,7 +581,6 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 }
 
 clean {
-	println("  cleaning generated and namespace-prefix file")
 	delete("src/generated/java")
 	delete("src/main/resources/namespace-prefix.xjb")
 }
@@ -638,15 +655,11 @@ dependencies {
 	compile "org.apache.httpcomponents:httpmime:4.3.5"
 	compile "org.apache.httpcomponents:fluent-hc:4.3.5"
 	
-	//compile "xerces:xercesImpl:2.11.0"
-	//compile "xml-apis:xml-apis:2.0.2"
-	//compile "xml-resolver:xml-resolver:1.2"
-	
 	compile "org.springframework:spring-core:4.1.4.RELEASE"
 	
 	compile "commons-io:commons-io:2.4"
 	
-	//compile "xerces:xercesImpl:2.11.0"
+	compile "commons-lang:commons-lang:2.6"
 	
 	// TODO: This block used for prototyping AST code. Strip out later.
 	compile name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
@@ -696,17 +709,19 @@ task retrieveSchemas(type: RetrieveSchemasTask)
 
 // Generate the JAXB Document Model
 task generateJAXB << {
+
 	ant.taskdef(name: "xjc", classname: "org.jvnet.jaxb2_commons.xjc.XJC2Task", classpath: configurations.xjc.asPath)
 
 	ant.mkdir(dir: "src/generated/java")
 
 	ant.xjc(destdir: "src/generated/java", extension: true, classpath: configurations.xjc.asPath) {
-		arg(line: "-debug -readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code -XtoString")
+		arg(line: "-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code -XtoString")
 		binding(dir: "src/main/resources", includes: "*.xjb")
 		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "cybox/cybox_core.xsd")
 		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "cybox/cybox_common.xsd")
 		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "cybox/cybox_default_vocabularies.xsd")
 		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "cybox/objects/*.xsd")
+		//schema(dir: "src/main/resources/schemas/v1.1.1", excludes: "cybox/external/**/*.xsd")
 		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "*.xsd")
 		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "extensions/**/*.xsd")
 		schema(dir: "src/main/resources/schemas/v1.1.1", includes: "external/**/*.xsd")
