@@ -13,6 +13,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang.StringUtils;
 import org.mitre.cybox.common_2.ToolInformationType;
 import org.mitre.cybox.common_2.ToolsInformationType;
 import org.mitre.stix.common_1.InformationSourceType;
@@ -64,6 +65,8 @@ public class CreationToolMetadata {
 
 			System.out.println(stixPackage.toXMLString());
 
+			System.out.println(StringUtils.repeat("-", 120));
+			
 			System.out.println("Validates: " + stixPackage.validate());
 
 		} catch (DatatypeConfigurationException e) {

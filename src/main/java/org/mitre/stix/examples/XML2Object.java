@@ -25,20 +25,19 @@ import java.util.Scanner;
  * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
  *
  */
-public class Xml2Object {
+public class XML2Object {
 
-	public Xml2Object() {
+	public XML2Object() {
 
 	}
 
-	@SuppressWarnings("resource")
 	public static void main(String[] args) {
-	
 		
 		try {
-			URL url = Xml2Object.class.getClass().getResource("/org/mitre/stix/examples/sample.xml");
+			URL url = XML2Object.class.getClass().getResource("/org/mitre/stix/examples/sample.xml");
 			File file = new File(url.toURI());
 			
+			@SuppressWarnings("resource")
 			String text = new Scanner(file).useDelimiter("\\A").next();
 	
 			STIXPackage stixPackage = STIXPackage.fromXMLString(text);

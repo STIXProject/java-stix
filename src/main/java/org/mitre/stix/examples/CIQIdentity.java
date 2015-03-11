@@ -4,8 +4,10 @@
  */
 package org.mitre.stix.examples;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -24,6 +26,7 @@ import oasis.names.tc.ciq.xpil._3.ContactNumbers;
 import oasis.names.tc.ciq.xpil._3.ElectronicAddressIdentifiers;
 import oasis.names.tc.ciq.xpil._3.FreeTextLines;
 
+import org.apache.commons.lang.StringUtils;
 import org.mitre.cybox.common_2.DateTimeWithPrecisionType;
 import org.mitre.cybox.common_2.HashListType;
 import org.mitre.cybox.common_2.HashType;
@@ -66,7 +69,7 @@ public class CIQIdentity {
 	 */
 	@SuppressWarnings("serial")
 	public static void main(String[] args)  {
-
+		
 		try {
 			// Get time for now.
 			XMLGregorianCalendar now = DatatypeFactory.newInstance()
@@ -145,7 +148,7 @@ public class CIQIdentity {
 	
 			observable.setObject(obj);
 	
-			Indicator indicator = new Indicator()
+			final Indicator indicator = new Indicator()
 					.withId(new QName("http://example.com/", "indicator-"
 							+ UUID.randomUUID().toString(), "example"))
 					.withTimestamp(now)
@@ -175,9 +178,15 @@ public class CIQIdentity {
 							+ UUID.randomUUID().toString(), "example"));
 	
 			System.out.println(stixPackage.toXMLString());
+			
+			System.out.println(StringUtils.repeat("-", 120));
 	
 			System.out.println("Validates: " + stixPackage.validate());
 			
+			System.out.println(StringUtils.repeat("-", 120));
+			
+			System.out.println(STIXPackage.fromXMLString(stixPackage.toXMLString()));
+				
 		} catch (DatatypeConfigurationException e) {
 			throw new RuntimeException(e);
 		}

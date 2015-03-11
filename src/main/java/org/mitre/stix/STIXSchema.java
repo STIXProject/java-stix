@@ -43,30 +43,32 @@ import org.xml.sax.SAXException;
  * 
  * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
  */
-public class Schema {
+public class STIXSchema {
 
-	private static final Logger LOGGER = Logger.getLogger(Schema.class
+	private static final Logger LOGGER = Logger.getLogger(STIXSchema.class
 			.getName());
 
 	private String version;
 
-	private static Schema instance;
+	private static STIXSchema instance;
 
 	private Map<String, String> prefixSchemaBindings;
 
 	private Validator validator;
+	
+	private javax.xml.validation.Schema schema;
 
 	/**
 	 * Returns a Schema for the requested schema version
 	 * 
 	 * @return
 	 */
-	public synchronized static Schema getInstance() {
+	public synchronized static STIXSchema getInstance() {
 
 		if (instance != null) {
 			return instance;
 		} else {
-			instance = new Schema();
+			instance = new STIXSchema();
 		}
 
 		return instance;
@@ -77,7 +79,7 @@ public class Schema {
 	 * 
 	 * @param version
 	 */
-	private Schema() {
+	private STIXSchema() {
 
 		// TODO Pull from model
 		this.version = "1.1.1";
@@ -87,7 +89,7 @@ public class Schema {
 
 		try {
 			schemaResources = patternResolver
-					.getResources("classpath*:schemas/**/*.xsd");
+					.getResources("classpath*:schemas/v1.1.1/**/*.xsd");
 
 			prefixSchemaBindings = new HashMap<String, String>();
 
@@ -148,7 +150,7 @@ public class Schema {
 		    	schemas[i++] = new StreamSource(schemaLocation); 		    	
 		    }
 
-		    javax.xml.validation.Schema schema = factory.newSchema(schemas);
+		    schema = factory.newSchema(schemas);
 
 		    validator = schema.newValidator();	
 		    validator.setErrorHandler(new ValidationErrorHandler());
@@ -250,11 +252,16 @@ public class Schema {
 	public static void main(String[] args) throws ParserConfigurationException,
 			SAXException, IOException {
 
-		Schema schema = Schema.getInstance();
+		STIXSchema schema = STIXSchema.getInstance();
 
 		System.out
 				.println(schema
 						.validate(new URL(
 								"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml")));
+	}
+
+	public javax.xml.validation.Schema getSchema() {
+
+		return schema;
 	}
 }

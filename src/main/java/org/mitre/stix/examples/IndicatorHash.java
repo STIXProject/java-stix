@@ -14,6 +14,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.lang.StringUtils;
 import org.mitre.cybox.common_2.DateTimeWithPrecisionType;
 import org.mitre.cybox.common_2.HashListType;
 import org.mitre.cybox.common_2.HashType;
@@ -90,7 +91,7 @@ public class IndicatorHash {
 									.withProducedTime(new DateTimeWithPrecisionType(
 											now, null)));
 
-			Indicator indicator = new Indicator()
+			final Indicator indicator = new Indicator()
 					.withId(new QName("http://example.com/", "indicator-"
 							+ UUID.randomUUID().toString(), "example"))
 					.withTimestamp(now)
@@ -121,6 +122,8 @@ public class IndicatorHash {
 
 			System.out.println(stixPackage.toXMLString());
 
+			System.out.println(StringUtils.repeat("-", 120));			
+			
 			System.out.println("Validates: " + stixPackage.validate());
 
 		} catch (DatatypeConfigurationException e) {
