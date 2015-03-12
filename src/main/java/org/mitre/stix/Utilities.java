@@ -39,10 +39,10 @@ public class Utilities {
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger.getLogger(Utilities.class
 			.getName());
-	
+
 	private static final String XML_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
 	private static final String XML_NAMESPACE = "http://www.w3.org/2000/xmlns/";
-	
+
 	private interface ElementVisitor {
 
 		void visit(Element element);
@@ -50,10 +50,13 @@ public class Utilities {
 	}
 
 	/**
-	 * Used to transverse an XML document.
+	 * Used to traverse an XML document.
 	 * 
 	 * @param element
+	 *            Represents an element in an XML document.
 	 * @param visitor
+	 *            Code to be executed.
+	 * 
 	 */
 	private final static void traverse(Element element, ElementVisitor visitor) {
 
@@ -72,57 +75,60 @@ public class Utilities {
 	}
 
 	/**
-	 * Returns a String for a JAXBElement
+	 * Returns a pretty printed String for a JAXBElement
 	 * 
 	 * @param jaxbElement
+	 *            JAXB representation of an Xml Element to be printed.
 	 * @return
 	 */
 	public static String getXMLString(JAXBElement<?> jaxbElement) {
 		return getXMLString(jaxbElement, true);
 	}
-	
+
 	/**
 	 * Returns a String for a JAXBElement
 	 * 
 	 * @param jaxbElement
+	 *            JAXB representation of an Xml Element to be printed.
 	 * @param prettyPrint
-	 * @return
+	 *            True for pretty print, otherwise false
+	 * @return String containing the XML mark-up.
 	 */
-	public static String getXMLString(JAXBElement<?> jaxbElement, boolean prettyPrint) {
-		
+	public static String getXMLString(JAXBElement<?> jaxbElement,
+			boolean prettyPrint) {
+
 		try {
-	        Document document = DocumentBuilderFactory
-	                .newInstance().newDocumentBuilder().newDocument();
-			
-	        JAXBContext jaxbContext = JAXBContext
-	                .newInstance(jaxbElement.getDeclaredType().getPackage().getName());
-	
-	        Marshaller marshaller = jaxbContext.createMarshaller();
-	
-	        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-	                true);
-	
-	        marshaller
-	                .setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-	
-	        try {
-	            marshaller.marshal(jaxbElement, document);
-	        } catch (JAXBException e) {
-	            // otherwise handle non-XMLRootElements
-	            QName qualifiedName = new QName(
-	                    Utilities.getnamespaceURI(jaxbElement), jaxbElement.getClass().getSimpleName());
-	
-	            @SuppressWarnings({ "rawtypes", "unchecked" })
-	            JAXBElement root = new JAXBElement(
-	                    qualifiedName, jaxbElement.getClass(), jaxbElement);
-	
-	            marshaller.marshal(root, document);
-	        }
-	
-	        Utilities.removeUnusedNamespaces(document);
-	
-	        return Utilities.getXMLString(document, prettyPrint);
-        
+			Document document = DocumentBuilderFactory.newInstance()
+					.newDocumentBuilder().newDocument();
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(jaxbElement
+					.getDeclaredType().getPackage().getName());
+
+			Marshaller marshaller = jaxbContext.createMarshaller();
+
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+
+			try {
+				marshaller.marshal(jaxbElement, document);
+			} catch (JAXBException e) {
+				// otherwise handle non-XMLRootElements
+				QName qualifiedName = new QName(
+						Utilities.getnamespaceURI(jaxbElement), jaxbElement
+								.getClass().getSimpleName());
+
+				@SuppressWarnings({ "rawtypes", "unchecked" })
+				JAXBElement root = new JAXBElement(qualifiedName,
+						jaxbElement.getClass(), jaxbElement);
+
+				marshaller.marshal(root, document);
+			}
+
+			Utilities.removeUnusedNamespaces(document);
+
+			return Utilities.getXMLString(document, prettyPrint);
+
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		} catch (JAXBException e) {
@@ -131,21 +137,28 @@ public class Utilities {
 	}
 
 	/**
-	 * Returns a String for a Document.
+	 * Returns a pretty printed String for a Document object representing the
+	 * entire XML document.
 	 * 
 	 * @param document
-	 * @return
+	 *            Document object representing the entire XML document
+	 * 
+	 * @return Pretty printed String containing the XML mark-up.
 	 */
 	public static String getXMLString(Document document) {
 		return getXMLString(document, true);
 	}
-	
+
 	/**
-	 * Returns a String for a Document.
+	 * Returns a String for a Document object representing the entire XML
+	 * document.
 	 * 
 	 * @param document
+	 *            Document object representing the entire XML document
 	 * @param prettyPrint
-	 * @return
+	 *            True for pretty print, otherwise false
+	 * 
+	 * @return String containing the XML mark-up.
 	 */
 	public static String getXMLString(Document document, boolean prettyPrint) {
 
@@ -195,15 +208,14 @@ public class Utilities {
 	 * 
 	 * This helper method based on Reboot's
 	 * (http://stackoverflow.com/users/392730/reboot) response to a
-	 * stackoverflow question on the subject will prune down the namespaces to
-	 * only those used.
+	 * stackoverflow question on the subject. I've modified it slightly, but it
+	 * will prune down the namespaces to only those used.
 	 * 
 	 * @param document
-	 * @param class1 
-	 * @param string 
+	 *            Document object representing the entire XML document
 	 */
 	public static void removeUnusedNamespaces(Document document) {
-				
+
 		final Set<String> namespaces = new HashSet<String>();
 
 		Element element = document.getDocumentElement();
@@ -211,7 +223,7 @@ public class Utilities {
 		traverse(element, new ElementVisitor() {
 
 			public void visit(Element element) {
-				
+
 				String namespace = element.getNamespaceURI();
 
 				if (namespace == null)
@@ -244,7 +256,7 @@ public class Utilities {
 						}
 					} else {
 						String value = attribute.getNodeValue();
-						
+
 						if (value.contains(":")) {
 							prefix = value.substring(0, value.indexOf(":"));
 						} else {
@@ -298,7 +310,9 @@ public class Utilities {
 	 * Pull the namespace URI from the package for the class of the object.
 	 * 
 	 * @param obj
+	 * 		Expects a JAXB model object.
 	 * @return
+	 * 		Name of the XML namespace.
 	 */
 	public static String getnamespaceURI(Object obj) {
 

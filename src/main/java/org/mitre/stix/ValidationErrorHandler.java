@@ -17,11 +17,11 @@ public class ValidationErrorHandler implements ErrorHandler {
 
 	private void log(String type, SAXParseException e) {
 		System.err.println("SAXParseException " + type);
-		System.err.println("  Public ID: " + e.getPublicId());
-		System.err.println("  System ID: " + e.getSystemId());
-		System.err.println("  Line     : " + e.getLineNumber());
-		System.err.println("  Column   : " + e.getColumnNumber());
-		System.err.println("  Message  : " + e.getMessage());
+		System.err.println("\tPublic ID: " + e.getPublicId());
+		System.err.println("\tSystem ID: " + e.getSystemId());
+		System.err.println("\tLine     : " + e.getLineNumber());
+		System.err.println("\tColumn   : " + e.getColumnNumber());
+		System.err.println("\tMessage  : " + e.getMessage());
 	}
 
 	/* (non-Javadoc)

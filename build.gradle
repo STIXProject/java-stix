@@ -250,9 +250,8 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		def addMethods = [
 			/(.*)/: [
 				imports: [
-					"java.io.ByteArrayInputStream",
-					"java.io.IOException",
-					"java.io.InputStream",
+					"java.io.StringReader",
+					"java.io.StringWriter",
 					"javax.xml.bind.JAXBContext",
 					"javax.xml.bind.JAXBElement",
 					"javax.xml.bind.JAXBException",
@@ -263,17 +262,20 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 					"javax.xml.parsers.ParserConfigurationException",
 					"javax.xml.transform.stream.StreamSource",
 					"org.mitre.stix.Utilities",
-					"org.mitre.stix.Schema"
+					"org.mitre.stix.STIXSchema",
+					"org.mitre.stix.ValidationEventHandler",
+					"org.eclipse.persistence.jaxb.MarshallerProperties",
+					"org.eclipse.persistence.oxm.MediaType"
 				],
 				methodTemplates: [
 					"""\
 	/**
-	 * Returns XML String for JAXB Document Object Model object.
-	 * 
-	 * @param obj
+	 * Returns JSON String for JAXB Document Object Model object.
+	*
 	 * @return the XML String for the JAXB object
 	 */
 	public String toXMLString() {
+
 		org.w3c.dom.Document document;
 		Marshaller marshaller;
 		
@@ -285,38 +287,38 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 					.getPackage().getName());
 	
 			marshaller = jaxbContext.createMarshaller();
-	
+
+			// pretty print
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-	
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+			
+			marshaller.setSchema(STIXSchema.getInstance().getSchema());
+			marshaller.setEventHandler(new ValidationEventHandler());
+
+								
+			try {
+				marshaller.marshal(this, document);
+			} catch (JAXBException e) {
+				// otherwise handle non-XMLRootElements
+				QName qualifiedName = new QName(Utilities.getnamespaceURI(this),
+						this.getClass().getSimpleName());
+	
+				@SuppressWarnings({ "rawtypes", "unchecked" })
+				JAXBElement root = new JAXBElement(qualifiedName, this.getClass(),
+						this);
+	
+				marshaller.marshal(root, document);
+			}
+	
+			Utilities.removeUnusedNamespaces(document);
+	
+			return Utilities.getXMLString(document);		
+	
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
-		}
-
-		try {
-			marshaller.marshal(this, document);
-		} catch (JAXBException e) {
-			// otherwise handle non-XMLRootElements
-			QName qualifiedName = new QName(Utilities.getnamespaceURI(this),
-					this.getClass().getSimpleName());
-
-			@SuppressWarnings({ "rawtypes", "unchecked" })
-			JAXBElement root = new JAXBElement(qualifiedName, this.getClass(),
-					this);
-
-			try {
-				marshaller.marshal(root, document);
-			} catch (JAXBException e1) {
-				throw new RuntimeException(e1);
-			}
-		}
-
-		Utilities.removeUnusedNamespaces(document);
-
-		return Utilities.getXMLString(document);
-	}
+		}	}
 """,
 					"""\
 	/**
@@ -329,29 +331,22 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	public static \${name} fromXMLString(String text) {
 
 		JAXBContext jaxbContext;
-		InputStream inputStream = null;
-
-		JAXBElement<?> root = null;
 
 		try {
 			jaxbContext = JAXBContext.newInstance(\${name}.class.getPackage()
 					.getName());
 
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-	
-			inputStream = new ByteArrayInputStream(text.getBytes());
-	
-			root = unmarshaller.unmarshal(new StreamSource(inputStream),
-					\${name}.class);
-	
-			inputStream.close();
+			
+			unmarshaller.setSchema(STIXSchema.getInstance().getSchema());
+			unmarshaller.setEventHandler(new ValidationEventHandler());
+
+			StreamSource streamSource = new StreamSource(new StringReader(text));
+			return (\${name}) unmarshaller.unmarshal(streamSource);
+
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		return (\${name}) root.getValue();
+		} 
 	}
 """,
 					"""\
@@ -363,7 +358,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
      * @return boolean
      */
     public boolean validate() {
-        return Schema.getInstance().validate(toXMLString());
+        return STIXSchema.getInstance().validate(toXMLString());
     }
 """
 				]]]
@@ -509,6 +504,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 				def attributes = document.getDocumentElement().getAttributes()
 	
 				def attribute, targetNamespace, prefix
+								
 				for (int i = 0 ; i < attributes.getLength() ; i++) {
 					attribute = attributes.item(i)
 					targetNamespace = document.getDocumentElement().getAttribute("targetNamespace")
@@ -648,7 +644,7 @@ dependencies {
 	// with XML namespace URIs.
 	xjc "org.jvnet.jaxb2_commons:jaxb2-namespace-prefix:1.1"
 
-	compile "javax.xml.bind:jaxb-api:2.2.+"
+	//compile "javax.xml.bind:jaxb-api:2.2.+"
 	compile "org.jvnet.jaxb2_commons:jaxb2-basics-runtime:0.6.5"
 	compile "org.apache.httpcomponents:httpclient:4.3.5"
 	compile "org.apache.httpcomponents:httpclient-cache:4.3.5"
@@ -661,17 +657,19 @@ dependencies {
 	
 	compile "commons-lang:commons-lang:2.6"
 	
+	//compile "org.codehaus.jackson:jackson-mapper-asl:1.9.13"
+	
 	// TODO: This block used for prototyping AST code. Strip out later.
-	compile name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
-	compile name: "org.eclipse.osgi_3.10.0.v20140606-1445"
-	compile name: "org.eclipse.core.contenttype_3.4.200.v20140207-1251"
-	compile name: "org.eclipse.equinox.common_3.6.200.v20130402-1505"
-	compile name: "org.eclipse.text_3.5.300.v20130515-1451"
-	compile name: "org.eclipse.core.jobs_3.6.0.v20140424-0053"
-	compile name: "org.eclipse.equinox.preferences_3.5.200.v20140224-1527"
-	compile name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
-	compile name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
-	compile name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
+	//compile name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
+	//compile name: "org.eclipse.osgi_3.10.0.v20140606-1445"
+	//compile name: "org.eclipse.core.contenttype_3.4.200.v20140207-1251"
+	//compile name: "org.eclipse.equinox.common_3.6.200.v20130402-1505"
+	//compile name: "org.eclipse.text_3.5.300.v20130515-1451"
+	//compile name: "org.eclipse.core.jobs_3.6.0.v20140424-0053"
+	//compile name: "org.eclipse.equinox.preferences_3.5.200.v20140224-1527"
+	//compile name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
+	//compile name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
+	//compile name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
 }
 
 buildscript {

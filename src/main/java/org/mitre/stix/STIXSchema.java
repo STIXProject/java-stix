@@ -39,7 +39,8 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 /**
- * Represents the schema.
+ * Gathers up the STIX schema useful for marshalling and unmarshalling, and
+ * validation.
  * 
  * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
  */
@@ -55,13 +56,13 @@ public class STIXSchema {
 	private Map<String, String> prefixSchemaBindings;
 
 	private Validator validator;
-	
+
 	private javax.xml.validation.Schema schema;
 
 	/**
-	 * Returns a Schema for the requested schema version
+	 * Returns STIXSchema object representing the STIX schema.
 	 * 
-	 * @return
+	 * @return Always returns a STIXSchema object representing the STIX schema.
 	 */
 	public synchronized static STIXSchema getInstance() {
 
@@ -75,9 +76,7 @@ public class STIXSchema {
 	}
 
 	/**
-	 * Private constructor to permit one Schema per version.
-	 * 
-	 * @param version
+	 * Private constructor to permit a single STIXSchema to exists.
 	 */
 	private STIXSchema() {
 
@@ -122,38 +121,36 @@ public class STIXSchema {
 
 						prefix = attributes.item(i).getNodeName().split(":")[1];
 
-						if ((prefixSchemaBindings
-								.containsKey(prefix))
-								&& (prefixSchemaBindings.get(
-										prefix).split(
+						if ((prefixSchemaBindings.containsKey(prefix))
+								&& (prefixSchemaBindings.get(prefix).split(
 										"schemas/v1.1.1/")[1]
 										.startsWith("external"))) {
 
 							continue;
 
-						}	
+						}
 
-						LOGGER.fine("     adding: " + prefix + " :: "
-								+ url);
+						LOGGER.fine("     adding: " + prefix + " :: " + url);
 
 						prefixSchemaBindings.put(prefix, url);
 					}
 				}
 			}
-			
-		    SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-		    
-		    Source[] schemas = new Source[prefixSchemaBindings.values().size()];
-		    
-		    int i = 0;
-		    for (String schemaLocation : prefixSchemaBindings.values()) {
-		    	schemas[i++] = new StreamSource(schemaLocation); 		    	
-		    }
 
-		    schema = factory.newSchema(schemas);
+			SchemaFactory factory = SchemaFactory
+					.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 
-		    validator = schema.newValidator();	
-		    validator.setErrorHandler(new ValidationErrorHandler());
+			Source[] schemas = new Source[prefixSchemaBindings.values().size()];
+
+			int i = 0;
+			for (String schemaLocation : prefixSchemaBindings.values()) {
+				schemas[i++] = new StreamSource(schemaLocation);
+			}
+
+			schema = factory.newSchema(schemas);
+
+			validator = schema.newValidator();
+			validator.setErrorHandler(new ValidationErrorHandler());
 
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -167,7 +164,7 @@ public class STIXSchema {
 	/**
 	 * Returns the schema version
 	 * 
-	 * @return
+	 * @return The STIX schema version
 	 */
 	public String getVersion() {
 		return version;
@@ -177,8 +174,7 @@ public class STIXSchema {
 	 * Validate XML text retrieved from URL
 	 * 
 	 * @param url
-	 * @throws IOException
-	 * @throws SAXException
+	 *            The URL object for the XML to be validated.
 	 */
 	public boolean validate(URL url) {
 
@@ -195,18 +191,18 @@ public class STIXSchema {
 	}
 
 	/**
-	 * Validate XML text String
+	 * Validate an XML text String against the STIX schema
 	 * 
 	 * @param xmlText
-	 * @throws SAXException
-	 * @throws IOException
+	 *            A string of XML text to be validated
 	 */
 	public boolean validate(String xmlText) {
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
 
-		// remove schema hint as we have em
+		// This section removes the schema hint as we have the schema docs
+		// otherwise exceptions may be thrown
 
 		try {
 			DocumentBuilder b = factory.newDocumentBuilder();
@@ -237,8 +233,8 @@ public class STIXSchema {
 		}
 
 		try {
-		    validator.validate(new StreamSource(new ByteArrayInputStream(xmlText
-					.getBytes(StandardCharsets.UTF_8))));
+			validator.validate(new StreamSource(new ByteArrayInputStream(
+					xmlText.getBytes(StandardCharsets.UTF_8))));
 
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -247,6 +243,17 @@ public class STIXSchema {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns Schema object representing the STIX schema.
+	 * 
+	 * @return Always returns a non-null Schema object representing the STIX
+	 *         schema.
+	 */
+	public javax.xml.validation.Schema getSchema() {
+
+		return schema;
 	}
 
 	public static void main(String[] args) throws ParserConfigurationException,
@@ -260,8 +267,4 @@ public class STIXSchema {
 								"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml")));
 	}
 
-	public javax.xml.validation.Schema getSchema() {
-
-		return schema;
-	}
 }

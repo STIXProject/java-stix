@@ -14,7 +14,7 @@ import java.net.URL;
 import java.util.Scanner;
 
 /**
- * Round-trip example. This script takes a STIX instance document from XML to
+ * Round-trip example. This code takes a STIX instance document from XML to
  * a binding object, then XML string, and then back into an binding object, which 
  * is then used to generate an XML string.
  * 

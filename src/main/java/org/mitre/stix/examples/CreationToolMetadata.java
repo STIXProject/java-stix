@@ -36,9 +36,6 @@ public class CreationToolMetadata {
 	public CreationToolMetadata() {
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 
 		try {
