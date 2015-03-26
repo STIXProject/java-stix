@@ -91,7 +91,7 @@ task helloworld(type: HelloWorldTask) {}
 class RetrieveSchemasTask extends DefaultTask {
 	
 	def patch() {
-		logger.info("    Patching src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd")
+		println("    Patching src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd")
 		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: 'src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd')
 	}
 	
@@ -108,7 +108,7 @@ class RetrieveSchemasTask extends DefaultTask {
 		def proc = command.execute(null, project.rootDir)
 		proc.waitFor()
 
-		logger.info("    ${proc.in.text}")
+		println("    ${proc.in.text}")
 	}
 
 	@TaskAction
@@ -120,7 +120,7 @@ class RetrieveSchemasTask extends DefaultTask {
 				throw new GradleException("    Build error occurred: You will need retrieve schemas by hand. See README.md file.");
 			}
 		} else {
-			logger.info("    Schemas are present. Retrieval is not needed.")
+			println("    Schemas are present. Retrieval is not needed.")
 		}
 	}
 }
