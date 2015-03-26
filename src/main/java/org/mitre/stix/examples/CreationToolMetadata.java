@@ -24,9 +24,10 @@ import org.mitre.stix.stix_1.STIXPackage;
 /**
  * Build a STIX Document with Tool Information
  * 
- * Same as {@link https
- * ://raw.githubusercontent.com/STIXProject/python-stix/master
- * /examples/creation_tool_metadata.py}.
+ * See <a href=
+ * "https://raw.githubusercontent.com/STIXProject/python-stix/master/examples/creation_tool_metadata.py"
+ * >https://raw.githubusercontent.com/STIXProject/python-stix/master/examples/
+ * creation_tool_metadata.py</a>
  * 
  * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
  *
@@ -63,7 +64,7 @@ public class CreationToolMetadata {
 			System.out.println(stixPackage.toXMLString());
 
 			System.out.println(StringUtils.repeat("-", 120));
-			
+
 			System.out.println("Validates: " + stixPackage.validate());
 
 		} catch (DatatypeConfigurationException e) {

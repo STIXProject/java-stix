@@ -37,9 +37,10 @@ import org.mitre.stix.stix_1.STIXPackage;
  * Build a STIX Indicator document containing a File observable with an
  * associated hash.
  * 
- * Same as {@link https
- * ://raw.githubusercontent.com/STIXProject/python-stix/master
- * /examples/indicator-hash.py}.
+ * See <a href=
+ * "https://raw.githubusercontent.com/STIXProject/python-stix/master/examples/indicator-hash.py"
+ * >https://raw.githubusercontent.com/STIXProject/python-stix/master/examples/
+ * indicator-hash.py</a>
  * 
  * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
  *
@@ -122,8 +123,8 @@ public class IndicatorHash {
 
 			System.out.println(stixPackage.toXMLString());
 
-			System.out.println(StringUtils.repeat("-", 120));			
-			
+			System.out.println(StringUtils.repeat("-", 120));
+
 			System.out.println("Validates: " + stixPackage.validate());
 
 		} catch (DatatypeConfigurationException e) {

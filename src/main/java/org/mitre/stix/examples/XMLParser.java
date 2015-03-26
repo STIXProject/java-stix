@@ -18,9 +18,10 @@ import org.mitre.stix.stix_1.STIXPackage;
 /**
  * Prints indicator, observable, object count from a STIXPackage object
  * 
- * Same as {@link https
- * ://raw.githubusercontent.com/STIXProject/python-stix/master
- * /examples/xml_parser.py}.
+ * See <a href=
+ * "https://raw.githubusercontent.com/STIXProject/python-stix/master/examples/xml_parser.py"
+ * >https://raw.githubusercontent.com/STIXProject/python-stix/master/examples/
+ * xml_parser.py</a>
  * 
  * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
  *

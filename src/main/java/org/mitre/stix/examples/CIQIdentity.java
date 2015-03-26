@@ -47,9 +47,10 @@ import org.mitre.stix.stix_1.STIXPackage;
 /**
  * An example of how to add CIQ Identity information to a STIX Indicator.
  * 
- * Same as {@link https
- * ://raw.githubusercontent.com/STIXProject/python-stix/master
- * /examples/ciq_identity.py}.
+ * See <a href=
+ * "https://raw.githubusercontent.com/STIXProject/python-stix/master/examples/ciq_identity.py"
+ * >https://raw.githubusercontent.com/STIXProject/python-stix/master/examples/
+ * ciq_identity.py</a>
  * 
  * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
  *
@@ -66,14 +67,14 @@ public class CIQIdentity {
 	 * @throws ParserConfigurationException
 	 */
 	@SuppressWarnings("serial")
-	public static void main(String[] args)  {
-		
+	public static void main(String[] args) {
+
 		try {
 			// Get time for now.
 			XMLGregorianCalendar now = DatatypeFactory.newInstance()
 					.newXMLGregorianCalendar(
 							new GregorianCalendar(TimeZone.getTimeZone("UTC")));
-	
+
 			ContactNumbers contactNumbers = new ContactNumbers()
 					.withContactNumbers(new ContactNumbers.ContactNumber()
 							.withContactNumberElements(
@@ -81,15 +82,15 @@ public class CIQIdentity {
 											.withValue("555-555-5555"),
 									new ContactNumbers.ContactNumber.ContactNumberElement()
 											.withValue("555-555-5556")));
-	
+
 			ElectronicAddressIdentifiers electronicAddressIdentifiers = new ElectronicAddressIdentifiers()
 					.withElectronicAddressIdentifiers(new ElectronicAddressIdentifiers.ElectronicAddressIdentifier()
 							.withValue("jsmith@example.com"));
-	
+
 			FreeTextLines freeTextLines = new FreeTextLines()
 					.withFreeTextLines(new FreeTextLines.FreeTextLine()
 							.withValue("Demonstrating Free Text!"));
-	
+
 			PartyNameType partyName = new PartyNameType()
 					.withNameLines(new NameLine().withValue("Foo"),
 							new NameLine().withValue("Bar"))
@@ -105,15 +106,16 @@ public class CIQIdentity {
 							new OrganisationName()
 									.withNameElements(new oasis.names.tc.ciq.xnl._3.OrganisationNameType.NameElement()
 											.withValue("Bar Corp.")));
-	
+
 			STIXCIQIdentity30Type specification = new STIXCIQIdentity30Type()
 					.withContactNumbers(contactNumbers)
-					.withElectronicAddressIdentifiers(electronicAddressIdentifiers)
+					.withElectronicAddressIdentifiers(
+							electronicAddressIdentifiers)
 					.withFreeTextLines(freeTextLines).withPartyName(partyName);
-	
+
 			CIQIdentity30InstanceType identity = new CIQIdentity30InstanceType()
 					.withSpecification(specification);
-	
+
 			InformationSourceType producer = new InformationSourceType()
 					.withDescription(
 							new StructuredTextType(
@@ -123,29 +125,30 @@ public class CIQIdentity {
 							new TimeType()
 									.withProducedTime(new DateTimeWithPrecisionType(
 											now, null))).withIdentity(identity);
-	
+
 			FileObjectType fileObject = new FileObjectType()
 					.withHashes(new HashListType(new ArrayList<HashType>() {
 						{
 							add(new HashType()
 									.withType(
-											new HashNameVocab10().withValue("MD5"))
+											new HashNameVocab10()
+													.withValue("MD5"))
 									.withSimpleHashValue(
 											new SimpleHashValueType()
 													.withValue("4EC0027BEF4D7E1786A04D021FA8A67F")));
 						}
 					}));
-	
-			ObjectType obj = new ObjectType().withProperties(fileObject).withId(
-					new QName("http://example.com/", "file-"
+
+			ObjectType obj = new ObjectType().withProperties(fileObject)
+					.withId(new QName("http://example.com/", "file-"
 							+ UUID.randomUUID().toString(), "example"));
-	
+
 			Observable observable = new Observable().withId(new QName(
 					"http://example.com/", "observable-"
 							+ UUID.randomUUID().toString(), "example"));
-	
+
 			observable.setObject(obj);
-	
+
 			final Indicator indicator = new Indicator()
 					.withId(new QName("http://example.com/", "indicator-"
 							+ UUID.randomUUID().toString(), "example"))
@@ -156,17 +159,18 @@ public class CIQIdentity {
 									"An indicator containing a File observable with an associated hash",
 									null)).withProducer(producer)
 					.withObservable(observable);
-	
+
 			IndicatorsType indicators = new IndicatorsType(
 					new ArrayList<IndicatorBaseType>() {
 						{
 							add(indicator);
 						}
 					});
-	
+
 			STIXHeaderType header = new STIXHeaderType()
-					.withDescription(new StructuredTextType().withValue("Example"));
-	
+					.withDescription(new StructuredTextType()
+							.withValue("Example"));
+
 			STIXPackage stixPackage = new STIXPackage()
 					.withSTIXHeader(header)
 					.withIndicators(indicators)
@@ -174,17 +178,18 @@ public class CIQIdentity {
 					.withTimestamp(now)
 					.withId(new QName("http://example.com/", "package-"
 							+ UUID.randomUUID().toString(), "example"));
-	
+
 			System.out.println(stixPackage.toXMLString());
-			
+
 			System.out.println(StringUtils.repeat("-", 120));
-	
+
 			System.out.println("Validates: " + stixPackage.validate());
-			
+
 			System.out.println(StringUtils.repeat("-", 120));
-			
-			System.out.println(STIXPackage.fromXMLString(stixPackage.toXMLString()));
-				
+
+			System.out.println(STIXPackage.fromXMLString(stixPackage
+					.toXMLString()));
+
 		} catch (DatatypeConfigurationException e) {
 			throw new RuntimeException(e);
 		}

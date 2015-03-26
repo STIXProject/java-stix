@@ -79,7 +79,7 @@ public class Utilities {
 	 * 
 	 * @param jaxbElement
 	 *            JAXB representation of an Xml Element to be printed.
-	 * @return
+	 * @return String containing the XML mark-up.
 	 */
 	public static String getXMLString(JAXBElement<?> jaxbElement) {
 		return getXMLString(jaxbElement, true);
@@ -310,9 +310,8 @@ public class Utilities {
 	 * Pull the namespace URI from the package for the class of the object.
 	 * 
 	 * @param obj
-	 * 		Expects a JAXB model object.
-	 * @return
-	 * 		Name of the XML namespace.
+	 *            Expects a JAXB model object.
+	 * @return Name of the XML namespace.
 	 */
 	public static String getnamespaceURI(Object obj) {
 
