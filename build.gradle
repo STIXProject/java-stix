@@ -195,7 +195,7 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 						
 						if (prefixSchemaBindings.containsKey(prefix)) {
 							//TODO: change to logging.
-							logger.warn("  " + schemaLocation + " claims the same prefix \"" + prefix + "\" as " + prefixSchemaBindings[prefix])
+							logger.warn("    " + schemaLocation + " claims the same prefix \"" + prefix + "\" as " + prefixSchemaBindings[prefix])
 						} else {
 							prefixSchemaBindings[prefix] = schemaLocation
 						}
