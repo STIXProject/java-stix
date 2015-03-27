@@ -17,270 +17,64 @@
  * 	build/libs/java-stix-${version}.jar
  */
 
+import org.gradle.plugins.signing.Sign
+
+import org.mitre.stix.RetrieveSchemasTask
+import org.mitre.stix.PrefixNamespaceBindingsTask
+import org.mitre.stix.GenerateJAXBTask
+//import org.mitre.stix.GeneratedSourceTransformationTask
+
+apply plugin: "java"
+apply plugin: "groovy"
+apply plugin: "eclipse"
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+version = "1.1.1"
+def isReleaseVersion = !version.endsWith("SNAPSHOT")
+
+def stixShemaVersion = "1.1.1"
+
+group = "org.mitre"
+archivesBaseName = "stix"
+
+defaultTasks "jar"
+
+task retrieveSchemas(type: RetrieveSchemasTask, dependsOn: clean) {
+	schemaVersion = project.version
+}
+
+task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask, dependsOn: retrieveSchemas)
+
+task generateJAXB(type: GenerateJAXBTask, dependsOn: createPrefixNamespaceBindings) {
+	classpath= buildscript.configurations.classpath
+	schemaVersion = project.version
+}
+
+// TODO: Figure out to put this into its own custom class in buildSrc directory -----------------
+import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.TaskAction
+
 import groovy.io.FileType
 import groovy.text.SimpleTemplateEngine
-import groovy.xml.StreamingMarkupBuilder
-import groovy.xml.XmlUtil
-
-import java.io.ByteArrayInputStream
-import java.io.File
-import java.nio.file.FileSystems
-import java.io.InputStream
-import java.text.SimpleDateFormat
-import java.util.ArrayList;
-import java.util.Date
-import java.util.Hashtable;
-import java.util.List
-import java.util.Map;
-import java.util.regex.Matcher
-import java.util.regex.Pattern
-
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.JAXBException
-import javax.xml.bind.Marshaller
-import javax.xml.bind.Unmarshaller
-import javax.xml.namespace.QName
-import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.parsers.ParserConfigurationException
-import javax.xml.transform.stream.StreamSource
 
 import org.eclipse.jdt.core.JavaCore
 import org.eclipse.jdt.core.ToolFactory
-import org.eclipse.jdt.core.compiler.IProblem
 import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTNode
 import org.eclipse.jdt.core.dom.ASTParser
 import org.eclipse.jdt.core.dom.CompilationUnit
-import org.eclipse.jdt.core.dom.ImportDeclaration
+//import org.eclipse.jdt.core.dom.ImportDeclaration
 import org.eclipse.jdt.core.dom.TypeDeclaration
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite
 import org.eclipse.jdt.core.formatter.CodeFormatter
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
-import org.eclipse.jface.text.Document
-import org.eclipse.text.edits.TextEdit
+//import org.eclipse.jface.text.Document
+//import org.eclipse.text.edits.TextEdit
 
-import org.w3c.dom.Document
-import org.apache.tools.ant.taskdefs.condition.Os
-
-import org.gradle.plugins.signing.Sign
-
-apply plugin: "java"
-
-apply plugin: "groovy"
-
-apply plugin: "eclipse"
-apply plugin: 'maven'
-apply plugin: 'signing'
-
-
-defaultTasks "jar"
-
-// TODO: use stixShemaVersion and version
-version = "1.1.1"
-//ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
-group = "org.mitre"
-archivesBaseName = "stix"
-
-// Will attempt to automatically retrieve the schemas
-class RetrieveSchemasTask extends DefaultTask {
-	
-	def patch() {
-		println("    Patching src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd")
-		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: 'src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd')
-	}
-	
-	def pull() {
-	
-		def command = null
-
-		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-			command = "cmd /c retrieve_schemas.bat"
-		} else {
-			command = "sh ./retrieve_schemas.sh"
-		}
-
-		def proc = command.execute(null, project.rootDir)
-		proc.waitFor()
-
-		println("    ${proc.in.text}")
-	}
-
-	@TaskAction
-	def retrieve() {
-		if ((project.file("src/main/resources/schemas/v1.1.1").list().size() == 0) || (project.file("src/main/resources/schemas/v1.1.1/cybox").list() == null)) {
-			pull()
-			patch()
-			if ((project.file("src/main/resources/schemas/v1.1.1").list().size() == 0) || (project.file("src/main/resources/schemas/v1.1.1/cybox").list() == null)) {
-				throw new GradleException("    Build error occurred: You will need retrieve schemas by hand. See README.md file.");
-			}
-		} else {
-			println("    Schemas are present. Retrieval is not needed.")
-		}
-	}
-}
-
-task retrieveSchemas(type: RetrieveSchemasTask, dependsOn: clean) {
-	description "Automatically attempt to retrieve the schemas."
-}
-
-
-// Dynamically creates the 
-//      src/main/resources/namespace-prefix.xjb
-
-// file from the schemas.
-//
-// namespace-prefix.xjb prevents XJC from dynamically assigning ns namespaces
-// and catalog.xml is used for parsing and validation.
-class PrefixNamespaceBindingsTask extends DefaultTask {
-	
-	// Returns a hashmap Binding objects
-	def get() {
-	
-		// ignore these namespaces cuz they are orphans
-		def notPartOfThisCompilation = [
-			"schemas/v1.1.1/cybox/external/cpe_2.3/cpe-naming_2.3.xsd",
-			"schemas/v1.1.1/cybox/external/cpe_2.3/cpe-language_2.3.xsd",
-			"schemas/v1.1.1/cybox/external/oasis_ciq_3.0/xlink-2003-12-31.xsd"
-		]
-
-		// fix paths for present platform
-		if (File.separator.equals("\\")) {
-			// couldn't get collect to work on windows
-			def temp = []
-			notPartOfThisCompilation.each {
-				temp.add(it.replaceAll("/", "\\\\"))
-
-			}
-			notPartOfThisCompilation = temp
-		}
-
-		def prefixSchemaBindings = [:]
-
-		// Gather up the schemas
-		def schemas = []
-		project.file("src/main/resources/schemas/v1.1.1").eachFileRecurse(FileType.FILES) { file ->
-			if (file.name.endsWith(".xsd")) {
-				schemas << file
-			}
-		}	
-		
-		schemas.each {schema ->
-
-			def schemaLocation = "schemas/v1.1.1" + schema.getAbsolutePath().split("schemas/v1.1.1")[1]
-			
-			if (!notPartOfThisCompilation.contains(schemaLocation)) {
-	
-				def document = DocumentBuilderFactory.newInstance()
-						.newDocumentBuilder().parse(new FileInputStream(schema))
-	
-				document.getDocumentElement().normalize()
-	
-				def attributes = document.getDocumentElement().getAttributes()
-	
-				def attribute, targetNamespace, prefix
-								
-				for (int i = 0 ; i < attributes.getLength() ; i++) {
-					attribute = attributes.item(i)
-					targetNamespace = document.getDocumentElement().getAttribute("targetNamespace")
-	
-					if (attribute.getNodeName().startsWith("xmlns:") && attribute.getNodeValue().equals(targetNamespace)) {
-	
-						prefix = attributes.item(i).getNodeName().split(":")[1]
-						
-						if (prefixSchemaBindings.containsKey(prefix)) {
-							//TODO: change to logging.
-							logger.warn("    " + schemaLocation + " claims the same prefix \"" + prefix + "\" as " + prefixSchemaBindings[prefix])
-						} else {
-							prefixSchemaBindings[prefix] = schemaLocation
-						}
-					}
-				}
-			}
-		}
-
-		//Add these external schemas
-		prefixSchemaBindings["xal"] = "schemas/v1.1.1/external/oasis_ciq_3.0/xAL-types.xsd"	
-		prefixSchemaBindings["xpil"] = "schemas/v1.1.1/external/oasis_ciq_3.0/xPIL.xsd"
-		prefixSchemaBindings["xnl"] = "schemas/v1.1.1/external/oasis_ciq_3.0/xNL-types.xsd"
-		
-		// Rename "maecPackage" to "maec"
-		prefixSchemaBindings.remove("maecPackage")
-		prefixSchemaBindings["maec"] = "schemas/v1.1.1/external/maec_4.1/maec_package_schema.xsd"
-
-		// The crawl would map the 'tns' prefix to both of these... fix that.
-		prefixSchemaBindings.remove("tns")
-		prefixSchemaBindings["ioc-tr"] = "schemas/v1.1.1/external/open_ioc_2010/ioc-TR.xsd"
-		prefixSchemaBindings["ioc"] = "schemas/v1.1.1/external/open_ioc_2010/ioc.xsd"
-
-//		prefixSchemaBindings.each{ k, v ->
-//			log.info("---> ${k} : ${v}")
-//		}
-
-		prefixSchemaBindings
-	}
-
-	// Dynamically creates the src/main/resources/namespace-prefix.xjb file used by XJC jaxb2-namespace-prefix plugin
-	@TaskAction
-	def create() {
-	
-		def prefixSchemaBindings = get()
-
-		def dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-		def date = new Date();
-
-		def xmlBuilder = new StreamingMarkupBuilder()
-		def writer = xmlBuilder.bind {
-			mkp.comment "WARNING!!!!! Dynamically created on ${dateFormat.format(date)} by the build.gradle's createPrefixNamespaceBindings task. All changes made to this file will be lost."
-			mkp.declareNamespace(jaxb:"http://java.sun.com/xml/ns/jaxb")
-			mkp.declareNamespace(xsi:"http://www.w3.org/2001/XMLSchema-instance")
-			mkp.declareNamespace(xs:"http://www.w3.org/2001/XMLSchema")
-			mkp.declareNamespace(namespace:"http://jaxb2-commons.dev.java.net/namespace-prefix")
-			'jaxb:bindings'(version: "2.1", "xsi:schemaLocation":"http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd http://jaxb2-commons.dev.java.net/namespace-prefix http://java.net/projects/jaxb2-commons/sources/svn/content/namespace-prefix/trunk/src/main/resources/prefix-namespace-schema.xsd") {
-				prefixSchemaBindings.each { prefix, schemaLocation ->
-					'jaxb:bindings'(schemaLocation:schemaLocation) {
-						'namespace:prefix'(name: prefix)
-					}
-				}
-			}
-		}
-		
-		project.file("src/main/resources/namespace-prefix.xjb")
-				.setText(XmlUtil.serialize(writer.toString()))
-				
-	}
-}
-
-task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask, dependsOn: retrieveSchemas) {
-	description "Dynamically create the prefix-namespace bindings file off of the schemas"
-}
-
-task generateJAXB(dependsOn: createPrefixNamespaceBindings) << {
-
-	ant.taskdef(name: "xjc", classname: "org.jvnet.jaxb2_commons.xjc.XJC2Task", classpath: configurations.xjc.asPath)
-
-	ant.mkdir(dir: "src/generated/java")
-	
-	def schemaDir = "src/main/resources/schemas/v" + version
-
-	ant.xjc(destdir: "src/generated/java", extension: true, classpath: configurations.xjc.asPath) {
-		arg(line: "-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code -XtoString")
-		binding(dir: "src/main/resources", includes: "*.xjb")
-		schema(dir: schemaDir, includes: "cybox/cybox_core.xsd")
-		schema(dir: schemaDir, includes: "cybox/cybox_common.xsd")
-		schema(dir: schemaDir, includes: "cybox/cybox_default_vocabularies.xsd")
-		schema(dir: schemaDir, includes: "cybox/objects/*.xsd")
-		//schema(dir: schemaDir, excludes: "cybox/external/**/*.xsd")
-		schema(dir: schemaDir, includes: "*.xsd")
-		schema(dir: schemaDir, includes: "extensions/**/*.xsd")
-		schema(dir: schemaDir, includes: "external/**/*.xsd")
-		//Doing it this way, xjc cannot find its way to all the imported schemas ...
-		//schema(dir: schemaDir, includes: "**/*.xsd")
-	}
-}
-
-generateJAXB.description "Generate the JAXB Document Model"
+import java.util.LinkedHashMap
+import java.util.regex.Pattern
 
 // Analyze and transform the generated document object model source. Creating
 // an XJC plug would take too long and introduce the compilation of an external
@@ -364,7 +158,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 				cu.imports().add(importDeclaration)
 			}
 	
-			TextEdit edits = cu.rewrite(document, null)
+			def edits = cu.rewrite(document, null)
 			edits.apply(document)
 		}
 
@@ -444,26 +238,22 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	 * @return the XML String for the JAXB object
 	 */
 	public String toXMLString() {
-
 		org.w3c.dom.Document document;
 		Marshaller marshaller;
 		
 		try {
 			document = DocumentBuilderFactory.newInstance()
 					.newDocumentBuilder().newDocument();
-
 			JAXBContext jaxbContext = JAXBContext.newInstance(this.getClass()
 					.getPackage().getName());
 	
 			marshaller = jaxbContext.createMarshaller();
-
 			// pretty print
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 			
 			marshaller.setSchema(STIXSchema.getInstance().getSchema());
 			marshaller.setEventHandler(new ValidationEventHandler());
-
 								
 			try {
 				marshaller.marshal(this, document);
@@ -487,7 +277,8 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 			throw new RuntimeException(e);
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
-		}	}
+		}	
+	}
 """,
 					"""\
 	/**
@@ -498,21 +289,16 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	 * @return JAXB object
 	 */
 	public static \${name} fromXMLString(String text) {
-
 		JAXBContext jaxbContext;
-
 		try {
 			jaxbContext = JAXBContext.newInstance(\${name}.class.getPackage()
 					.getName());
-
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 			
 			unmarshaller.setSchema(STIXSchema.getInstance().getSchema());
 			unmarshaller.setEventHandler(new ValidationEventHandler());
-
 			StreamSource streamSource = new StreamSource(new StringReader(text));
 			return (\${name}) unmarshaller.unmarshal(streamSource);
-
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
 		} 
@@ -618,10 +404,13 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		}
 	}
 }
+// END TODO -------------------------------------------------------------------------------------
 
 task generatedSourceTransformation(type: GeneratedSourceTransformationTask, dependsOn: generateJAXB) {
 	description "Perfom syntactical analysis and tranformations on the model (e.g., adding convenience methods)"
 }
+
+
 
 compileJava.dependsOn generatedSourceTransformation
 
@@ -639,12 +428,10 @@ task sourcesJar(type: Jar, dependsOn: javadoc) {
     from sourceSets.main.allSource
 }
 
-
 clean {
 	delete("src/generated/java")
 	delete("src/main/resources/namespace-prefix.xjb")
 }
-
 
 sourceSets {
 	main {
@@ -659,51 +446,17 @@ sourceSets {
 repositories {
 	jcenter()
 	mavenCentral()
+	mavenLocal()
 
 	// TODO: Used for prototyping groovy code. strip out later.
-	flatDir { dirs "libs" }
+	//flatDir { dirs "libs" }
 }
-
-configurations { xjc }
 
 dependencies {
 
 	compile localGroovy()
 	compile gradleApi()
-
-	xjc "com.sun.xml.bind:jaxb-xjc:2.2.5-2"
-	xjc "com.sun.xml.bind:jaxb-impl:2.2.5-2"
-	xjc "javax.xml.bind:jaxb-api:2.2.+"
-
-	// JAXB2 Basics provides a package of plugins which can generate such
-	// utility code
-	xjc "org.jvnet.jaxb2_commons:jaxb2-basics:0.6.5"
-	xjc "org.jvnet.jaxb2_commons:jaxb2-basics-ant:0.6.5"
-
-	// Causes JAXB RI 2 XJC to generate additional methods that allows method
-	// chaining.
-	xjc "org.jvnet.jaxb2_commons:jaxb2-fluent-api:3.0"
-
-	// Causes JAXB RI 2 XJC to generate a value constructor, where each
-	// embedded element is included as a constructor parameter.
-	xjc "org.jvnet.jaxb2_commons:jaxb2-value-constructor:3.0"
-
-	// Causes JAXB RI 2.2 XJC to automatically generate methods for toString(),
-	// equals() and hashCode() using jakarta-commons-lang. The code that uses
-	// this plugin can still run with any JAXB2 implementation.
-	//xjc "org.jvnet.jaxb2_commons:jaxb2-commons-lang:2.4"
-
-	// This plugin uses the XML schema "element" tag's "default" attribute to
-	// set default values for variables in the classes generated by JAXB
-	xjc "org.jvnet.jaxb2_commons:jaxb2-default-value:1.1"
-
-	// This plugin adds 'javax.xml.bind.annotation.XmlNs' annotations to
-	// 'package-info.java' file according to specific definitions in
-	// bindings.xml file. Those annotations associate namespace prefixes
-	// with XML namespace URIs.
-	xjc "org.jvnet.jaxb2_commons:jaxb2-namespace-prefix:1.1"
-
-	//compile "javax.xml.bind:jaxb-api:2.2.+"
+	
 	compile "org.jvnet.jaxb2_commons:jaxb2-basics-runtime:0.6.5"
 	compile "org.apache.httpcomponents:httpclient:4.3.5"
 	compile "org.apache.httpcomponents:httpclient-cache:4.3.5"
@@ -715,20 +468,6 @@ dependencies {
 	compile "commons-io:commons-io:2.4"
 	
 	compile "commons-lang:commons-lang:2.6"
-	
-	//compile "org.codehaus.jackson:jackson-mapper-asl:1.9.13"
-	
-	// TODO: This block used for prototyping AST code. Strip out later.
-	//compile name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
-	//compile name: "org.eclipse.osgi_3.10.0.v20140606-1445"
-	//compile name: "org.eclipse.core.contenttype_3.4.200.v20140207-1251"
-	//compile name: "org.eclipse.equinox.common_3.6.200.v20130402-1505"
-	//compile name: "org.eclipse.text_3.5.300.v20130515-1451"
-	//compile name: "org.eclipse.core.jobs_3.6.0.v20140424-0053"
-	//compile name: "org.eclipse.equinox.preferences_3.5.200.v20140224-1527"
-	//compile name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
-	//compile name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
-	//compile name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
 }
 
 jar {
@@ -745,8 +484,8 @@ jar {
 
 gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.allTasks.any { it instanceof Sign }) {
-		// these three should be defined out of the repository, for example, in ~/.gradle/gradle.properties
-		// or alternatively as environment variables
+		// signingKeyId, signingPassword, secretKeyFile should be defined out of the repository, 
+		// for example, in ~/.gradle/gradle.properties or alternatively as environment variables
 		
 		// signingKeyId = System.properties['signingKeyId']
 		// secretKeyFile = System.properties['secretKeyFile']
@@ -805,8 +544,9 @@ artifacts {
 
 uploadArchives {
 
-    // these two should be defined out of the repository, for example, in ~/.gradle/gradle.properties
-	// or alternatively as environment variables
+    // ossrhUsername, ossrhPassword should be defined out of the repository, 
+    // for example, in ~/.gradle/gradle.properties or alternatively as 
+    // environment variables
 
 	// ossrhUsername = System.properties['sonotypeJiraId']
 	// ossrhPassword= System.properties['sonotypeJiraPassword']
@@ -864,23 +604,84 @@ buildscript {
 	repositories {
 		jcenter()
 		mavenCentral()
+		mavenLocal()
+		
+		//maven {       
+        //	url "${System.properties['user.home']}/.m2/repository"
+    	//}
 
-		flatDir { dirs "libs" }
+		//flatDir { dirs "libs" }
+    	
+    	//flatDir(dir: "${projectDir]}/libs", name: 'Local libs directory')
+
+    	//maven {
+        //	url "http://repo.typesafe.com/typesafe/releases/"
+    	//}
+
+    	//maven {
+        //	url "http://gradle.artifactoryonline.com/gradle/libs/"
+    	//}    	
 	}
+	
+	//configurations { xjc }
 
 	dependencies {
 	
+		//classpath name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
+		//classpath name: "org.eclipse.osgi_3.10.0.v20140606-1445"
+		//classpath name: "org.eclipse.core.contenttype_3.4.200.v20140207-1251"
+		//classpath name: "org.eclipse.equinox.common_3.6.200.v20130402-1505"
+		//classpath name: "org.eclipse.text_3.5.300.v20130515-1451"
+		//classpath name: "org.eclipse.core.jobs_3.6.0.v20140424-0053"
+		//classpath name: "org.eclipse.equinox.preferences_3.5.200.v20140224-1527"
+		//classpath name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
+		//classpath name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
+		//classpath name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
+
+		classpath "org.eclipse.core:org.eclipse.core.runtime:3.10.0.v20140318-2214"
+		classpath "org.eclipse:org.eclipse.osgi:3.10.0.v20140606-1445"
+		classpath "org.eclipse.core:org.eclipse.core.contenttype:3.4.200.v20140207-1251"
+		classpath "org.eclipse.equinox:org.eclipse.equinox.common:3.6.200.v20130402-1505"
+		classpath "org.eclipse:org.eclipse.text:3.5.300.v20130515-1451"
+		classpath "org.eclipse.core:org.eclipse.core.jobs:3.6.0.v20140424-0053"
+		classpath "org.eclipse.equinox:org.eclipse.equinox.preferences:3.5.200.v20140224-1527"
+		classpath "org.eclipse.core:org.eclipse.core.resources:3.9.0.v20140514-1307"
+		classpath "org.eclipse.jdt:org.eclipse.jdt.core:3.10.0.v20140604-1726"
+		classpath "org.eclipse.equinox:org.eclipse.equinox.registry:3.5.400.v20140428-1507"
+
+		//--- xjc
+		
+		classpath "com.sun.xml.bind:jaxb-xjc:2.2.5-2"
+		classpath "com.sun.xml.bind:jaxb-impl:2.2.5-2"
+		classpath "javax.xml.bind:jaxb-api:2.2.+"
 	
-		classpath name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
-		classpath name: "org.eclipse.osgi_3.10.0.v20140606-1445"
-		classpath name: "org.eclipse.core.contenttype_3.4.200.v20140207-1251"
-		classpath name: "org.eclipse.equinox.common_3.6.200.v20130402-1505"
-		classpath name: "org.eclipse.text_3.5.300.v20130515-1451"
-		classpath name: "org.eclipse.core.jobs_3.6.0.v20140424-0053"
-		classpath name: "org.eclipse.equinox.preferences_3.5.200.v20140224-1527"
-		classpath name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
-		classpath name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
-		classpath name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
+		// JAXB2 Basics provides a package of plugins which can generate such
+		// utility code
+		classpath "org.jvnet.jaxb2_commons:jaxb2-basics:0.6.5"
+		classpath "org.jvnet.jaxb2_commons:jaxb2-basics-ant:0.6.5"
+	
+		// Causes JAXB RI 2 XJC to generate additional methods that allows method
+		// chaining.
+		classpath "org.jvnet.jaxb2_commons:jaxb2-fluent-api:3.0"
+	
+		// Causes JAXB RI 2 XJC to generate a value constructor, where each
+		// embedded element is included as a constructor parameter.
+		classpath "org.jvnet.jaxb2_commons:jaxb2-value-constructor:3.0"
+	
+		// Causes JAXB RI 2.2 XJC to automatically generate methods for toString(),
+		// equals() and hashCode() using jakarta-commons-lang. The code that uses
+		// this plugin can still run with any JAXB2 implementation.
+		//xjc "org.jvnet.jaxb2_commons:jaxb2-commons-lang:2.4"
+	
+		// This plugin uses the XML schema "element" tag's "default" attribute to
+		// set default values for variables in the classes generated by JAXB
+		classpath "org.jvnet.jaxb2_commons:jaxb2-default-value:1.1"
+	
+		// This plugin adds 'javax.xml.bind.annotation.XmlNs' annotations to
+		// 'package-info.java' file according to specific definitions in
+		// bindings.xml file. Those annotations associate namespace prefixes
+		// with XML namespace URIs.
+		classpath "org.jvnet.jaxb2_commons:jaxb2-namespace-prefix:1.1"
 
 		//classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.1"
 	}
