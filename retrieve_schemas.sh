@@ -5,7 +5,6 @@ git submodule init
 git submodule update --force
 cd src/main/resources/schemas/v1.1.1
 git checkout tags/v1.1.1
-cd cybox
 
 echo "    Retrieving CybOX schemas..."
 git submodule init
