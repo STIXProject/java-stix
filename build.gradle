@@ -66,8 +66,6 @@ import org.apache.tools.ant.taskdefs.condition.Os
 
 import org.gradle.plugins.signing.Sign
 
-import org.mitre.stix.HelloWorldTask
-
 apply plugin: "java"
 
 apply plugin: "groovy"
@@ -84,8 +82,6 @@ version = "1.1.1"
 //ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 group = "org.mitre"
 archivesBaseName = "stix"
-
-task helloworld(type: HelloWorldTask) {}
 
 // Will attempt to automatically retrieve the schemas
 class RetrieveSchemasTask extends DefaultTask {
