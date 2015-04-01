@@ -272,7 +272,7 @@ After running the Gradle buildscript, if you are using the Eclipse IDE
 you may want to run the following from the command-line to set up the
 Ecipse environment:
 
-	gradle clean cleanEclipse eclipse
+	gradle build cleanEclipse eclipse
 
 It entirely depends on how smart yoour Eclipse Gradle plugin is and how
 you imported the project.  The above command will change your prject to
