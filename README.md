@@ -135,12 +135,6 @@ And for now add the folling lines to your ~/gradle/gradle.properties file
 Otherwise, gradle will fail not finding "sonotypeJiraId" or some such.  I need to set all
 these properties to archivePush java-stix to Maven Central.
 
-You'll also need to push a number of eclipse libraries that are not 
-reliably distributed into you local maven repo. 
-
-	cd ./libs
-	./insertIntoMavenLocal.sh
-
 ### Building via Gradle buildscript
 
 Change directories into the project and enter on the command-line:
