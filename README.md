@@ -21,6 +21,31 @@ specification at [http://semver.org/](http://semver.org/). Java-stix
 is currently under active development; see TODO.txt for a tentative
 roadmap.  Releases will be announced on the [STIX discussion list](http://stix.mitre.org/community/registration.html).
 
+## Snapshots
+
+Snapshots are being pushed to 
+
+https://oss.sonatype.org/content/repositories/snapshots/org/mitre/stix/ 
+
+So, users can simply retrieve java-stix directly via the Central Repository.
+
+     <repositories>
+       <repository>
+         <id>snapshots-repo</id>
+         <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+         <releases><enabled>false</enabled></releases>
+         <snapshots><enabled>true</enabled></snapshots>
+       </repository>
+     </repositories>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.mitre</groupId>
+			<artifactId>stix</artifactId>
+			<version>1.1.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
 # Building
 
 ## Clone the repository
@@ -53,7 +78,9 @@ To manually retrieve the schemas, enter the project and run
 these  additonal git commands on the command line:
 
     git submodule init
-    git submodule update
+    git submodule update --force
+    cd src/main/resources/schemas/v1.1.1
+    git checkout tags/v1.1.1
     
 Your not done.  You'll also need to retrieve the CybOX schemas.
 
@@ -61,9 +88,9 @@ Your not done.  You'll also need to retrieve the CybOX schemas.
 
 While in the project:
 
-    cd src/main/resources/schemas
     git submodule init
-    git submodule update
+    git submodule update --force
+    git checkout 3442ebe50385d3bd0b3305952b90d296e0a1242c
 
 When the Buildscript first runs it will also patch the CybOX schemas 
 so  that the JAXB2 Simple Document Object Model can be generated.
@@ -72,16 +99,6 @@ fails to retrieve the schemas, you will need to patch the schemas
 by hand from the command-line.  The patch file, `cybox_object_archive_object_patch` 
 is in  the root of the project.  NetBeans can also apply patches via
 `Team` -> `Patches` -> `Apply Diff Patch`. 
-
-### Handling schema updates
-
-Any time you see that the schemas project has been modified (when
-merging or pulling updates) you will need to run
-
-    git submodule update
-
-again to update the schemas themselves, and then recreate the JAXB
-document model.
 
 ## Creating the JAXB2 Document Model
 
@@ -104,6 +121,25 @@ If you're using the Eclipse IDE consider installing the latest
 [Gradle IDE Pack](http://marketplace.eclipse.org/content/gradle-ide-pack) 
 or use [Nodeclipse/Enide Gradle for Eclipse](http://marketplace.eclipse.org/content/gradle). 
 Gradle Eclipse integration is somewhat emergent.  I'd advise using the Gradle command-line.
+
+### Do these prior to building
+
+And for now add the folling lines to your ~/gradle/gradle.properties file
+
+    signingKeyId=filler
+    signingPassword=filler
+    secretKeyFile=filler
+    sonotypeJiraId=filler
+    sonotypeJiraPassword=filler
+    
+Otherwise, gradle will fail not finding "sonotypeJiraId" or some such.  I need to set all
+these properties to archivePush java-stix to Maven Central.
+
+You'll also need to push a number of eclipse libraries that are not 
+reliably distributed into you local maven repo. 
+
+	cd ./libs
+	./insertIntoMavenLocal.sh
 
 ### Building via Gradle buildscript
 
@@ -140,7 +176,7 @@ Success will look like this on UNIX:
 If the build goes well you will find the JAXB Document Model in jar
 at
 
-	buil/libs/java-stix-${version}.jar
+	build/libs/java-stix-${version}.jar
 
 where `${version}` is replaced with the `version` number in the Gradle Buildscript.
 
