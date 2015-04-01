@@ -32,7 +32,7 @@ apply plugin: 'signing'
 version = "1.1.1"
 def isReleaseVersion = !version.endsWith("SNAPSHOT")
 
-def stixShemaVersion = "1.1.1"
+def schemaVersion = "1.1.1"
 
 group = "org.mitre"
 archivesBaseName = "stix"
@@ -40,7 +40,7 @@ archivesBaseName = "stix"
 defaultTasks "jar"
 
 task retrieveSchemas(type: RetrieveSchemasTask, dependsOn: clean) {
-	schemaVersion = project.stixShemaVersion
+	schemaVersion = project.schemaVersion
 }
 
 task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask, dependsOn: retrieveSchemas)
