@@ -40,7 +40,7 @@ archivesBaseName = "stix"
 defaultTasks "jar"
 
 task retrieveSchemas(type: RetrieveSchemasTask, dependsOn: clean) {
-	schemaVersion = project.version
+	schemaVersion = project.stixShemaVersion
 }
 
 task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask, dependsOn: retrieveSchemas)
@@ -69,6 +69,7 @@ task sourcesJar(type: Jar, dependsOn: javadoc) {
     from 'README.md'
     from sourceSets.main.allSource
 }
+
 
 clean {
 	delete("src/generated/java")
@@ -120,19 +121,20 @@ jar {
 
 gradle.taskGraph.whenReady { taskGraph ->
     if (taskGraph.allTasks.any { it instanceof Sign }) {
-		// signingKeyId, signingPassword, secretKeyFile should be defined out of the repository, 
+  		// signingKeyId, signingPassword, secretKeyFile should be defined out of the repository, 
 		// for example, in ~/.gradle/gradle.properties or alternatively as environment variables
-		
-		// signingKeyId = System.properties['signingKeyId']
-		// secretKeyFile = System.properties['secretKeyFile']
-		// signingPassword = System.properties['signingPassword']	
-		
-		allprojects { 
-			ext."signing.keyId"=signingKeyId
-			ext."signing.password"=signingPassword 
-			ext."signing.secretKeyRingFile"=secretKeyFile 
-		}
+		allprojects { ext."signing.keyId" = signingKeyId }
+		allprojects { ext."signing.password" = signingPassword }
+		allprojects { ext."signing.secretKeyRingFile" = secretKeyFile }   
     }
+    
+    if (taskGraph.allTasks.any { it instanceof Upload }) {
+	    // ossrhUsername, ossrhPassword should be defined out of the repository, 
+	    // for example, in ~/.gradle/gradle.properties or alternatively as 
+	    // environment variables
+		allprojects { ext."ossrhUsername" = sonotypeJiraId }
+		allprojects { ext."ossrhPassword" = sonotypeJiraPassword }
+    }    
 }
 
 signing {
@@ -180,16 +182,9 @@ artifacts {
 
 uploadArchives {
 
-    // ossrhUsername, ossrhPassword should be defined out of the repository, 
-    // for example, in ~/.gradle/gradle.properties or alternatively as 
-    // environment variables
-
-	// ossrhUsername = System.properties['sonotypeJiraId']
-	// ossrhPassword= System.properties['sonotypeJiraPassword']
+	ext."ossrhUsername" = ""
+	ext."ossrhPassword" = ""
 	
-	ext."ossrhUsername"=sonotypeJiraId
-	ext."ossrhPassword"=sonotypeJiraPassword
-
 	repositories {
     	mavenDeployer {
       		beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
