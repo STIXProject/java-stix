@@ -10,11 +10,11 @@
  *
  *	gradle
  *
- * from the commnand-line.
+ * from the commnand-line will default to "gradle jar".
  *
- * Jar will be built to 
+ * The Jar will be built to 
  *
- * 	build/libs/java-stix-${version}.jar
+ * 	build/libs/stix-${version}.jar
  */
 
 import org.gradle.plugins.signing.Sign
