@@ -22,10 +22,9 @@ import org.gradle.plugins.signing.Sign
 import org.mitre.stix.RetrieveSchemasTask
 import org.mitre.stix.PrefixNamespaceBindingsTask
 import org.mitre.stix.GenerateJAXBTask
-//import org.mitre.stix.GeneratedSourceTransformationTask
+import org.mitre.stix.GeneratedSourceTransformationTask
 
 apply plugin: "java"
-apply plugin: "groovy"
 apply plugin: "eclipse"
 apply plugin: 'maven'
 apply plugin: 'signing'
@@ -51,366 +50,9 @@ task generateJAXB(type: GenerateJAXBTask, dependsOn: createPrefixNamespaceBindin
 	schemaVersion = project.version
 }
 
-// TODO: Figure out to put this into its own custom class in buildSrc directory -----------------
-import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.TaskAction
-
-import groovy.io.FileType
-import groovy.text.SimpleTemplateEngine
-
-import org.eclipse.jdt.core.JavaCore
-import org.eclipse.jdt.core.ToolFactory
-import org.eclipse.jdt.core.dom.AST
-import org.eclipse.jdt.core.dom.ASTNode
-import org.eclipse.jdt.core.dom.ASTParser
-import org.eclipse.jdt.core.dom.CompilationUnit
-//import org.eclipse.jdt.core.dom.ImportDeclaration
-import org.eclipse.jdt.core.dom.TypeDeclaration
-import org.eclipse.jdt.core.dom.rewrite.ASTRewrite
-import org.eclipse.jdt.core.dom.rewrite.ListRewrite
-import org.eclipse.jdt.core.formatter.CodeFormatter
-import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
-//import org.eclipse.jface.text.Document
-//import org.eclipse.text.edits.TextEdit
-
-import java.util.LinkedHashMap
-import java.util.regex.Pattern
-
-// Analyze and transform the generated document object model source. Creating
-// an XJC plug would take too long and introduce the compilation of an external
-// project as a dependency, and adding them via bindings file is too brittle.
-// So, gradle to the rescue.
-class GeneratedSourceTransformationTask extends DefaultTask {
-
-	def lineSeperator = System.getProperty("line.separator")
-
-	// Format src
-	def format(src) {
-
-		def options = DefaultCodeFormatterConstants.getEclipseDefaultSettings()
-		options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_5)
-		options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_5)
-		options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_5)
-
-		def codeFormatter = ToolFactory.createCodeFormatter(options)
-
-		def edit = codeFormatter.format(
-				CodeFormatter.K_COMPILATION_UNIT,
-				src,
-				0,
-				src.length(),
-				0,
-				lineSeperator
-				)
-
-		def document = new org.eclipse.jface.text.Document(src)
-
-		try {
-			edit.apply(document)
-		} catch (Exception e) {
-			e.printStackTrace()
-		}
-
-		document.get()
-	}
-
-	// Add a imports to source and organizes them
-	def addImportsToSrc(source, importsToAdd) {
-		def document = new org.eclipse.jface.text.Document(source)
-
-		def parser = ASTParser.newParser(AST.JLS8)
-
-		def options = JavaCore.getOptions()
-		options.put(JavaCore.COMPILER_COMPLIANCE, "1.5")
-		options.put(JavaCore.COMPILER_SOURCE, "1.5")
-		parser.setCompilerOptions(options)
-
-		parser.setSource(document.get().toCharArray())
-		parser.setKind(ASTParser.K_COMPILATION_UNIT)
-
-		def cu = (CompilationUnit) parser.createAST(null)
-		
-		if (!(cu.types().get(0) instanceof org.eclipse.jdt.core.dom.EnumDeclaration)) {
-			cu.recordModifications()
-	
-			def ast = cu.getAST();
-	
-			def importMembers = []
-	
-			cu.imports().each { importDecl ->
-				importMembers << importDecl.getName().toString()
-			}
-	
-			cu.imports().clear()
-	
-			importsToAdd.each { member ->
-				if (!importMembers.contains(member)) {
-					importMembers << member
-				}
-			}
-	
-			importMembers.sort()
-	
-			importMembers.each { member ->
-				def importDeclaration = ast.newImportDeclaration();
-				importDeclaration.setName(ast.newName(member.split("\\.")))
-	
-				cu.imports().add(importDeclaration)
-			}
-	
-			def edits = cu.rewrite(document, null)
-			edits.apply(document)
-		}
-
-		document.get()
-	}
-
-	// Add methods to source
-	def addMethodsToSrc(source, methodTemplates, templateBindings) {
-
-		def document = new org.eclipse.jface.text.Document(source)
-		def parser = ASTParser.newParser(AST.JLS8)
-
-		def options = JavaCore.getOptions()
-		options.put(JavaCore.COMPILER_COMPLIANCE, "1.5")
-		options.put(JavaCore.COMPILER_SOURCE, "1.5")
-
-		parser.setCompilerOptions(options)
-
-		parser.setSource(document.get().toCharArray())
-		parser.setKind(ASTParser.K_COMPILATION_UNIT)
-
-		def cu = (CompilationUnit) parser.createAST(null)
-		
-		if (!(cu.types().get(0) instanceof org.eclipse.jdt.core.dom.EnumDeclaration)) {
-			cu.recordModifications()
-	
-			def rewriter = ASTRewrite.create(cu.getAST())
-	
-			def engine = new SimpleTemplateEngine()
-
-			methodTemplates.each { methodTemplate ->
-				def template = engine.createTemplate(methodTemplate).make(templateBindings)
-				def methodSource = template.toString()
-
-				def lrw = rewriter.getListRewrite((TypeDeclaration) cu.types().get(0),
-						TypeDeclaration.BODY_DECLARATIONS_PROPERTY)
-
-				lrw.insertLast(rewriter.createStringPlaceholder(methodSource,
-						ASTNode.METHOD_DECLARATION), null)
-
-			}
-
-			def edits = rewriter.rewriteAST(document, null)
-			edits.apply(document)
-			
-		}
-
-		document.get()
-	}
-
-	@TaskAction
-	def sourceTransformation() {
-
-		def addMethods = [
-			/(.*)/: [
-				imports: [
-					"java.io.StringReader",
-					"java.io.StringWriter",
-					"javax.xml.bind.JAXBContext",
-					"javax.xml.bind.JAXBElement",
-					"javax.xml.bind.JAXBException",
-					"javax.xml.bind.Marshaller",
-					"javax.xml.bind.Unmarshaller",
-					"javax.xml.namespace.QName",
-					"javax.xml.parsers.DocumentBuilderFactory",
-					"javax.xml.parsers.ParserConfigurationException",
-					"javax.xml.transform.stream.StreamSource",
-					"org.mitre.stix.Utilities",
-					"org.mitre.stix.STIXSchema",
-					"org.mitre.stix.ValidationEventHandler"
-				],
-				methodTemplates: [
-					"""\
-	/**
-	 * Returns XML String for JAXB Document Object Model object.
-	 *
-	 * @return the XML String for the JAXB object
-	 */
-	public String toXMLString() {
-		org.w3c.dom.Document document;
-		Marshaller marshaller;
-		
-		try {
-			document = DocumentBuilderFactory.newInstance()
-					.newDocumentBuilder().newDocument();
-			JAXBContext jaxbContext = JAXBContext.newInstance(this.getClass()
-					.getPackage().getName());
-	
-			marshaller = jaxbContext.createMarshaller();
-			// pretty print
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-			
-			marshaller.setSchema(STIXSchema.getInstance().getSchema());
-			marshaller.setEventHandler(new ValidationEventHandler());
-								
-			try {
-				marshaller.marshal(this, document);
-			} catch (JAXBException e) {
-				// otherwise handle non-XMLRootElements
-				QName qualifiedName = new QName(Utilities.getnamespaceURI(this),
-						this.getClass().getSimpleName());
-	
-				@SuppressWarnings({ "rawtypes", "unchecked" })
-				JAXBElement root = new JAXBElement(qualifiedName, this.getClass(),
-						this);
-	
-				marshaller.marshal(root, document);
-			}
-	
-			Utilities.removeUnusedNamespaces(document);
-	
-			return Utilities.getXMLString(document);		
-	
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		} catch (JAXBException e) {
-			throw new RuntimeException(e);
-		}	
-	}
-""",
-					"""\
-	/**
-	 * Creates JAXB Document Object Model for XML text string
-	 * 
-	 * @param text
-	 *            XML string for the document
-	 * @return JAXB object
-	 */
-	public static \${name} fromXMLString(String text) {
-		JAXBContext jaxbContext;
-		try {
-			jaxbContext = JAXBContext.newInstance(\${name}.class.getPackage()
-					.getName());
-			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-			
-			unmarshaller.setSchema(STIXSchema.getInstance().getSchema());
-			unmarshaller.setEventHandler(new ValidationEventHandler());
-			StreamSource streamSource = new StreamSource(new StringReader(text));
-			return (\${name}) unmarshaller.unmarshal(streamSource);
-		} catch (JAXBException e) {
-			throw new RuntimeException(e);
-		} 
-	}
-""",
-					"""\
-    /**
-     * Validates the XML representation of this JAXB Document 
-     * Object Model object. Returning true indicating a successful
-     * validation, false if not.
-     * 
-     * @return boolean
-     */
-    public boolean validate() {
-        return STIXSchema.getInstance().validate(toXMLString());
-    }
-"""
-				]]]
-
-		//		def replaceCode = [
-		//			/(org.mitre.stix.stix_1.STIXType) |
-		//			(org.mitre.stix.indicator_2.IndicatorType) |
-		//			(org.mitre.stix.incident_1.IncidentType) |
-		//			(org.mitre.stix.ttp_1.TTPType) |
-		//			(org.mitre.stix.threatactor_1.ThreatActorType) |
-		//			(org.mitre.stix.campaign_1.CampaignType) |
-		//			(org.mitre.stix.exploittarget_1.ExploitTargetType) |
-		//			(org.mitre.stix.courseofaction_1.CourseOfActionType) |
-		//			(org.mitre.cybox.cybox_2.ObservableType) |
-		//			(org.mitre.cybox.cybox_2.ObjectType) |
-		//			(org.mitre.cybox.objects.TaskActionTypeType) |
-		//			(org.mitre.cybox.cybox_2.EventType)/: [
-		//				'regex':/(?m)(\/\*\*.*)(public void setId.*})/, 'codeTemplate': """\
-		//    /**
-		//	 * Sets the value of the id property.
-		//	 *
-		//	 * Helloworld!
-		//	 *
-		//	 * @param value
-		//	 *     allowed object is
-		//	 *     {@link QName }
-		//	 *
-		//	 */
-		//    public void setId(QName value) {
-		//        this.id = value;
-		//        System.out.println("Helloworld!");
-		//    }
-		//"""
-		//			]]
-
-		def dom = []
-
-		project.file("src/generated/java").eachFileRecurse(FileType.FILES) { file ->
-			if (!file.name.endsWith("package-info.java") && !file.name.endsWith("EnumType.java") && !file.name.endsWith("TypeEnum.java")) {
-
-				def obj = new LinkedHashMap();
-				obj.uri = file.toURI()
-				obj.name = file.getName().split(/\./)[0]
-				obj.package = file.getParent().split(Pattern.quote(System.getProperty("file.separator")))[3..-1].join('.')
-
-				dom << obj
-			}
-		}
-
-		dom.each() { obj ->
-			def templateBindings = ["pkg":obj.package, "name":obj.name]
-
-			addMethods.each { regex, methodDeclarations ->
-
-				if ( obj.package + "." + obj.name ==~ regex) {
-
-					def source = project.file(obj.uri).readLines().iterator()
-							.join(lineSeperator)
-
-					source = addImportsToSrc(source,
-							methodDeclarations["imports"])
-
-					source = addMethodsToSrc(source,
-							methodDeclarations["methodTemplates"], templateBindings)
-
-					//			replaceCode.each { regex, replace ->
-					//				if ( obj.package + "." + obj.name ==~ regex) {
-					//					if (lines == null) {
-					//						lines = project.file(obj.uri).readLines().iterator().join("\n")
-					//					}
-					//
-					//					def replacementCode = ""
-					//					replace['codeTemplate'].eachLine { line ->
-					//						replacementCode += line.replaceAll(/(\$\{pkg\})/, obj.package).replaceAll(/(\$\{name\})/, obj.name) + "\n"
-					//					}
-					//
-					//					lines.replaceAll(replace["regex"], replacementCode)
-					//				}
-					//			}
-
-					project.file( obj.uri ).with { outFile ->
-						outFile.setWritable(true)
-						outFile.withWriter{ out -> out.println format(source) }
-						outFile.setWritable(false)
-					}
-				}
-			}
-		}
-	}
-}
-// END TODO -------------------------------------------------------------------------------------
-
 task generatedSourceTransformation(type: GeneratedSourceTransformationTask, dependsOn: generateJAXB) {
 	description "Perfom syntactical analysis and tranformations on the model (e.g., adding convenience methods)"
 }
-
-
 
 compileJava.dependsOn generatedSourceTransformation
 
@@ -447,16 +89,10 @@ repositories {
 	jcenter()
 	mavenCentral()
 	mavenLocal()
-
-	// TODO: Used for prototyping groovy code. strip out later.
-	//flatDir { dirs "libs" }
+	flatDir { dirs "libs" }
 }
 
 dependencies {
-
-	compile localGroovy()
-	compile gradleApi()
-	
 	compile "org.jvnet.jaxb2_commons:jaxb2-basics-runtime:0.6.5"
 	compile "org.apache.httpcomponents:httpclient:4.3.5"
 	compile "org.apache.httpcomponents:httpclient-cache:4.3.5"
@@ -473,7 +109,7 @@ dependencies {
 jar {
 	manifest {
 		attributes 'Specification-Title': 'Structured Threat Information eXpression (STIX)',
-		'Specification-Version': '1.1.1',
+		'Specification-Version': version,
 		'Implementation-Title': 'Java-STIX',
 		'Implementation-Version': version,
 		'Implementation-Vendor': 'The MITRE Corporation'
@@ -605,51 +241,23 @@ buildscript {
 		jcenter()
 		mavenCentral()
 		mavenLocal()
-		
-		//maven {       
-        //	url "${System.properties['user.home']}/.m2/repository"
-    	//}
 
-		//flatDir { dirs "libs" }
-    	
-    	//flatDir(dir: "${projectDir]}/libs", name: 'Local libs directory')
-
-    	//maven {
-        //	url "http://repo.typesafe.com/typesafe/releases/"
-    	//}
-
-    	//maven {
-        //	url "http://gradle.artifactoryonline.com/gradle/libs/"
-    	//}    	
+		flatDir { dirs "libs" }
 	}
 	
-	//configurations { xjc }
-
 	dependencies {
 	
-		//classpath name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
-		//classpath name: "org.eclipse.osgi_3.10.0.v20140606-1445"
-		//classpath name: "org.eclipse.core.contenttype_3.4.200.v20140207-1251"
-		//classpath name: "org.eclipse.equinox.common_3.6.200.v20130402-1505"
-		//classpath name: "org.eclipse.text_3.5.300.v20130515-1451"
-		//classpath name: "org.eclipse.core.jobs_3.6.0.v20140424-0053"
-		//classpath name: "org.eclipse.equinox.preferences_3.5.200.v20140224-1527"
-		//classpath name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
-		//classpath name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
-		//classpath name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
-
-		classpath "org.eclipse.core:org.eclipse.core.runtime:3.10.0.v20140318-2214"
-		classpath "org.eclipse:org.eclipse.osgi:3.10.0.v20140606-1445"
-		classpath "org.eclipse.core:org.eclipse.core.contenttype:3.4.200.v20140207-1251"
-		classpath "org.eclipse.equinox:org.eclipse.equinox.common:3.6.200.v20130402-1505"
-		classpath "org.eclipse:org.eclipse.text:3.5.300.v20130515-1451"
-		classpath "org.eclipse.core:org.eclipse.core.jobs:3.6.0.v20140424-0053"
-		classpath "org.eclipse.equinox:org.eclipse.equinox.preferences:3.5.200.v20140224-1527"
-		classpath "org.eclipse.core:org.eclipse.core.resources:3.9.0.v20140514-1307"
-		classpath "org.eclipse.jdt:org.eclipse.jdt.core:3.10.0.v20140604-1726"
-		classpath "org.eclipse.equinox:org.eclipse.equinox.registry:3.5.400.v20140428-1507"
-
-		//--- xjc
+	 	// Needed for GeneratedSourceTransformationTask
+		classpath name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
+		classpath name: "org.eclipse.osgi_3.10.0.v20140606-1445"
+		classpath name: "org.eclipse.core.contenttype_3.4.200.v20140207-1251"
+		classpath name: "org.eclipse.equinox.common_3.6.200.v20130402-1505"
+		classpath name: "org.eclipse.text_3.5.300.v20130515-1451"
+		classpath name: "org.eclipse.core.jobs_3.6.0.v20140424-0053"
+		classpath name: "org.eclipse.equinox.preferences_3.5.200.v20140224-1527"
+		classpath name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
+		classpath name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
+		classpath name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
 		
 		classpath "com.sun.xml.bind:jaxb-xjc:2.2.5-2"
 		classpath "com.sun.xml.bind:jaxb-impl:2.2.5-2"
@@ -682,7 +290,5 @@ buildscript {
 		// bindings.xml file. Those annotations associate namespace prefixes
 		// with XML namespace URIs.
 		classpath "org.jvnet.jaxb2_commons:jaxb2-namespace-prefix:1.1"
-
-		//classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.1"
 	}
 }
