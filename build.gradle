@@ -23,6 +23,7 @@ import org.mitre.stix.RetrieveSchemasTask
 import org.mitre.stix.PrefixNamespaceBindingsTask
 import org.mitre.stix.GenerateJAXBTask
 import org.mitre.stix.GeneratedSourceTransformationTask
+import org.mitre.stix.CleanSchemaTask
 
 apply plugin: "java"
 apply plugin: "eclipse"
@@ -50,6 +51,10 @@ task generateJAXB(type: GenerateJAXBTask, dependsOn: createPrefixNamespaceBindin
 }
 
 task generatedSourceTransformation(type: GeneratedSourceTransformationTask, dependsOn: generateJAXB)
+
+task cleanSchema(type: CleanSchemaTask) {
+	schemaVersion = project.schemaVersion
+}
 
 compileJava.dependsOn generatedSourceTransformation
 

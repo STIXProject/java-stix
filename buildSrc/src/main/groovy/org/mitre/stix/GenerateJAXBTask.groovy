@@ -28,9 +28,9 @@ class GenerateJAXBTask extends DefaultTask {
 	
 		ant.mkdir(dir: "src/generated/java")
 		
-		def schemaDir = "src/main/resources/schemas/v${schemaVersion}"
+		def schemaDir = project.file("src/main/resources/schemas/v${schemaVersion}").getPath()
 		
-		println "    Generating JAXB model to src/generated/java for STIX Schema v${schemaVersion} found in ${schemaDir}"
+		println "    Generating JAXB model to ${project.file("src/generated/java").getPath()} for STIX Schema v${schemaVersion} found in ${schemaDir}"
 
 		ant.xjc(destdir: "src/generated/java", extension: true, classpath: classpath.asPath) {
 			arg(line: "-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code -XtoString")

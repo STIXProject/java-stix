@@ -26,8 +26,10 @@ class RetrieveSchemasTask extends DefaultTask {
 	}
 	
 	def patch() {
-		println("    Patching src/main/resources/schemas/v" + schemaVersion + "/cybox/objects/Archive_File_Object.xsd")
-		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: "src/main/resources/schemas/v" + schemaVersion + "/cybox/objects/Archive_File_Object.xsd")
+		def fileToBePatched = project.file("src/main/resources/schemas/v${schemaVersion}/cybox/objects/Archive_File_Object.xsd")
+		
+		println("    Patching ${fileToBePatched}")
+		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: fileToBePatched)
 	}
 	
 	def pull() {
@@ -48,7 +50,7 @@ class RetrieveSchemasTask extends DefaultTask {
 
 	@TaskAction
 	def retrieve() {
-		if ((project.file("src/main/resources/schemas/v${schemaVersion}").list().size() == 0) || (project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null)) {
+		if ((!project.file("src/main/resources/schemas/v${schemaVersion}").exists()) || (project.file("src/main/resources/schemas/v${schemaVersion}").list().size() == 0) || (project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null)) {
 			pull()
 			patch()
 			if ((project.file("src/main/resources/schemas/v${schemaVersion}").list().size() == 0) || (project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null)) {
