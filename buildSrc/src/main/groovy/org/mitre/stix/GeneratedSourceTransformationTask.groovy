@@ -12,14 +12,12 @@ import org.eclipse.jdt.core.dom.AST
 import org.eclipse.jdt.core.dom.ASTNode
 import org.eclipse.jdt.core.dom.ASTParser
 import org.eclipse.jdt.core.dom.CompilationUnit
-//import org.eclipse.jdt.core.dom.ImportDeclaration
+
 import org.eclipse.jdt.core.dom.TypeDeclaration
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite
 import org.eclipse.jdt.core.formatter.CodeFormatter
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
-//import org.eclipse.jface.text.Document
-//import org.eclipse.text.edits.TextEdit
 
 import java.util.LinkedHashMap
 import java.util.regex.Pattern
@@ -129,12 +127,12 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		parser.setKind(ASTParser.K_COMPILATION_UNIT)
 
 		def cu = (CompilationUnit) parser.createAST(null)
-		
+
 		if (!(cu.types().get(0) instanceof org.eclipse.jdt.core.dom.EnumDeclaration)) {
 			cu.recordModifications()
-	
+
 			def rewriter = ASTRewrite.create(cu.getAST())
-	
+
 			def engine = new SimpleTemplateEngine()
 
 			methodTemplates.each { methodTemplate ->
@@ -146,12 +144,10 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 
 				lrw.insertLast(rewriter.createStringPlaceholder(methodSource,
 						ASTNode.METHOD_DECLARATION), null)
-
 			}
 
 			def edits = rewriter.rewriteAST(document, null)
 			edits.apply(document)
-			
 		}
 
 		document.get()
@@ -194,7 +190,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 					.newDocumentBuilder().newDocument();
 			JAXBContext jaxbContext = JAXBContext.newInstance(this.getClass()
 					.getPackage().getName());
-	
+
 			marshaller = jaxbContext.createMarshaller();
 			// pretty print
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -202,25 +198,25 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 			
 			marshaller.setSchema(STIXSchema.getInstance().getSchema());
 			marshaller.setEventHandler(new ValidationEventHandler());
-								
+
 			try {
 				marshaller.marshal(this, document);
 			} catch (JAXBException e) {
 				// otherwise handle non-XMLRootElements
 				QName qualifiedName = new QName(Utilities.getnamespaceURI(this),
 						this.getClass().getSimpleName());
-	
+
 				@SuppressWarnings({ "rawtypes", "unchecked" })
 				JAXBElement root = new JAXBElement(qualifiedName, this.getClass(),
 						this);
-	
+
 				marshaller.marshal(root, document);
 			}
-	
+
 			Utilities.removeUnusedNamespaces(document);
-	
+
 			return Utilities.getXMLString(document);		
-	
+
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		} catch (JAXBException e) {
@@ -253,16 +249,16 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	}
 """,
 					"""\
-    /**
-     * Validates the XML representation of this JAXB Document 
-     * Object Model object. Returning true indicating a successful
-     * validation, false if not.
-     * 
-     * @return boolean
-     */
-    public boolean validate() {
-        return STIXSchema.getInstance().validate(toXMLString());
-    }
+	/**
+	 * Validates the XML representation of this JAXB Document 
+	 * Object Model object. Returning true indicating a successful
+	 * validation, false if not.
+	 * 
+	 * @return boolean
+	 */
+	public boolean validate() {
+		return STIXSchema.getInstance().validate(toXMLString());
+	}
 """
 				]]]
 

@@ -19,10 +19,10 @@ class GenerateJAXBTask extends DefaultTask {
 	@Input String schemaVersion
 
 	GenerateJAXBTask() {
-	   description = "Generate the JAXB Document Model"
+		description = "Generate the JAXB Document Model"
 	}
 
-    @TaskAction
+	@TaskAction
 	def start() {
 		ant.taskdef(name: "xjc", classname: "org.jvnet.jaxb2_commons.xjc.XJC2Task", classpath: classpath.asPath)
 	
@@ -31,7 +31,7 @@ class GenerateJAXBTask extends DefaultTask {
 		def schemaDir = "src/main/resources/schemas/v${schemaVersion}"
 		
 		println "    Generating JAXB model to src/generated/java for STIX Schema v${schemaVersion} found in ${schemaDir}"
-	
+
 		ant.xjc(destdir: "src/generated/java", extension: true, classpath: classpath.asPath) {
 			arg(line: "-readOnly -verbose -Xequals -XhashCode -Xfluent-api -Xvalue-constructor -Xdefault-value -Xnamespace-prefix -Xinject-code -XtoString")
 			binding(dir: "src/main/resources", includes: "*.xjb")

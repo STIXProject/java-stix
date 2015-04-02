@@ -52,8 +52,8 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 			def temp = []
 			notPartOfThisCompilation.each {
 				temp.add(it.replaceAll("/", "\\\\"))
-
 			}
+
 			notPartOfThisCompilation = temp
 		}
 
@@ -152,5 +152,3 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 				
 	}
 }
-
-

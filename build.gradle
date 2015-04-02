@@ -29,15 +29,14 @@ apply plugin: "eclipse"
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+defaultTasks "jar"
+
 version = "1.1.1"
 group = "org.mitre"
+archivesBaseName = "stix"
 
 project.ext.set("isReleaseVersion", !version.endsWith("SNAPSHOT"))
 project.ext.set("schemaVersion", "1.1.1")
-
-archivesBaseName = "stix"
-
-defaultTasks "jar"
 
 task retrieveSchemas(type: RetrieveSchemasTask, dependsOn: clean) {
 	schemaVersion = project.schemaVersion
@@ -57,17 +56,17 @@ task generatedSourceTransformation(type: GeneratedSourceTransformationTask, depe
 compileJava.dependsOn generatedSourceTransformation
 
 task javadocJar(type: Jar) {
-    classifier = 'javadoc'
-    from 'LICENSE'
-    from javadoc
-    // from javadoc.destinationDir
+	classifier = 'javadoc'
+	from 'LICENSE'
+	from javadoc
+	// from javadoc.destinationDir
 }
 
 task sourcesJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'sources'
-    from 'LICENSE'
-    from 'README.md'
-    from sourceSets.main.allSource
+	classifier = 'sources'
+	from 'LICENSE'
+	from 'README.md'
+	from sourceSets.main.allSource
 }
 
 
@@ -99,11 +98,11 @@ dependencies {
 	compile "org.apache.httpcomponents:httpclient-cache:4.3.5"
 	compile "org.apache.httpcomponents:httpmime:4.3.5"
 	compile "org.apache.httpcomponents:fluent-hc:4.3.5"
-	
+
 	compile "org.springframework:spring-core:4.1.4.RELEASE"
-	
+
 	compile "commons-io:commons-io:2.4"
-	
+
 	compile "commons-lang:commons-lang:2.6"
 }
 
@@ -115,31 +114,31 @@ jar {
 		'Implementation-Version': version,
 		'Implementation-Vendor': 'The MITRE Corporation'
 	}
-	
+
 	from 'LICENSE'
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.allTasks.any { it instanceof Sign }) {
-  		// signingKeyId, signingPassword, secretKeyFile should be defined out of the repository, 
+	if (taskGraph.allTasks.any { it instanceof Sign }) {
+		// signingKeyId, signingPassword, secretKeyFile should be defined out of the repository, 
 		// for example, in ~/.gradle/gradle.properties or alternatively as environment variables
 		allprojects { ext."signing.keyId" = signingKeyId }
 		allprojects { ext."signing.password" = signingPassword }
 		allprojects { ext."signing.secretKeyRingFile" = secretKeyFile }   
-    }
-    
-    if (taskGraph.allTasks.any { it instanceof Upload }) {
-	    // ossrhUsername, ossrhPassword should be defined out of the repository, 
-	    // for example, in ~/.gradle/gradle.properties or alternatively as 
-	    // environment variables
+	}
+
+	if (taskGraph.allTasks.any { it instanceof Upload }) {
+		// ossrhUsername, ossrhPassword should be defined out of the repository, 
+		// for example, in ~/.gradle/gradle.properties or alternatively as 
+		// environment variables
 		allprojects { ext."ossrhUsername" = sonotypeJiraId }
 		allprojects { ext."ossrhPassword" = sonotypeJiraPassword }
-    }    
+	}    
 }
 
 signing {
 	// required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
+	sign configurations.archives
 }
 
 javadoc {
@@ -153,81 +152,81 @@ javadoc {
 	include "**/org/w3/**/*"
 
 	// options.memberLevel = JavadocMemberLevel.PRIVATE
-    options.overview = "src/main/javadoc/overview.html";
-    options.showAll()
-    options.encoding("UTF-8")
-    options.setUse(true)
-    options.author(true)
-    options.version(true)
-    options.windowTitle("java-stix v." + version)
-    options.docTitle("java-stix v." + version)
-    options.footer("Copyright (c) 2015, The MITRE Corporation. All rights reserved.")
-    
-    doFirst {
-        javadoc.title = "java-stix v." + version
-        javadoc.options.docTitle = javadoc.title
-    }
+	options.overview = "src/main/javadoc/overview.html";
+	options.showAll()
+	options.encoding("UTF-8")
+	options.setUse(true)
+	options.author(true)
+	options.version(true)
+	options.windowTitle("java-stix v." + version)
+	options.docTitle("java-stix v." + version)
+	options.footer("Copyright (c) 2015, The MITRE Corporation. All rights reserved.")
+
+	doFirst {
+		javadoc.title = "java-stix v." + version
+		javadoc.options.docTitle = javadoc.title
+	}
 }
 
 if (JavaVersion.current().isJava8Compatible()) {
-    tasks.withType(Javadoc) {
-        // disable strict doclint in Java 8
-        options.addStringOption('Xdoclint:none', '-quiet')
-    }
+	tasks.withType(Javadoc) {
+		// disable strict doclint in Java 8
+		options.addStringOption('Xdoclint:none', '-quiet')
+	}
 }
 
 artifacts {
-    archives javadocJar, sourcesJar
+	archives javadocJar, sourcesJar
 }
 
 uploadArchives {
 
 	ext."ossrhUsername" = ""
 	ext."ossrhPassword" = ""
-	
-	repositories {
-    	mavenDeployer {
-      		beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-	      	repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-	        	authentication(userName: ossrhUsername, password: ossrhPassword)
-	      	}
+	repositories {
+		mavenDeployer {
+			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+				authentication(userName: ossrhUsername, password: ossrhPassword)
+			}
 	
-	      	snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-	        	authentication(userName: ossrhUsername, password: ossrhPassword)
-	      	}
+			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+				authentication(userName: ossrhUsername, password: ossrhPassword)
+			}
 	
 			pom.project {
-	        	name 'stix'
-	        	packaging 'jar'
-	        	version "${version}-SNAPSHOT" // default is project.version
-	        	// optionally artifactId can be defined here 
-	        	description "The JAXB Bindings for STIX v." + version
-	        	url "https://github.com/nemonik/java_stix"
-	
-	        	scm {
-	          		connection "https://github.com/nemonik/java_stix.git"
-	          		developerConnection "https://github.com/nemonik/java_stix.git"
-	          		url "https://github.com/nemonik/java_stix"
-	        	}
-	
-	        	licenses {
-	          		license {
-	            		name "The BSD 3-Clause License"
-	            		url "https://raw.githubusercontent.com/nemonik/java_stix/master/LICENSE"
-	          		}
-	        	}
-	
-	        	developers {
-	        		developer {
-	            		id 'nemonik'
-	            		name 'Michael Joseph Walsh'
-	            		email 'java-stix-pom[ASCII character number 64]nemonik.com'
-	          		}
-	        	}
-	        }
-	    }     
-    }
+				name 'stix'
+				packaging 'jar'
+				version "${version}-SNAPSHOT" // default is project.version
+				// optionally artifactId can be defined here 
+				description "The JAXB Bindings for STIX v." + version
+				url "https://github.com/nemonik/java_stix"
+
+				scm {
+					connection "https://github.com/nemonik/java_stix.git"
+					developerConnection "https://github.com/nemonik/java_stix.git"
+					url "https://github.com/nemonik/java_stix"
+				}
+
+				licenses {
+					license {
+						name "The BSD 3-Clause License"
+						url "https://raw.githubusercontent.com/nemonik/java_stix/master/LICENSE"
+					}
+				}
+
+				developers {
+					developer {
+						id 'nemonik'
+						name 'Michael Joseph Walsh'
+						email 'java-stix-pom[ASCII character number 64]nemonik.com'
+					}
+				}
+			}
+		}
+	}
 }
 
 buildscript {
@@ -241,8 +240,8 @@ buildscript {
 	}
 	
 	dependencies {
-	
-	 	// Needed for GeneratedSourceTransformationTask
+
+		// Needed for GeneratedSourceTransformationTask
 		classpath name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
 		classpath name: "org.eclipse.osgi_3.10.0.v20140606-1445"
 		classpath name: "org.eclipse.core.contenttype_3.4.200.v20140207-1251"
@@ -253,12 +252,12 @@ buildscript {
 		classpath name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
 		classpath name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
 		classpath name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
-		
+
 		// Needed for GenerateJAXBTask
 		classpath "com.sun.xml.bind:jaxb-xjc:2.2.5-2"
 		classpath "com.sun.xml.bind:jaxb-impl:2.2.5-2"
 		classpath "javax.xml.bind:jaxb-api:2.2.+"
-	
+
 		classpath "org.jvnet.jaxb2_commons:jaxb2-basics:0.6.5"
 		classpath "org.jvnet.jaxb2_commons:jaxb2-basics-ant:0.6.5"
 		classpath "org.jvnet.jaxb2_commons:jaxb2-fluent-api:3.0"
