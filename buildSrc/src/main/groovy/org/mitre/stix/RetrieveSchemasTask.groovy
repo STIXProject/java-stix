@@ -27,7 +27,7 @@ class RetrieveSchemasTask extends DefaultTask {
 	
 	def patch() {
 		println("    Patching src/main/resources/schemas/v" + schemaVersion + "/cybox/objects/Archive_File_Object.xsd")
-		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: 'src/main/resources/schemas/v" + schemaVersion + "/cybox/objects/Archive_File_Object.xsd')
+		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: "src/main/resources/schemas/v" + schemaVersion + "/cybox/objects/Archive_File_Object.xsd")
 	}
 	
 	def pull() {
