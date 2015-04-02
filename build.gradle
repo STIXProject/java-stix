@@ -30,11 +30,11 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 version = "1.1.1"
-def isReleaseVersion = !version.endsWith("SNAPSHOT")
-
-def schemaVersion = "1.1.1"
-
 group = "org.mitre"
+
+project.ext.set("isReleaseVersion", !version.endsWith("SNAPSHOT"))
+project.ext.set("schemaVersion", "1.1.1")
+
 archivesBaseName = "stix"
 
 defaultTasks "jar"
@@ -47,7 +47,7 @@ task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask, dependsOn:
 
 task generateJAXB(type: GenerateJAXBTask, dependsOn: createPrefixNamespaceBindings) {
 	classpath= buildscript.configurations.classpath
-	schemaVersion = project.version
+	schemaVersion = project.schemaVersion
 }
 
 task generatedSourceTransformation(type: GeneratedSourceTransformationTask, dependsOn: generateJAXB) {
