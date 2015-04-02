@@ -30,7 +30,7 @@ apply plugin: "eclipse"
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-defaultTasks "jar"
+defaultTasks "build"
 
 version = "1.1.1-SNAPSHOT"
 group = "org.mitre"
