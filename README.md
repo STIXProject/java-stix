@@ -122,19 +122,6 @@ If you're using the Eclipse IDE consider installing the latest
 or use [Nodeclipse/Enide Gradle for Eclipse](http://marketplace.eclipse.org/content/gradle). 
 Gradle Eclipse integration is somewhat emergent.  I'd advise using the Gradle command-line.
 
-### Do these prior to building
-
-And for now add the folling lines to your ~/gradle/gradle.properties file
-
-    signingKeyId=filler
-    signingPassword=filler
-    secretKeyFile=filler
-    sonotypeJiraId=filler
-    sonotypeJiraPassword=filler
-    
-Otherwise, gradle will fail not finding "sonotypeJiraId" or some such.  I need to set all
-these properties to archivePush java-stix to Maven Central.
-
 ### Building via Gradle buildscript
 
 Change directories into the project and enter on the command-line:

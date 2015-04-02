@@ -31,7 +31,7 @@ apply plugin: 'signing'
 
 defaultTasks "jar"
 
-version = "1.1.1"
+version = "1.1.1-SNAPSHOT"
 group = "org.mitre"
 archivesBaseName = "stix"
 
@@ -119,20 +119,65 @@ jar {
 
 gradle.taskGraph.whenReady { taskGraph ->
 	if (taskGraph.allTasks.any { it instanceof Sign }) {
-		// signingKeyId, signingPassword, secretKeyFile should be defined out of the repository, 
+		// signingKeyId, signingPassword, secretKeyFile should be defined out of the repository,
 		// for example, in ~/.gradle/gradle.properties or alternatively as environment variables
 		allprojects { ext."signing.keyId" = signingKeyId }
 		allprojects { ext."signing.password" = signingPassword }
-		allprojects { ext."signing.secretKeyRingFile" = secretKeyFile }   
+		allprojects { ext."signing.secretKeyRingFile" = secretKeyFile }
 	}
 
 	if (taskGraph.allTasks.any { it instanceof Upload }) {
-		// ossrhUsername, ossrhPassword should be defined out of the repository, 
+		// ossrhUsername, ossrhPassword should be defined out of the repository,
 		// for example, in ~/.gradle/gradle.properties or alternatively as 
 		// environment variables
-		allprojects { ext."ossrhUsername" = sonotypeJiraId }
-		allprojects { ext."ossrhPassword" = sonotypeJiraPassword }
-	}    
+		allprojects { 
+			uploadArchives {
+				repositories {
+					mavenDeployer {
+						beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+			
+						repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+							authentication(userName: ossrhUsername, password: ossrhPassword)
+						}
+				
+						snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+							authentication(userName: ossrhUsername, password: ossrhPassword)
+						}
+				
+						pom.project {
+							name 'stix'
+							packaging 'jar'
+							version "${project.version}"
+							// optionally artifactId can be defined here 
+							description "The JAXB Bindings for STIX v." + version
+							url "https://github.com/nemonik/java_stix"
+			
+							scm {
+								connection "https://github.com/nemonik/java_stix.git"
+								developerConnection "https://github.com/nemonik/java_stix.git"
+								url "https://github.com/nemonik/java_stix"
+							}
+			
+							licenses {
+								license {
+									name "The BSD 3-Clause License"
+									url "https://raw.githubusercontent.com/nemonik/java_stix/master/LICENSE"
+								}
+							}
+			
+							developers {
+								developer {
+									id 'nemonik'
+									name 'Michael Joseph Walsh'
+									email 'java-stix-pom[ASCII character number 64]nemonik.com'
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 signing {
@@ -176,55 +221,6 @@ if (JavaVersion.current().isJava8Compatible()) {
 
 artifacts {
 	archives javadocJar, sourcesJar
-}
-
-uploadArchives {
-	ext."ossrhUsername" = ""
-	ext."ossrhPassword" = ""
-
-	repositories {
-		mavenDeployer {
-			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-				authentication(userName: ossrhUsername, password: ossrhPassword)
-			}
-	
-			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-				authentication(userName: ossrhUsername, password: ossrhPassword)
-			}
-	
-			pom.project {
-				name 'stix'
-				packaging 'jar'
-				version "${version}-SNAPSHOT" // default is project.version
-				// optionally artifactId can be defined here 
-				description "The JAXB Bindings for STIX v." + version
-				url "https://github.com/nemonik/java_stix"
-
-				scm {
-					connection "https://github.com/nemonik/java_stix.git"
-					developerConnection "https://github.com/nemonik/java_stix.git"
-					url "https://github.com/nemonik/java_stix"
-				}
-
-				licenses {
-					license {
-						name "The BSD 3-Clause License"
-						url "https://raw.githubusercontent.com/nemonik/java_stix/master/LICENSE"
-					}
-				}
-
-				developers {
-					developer {
-						id 'nemonik'
-						name 'Michael Joseph Walsh'
-						email 'java-stix-pom[ASCII character number 64]nemonik.com'
-					}
-				}
-			}
-		}
-	}
 }
 
 buildscript {
