@@ -130,34 +130,52 @@ Change directories into the project and enter on the command-line:
 
 Success will look like this on UNIX:
 
-    ➜  java_stix git:(master) ✗ gradle
-    To honour the JVM settings for this build a new JVM will be forked. Please consider using the daemon: http://gradle.org/docs/2.2/userguide/gradle_daemon.html.
-    :createPrefixNamespaceBindings
-    :cleanGenerate
-    :retrieveSchemas
-    Retrieving STIX schemas...
-    Submodule path 'src/main/resources/schemas': checked out 'fd6ce20a62e52a7ddeb5ab0fb0e5b760778c443e'
-    Retrieving CybOX schemas...
-    Submodule 'cybox' (https://github.com/CybOXProject/schemas.git) registered for path 'cybox'
-    Submodule path 'cybox': checked out '97beb32c376a9223e91b52cb3e4c8d2af6baf786'
-    
-    :generateJAXB
-    :generatedSourceTransformation
-    :compileJava
-    Note: Some input files use unchecked or unsafe operations.
-    Note: Recompile with -Xlint:unchecked for details.
-    :processResources
-    :classes
-    :jar
-    
+	➜  java_stix git:(master) gradle
+	To honour the JVM settings for this build a new JVM will be forked. Please consider using the daemon: http://gradle.org/docs/2.3/userguide/gradle_daemon.html.
+	:buildSrc:clean UP-TO-DATE
+	:buildSrc:compileJava UP-TO-DATE
+	:buildSrc:compileGroovy
+	:buildSrc:processResources UP-TO-DATE
+	:buildSrc:classes
+	:buildSrc:jar
+	:buildSrc:assemble
+	:buildSrc:compileTestJava UP-TO-DATE
+	:buildSrc:compileTestGroovy UP-TO-DATE
+	:buildSrc:processTestResources UP-TO-DATE
+	:buildSrc:testClasses UP-TO-DATE
+	:buildSrc:test UP-TO-DATE
+	:buildSrc:check UP-TO-DATE
+	:buildSrc:build
+	:clean UP-TO-DATE
+	:retrieveSchemas
+	    Retrieving STIX schemas...
+	Submodule 'src/main/resources/schemas/v1.1.1' (https://github.com/STIXProject/schemas.git) registered for path 'src/main/resources/schemas/v1.1.1'
+	Submodule path 'src/main/resources/schemas/v1.1.1': checked out 'deef231f0e6fa9f05122f8e0fc089f03128bfe21'
+	    Retrieving CybOX schemas...
+	Submodule 'cybox' (https://github.com/CybOXProject/schemas.git) registered for path 'cybox'
+	Submodule path 'cybox': checked out '97beb32c376a9223e91b52cb3e4c8d2af6baf786'
+	
+	    Patching src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd
+	:createPrefixNamespaceBindings
+	    schemas/v1.1.1/external/open_ioc_2010/ioc.xsd claims the same prefix "tns" as schemas/v1.1.1/external/open_ioc_2010/ioc-TR.xsd
+	:generateJAXB
+	    Generating JAXB model to src/generated/java for STIX Schema v1.1.1 found in src/main/resources/schemas/v1.1.1
+	:generatedSourceTransformation
+	:compileJava
+	Note: Some input files use unchecked or unsafe operations.
+	Note: Recompile with -Xlint:unchecked for details.
+	:processResources
+	:classes
+	:jar
+	
 	BUILD SUCCESSFUL
 	
-	Total time: 2 mins 31.743 secs
+	Total time: 1 mins 24.123 secs
 
 If the build goes well you will find the JAXB Document Model in jar
 at
 
-	build/libs/java-stix-${version}.jar
+	build/libs/stix-${version}.jar
 
 where `${version}` is replaced with the `version` number in the Gradle Buildscript.
 
@@ -205,7 +223,7 @@ A build will go like so on Windows:
 If the build goes well you will find the JAXB Document Model in jar
 at
 
-	build\libs\java-stix-${version}.jar
+	build\libs\stix-${version}.jar
 	
 where `${version}` is replaced with the `version` number in the Gradle Buildscript.
 
