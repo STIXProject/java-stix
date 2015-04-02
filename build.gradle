@@ -49,9 +49,7 @@ task generateJAXB(type: GenerateJAXBTask, dependsOn: createPrefixNamespaceBindin
 	schemaVersion = project.schemaVersion
 }
 
-task generatedSourceTransformation(type: GeneratedSourceTransformationTask, dependsOn: generateJAXB) {
-	description "Perfom syntactical analysis and tranformations on the model (e.g., adding convenience methods)"
-}
+task generatedSourceTransformation(type: GeneratedSourceTransformationTask, dependsOn: generateJAXB)
 
 compileJava.dependsOn generatedSourceTransformation
 

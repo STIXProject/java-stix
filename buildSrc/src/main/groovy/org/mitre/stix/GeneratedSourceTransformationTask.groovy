@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2015, The MITRE Corporation. All rights reserved.
+ * See LICENSE for complete terms.
+ */
 package org.mitre.stix
 
 import org.gradle.api.DefaultTask
@@ -22,11 +26,18 @@ import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
 import java.util.LinkedHashMap
 import java.util.regex.Pattern
 
-// Analyze and transform the generated document object model source. Creating
-// an XJC plug would take too long and introduce the compilation of an external
-// project as a dependency, and adding them via bindings file is too brittle.
-// So, gradle to the rescue.
+/**
+ * Gradle Task used to perfom syntactical analysis and tranformations on the model 
+ * (e.g., adding convenience methods)
+ * 
+ * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
+ *
+ */
 class GeneratedSourceTransformationTask extends DefaultTask {
+
+	GeneratedSourceTransformationTask() {
+		description = "Perfom syntactical analysis and tranformations on the model (e.g., adding convenience methods)"
+	}
 
 	def lineSeperator = System.getProperty("line.separator")
 
