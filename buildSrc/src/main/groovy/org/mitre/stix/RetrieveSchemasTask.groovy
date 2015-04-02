@@ -43,7 +43,7 @@ class RetrieveSchemasTask extends DefaultTask {
 		def proc = command.execute(null, project.rootDir)
 		proc.waitFor()
 
-		println("    ${proc.in.text}")
+		println("${proc.in.text}")
 	}
 
 	@TaskAction

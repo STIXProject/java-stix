@@ -69,7 +69,6 @@ task sourcesJar(type: Jar, dependsOn: javadoc) {
 	from sourceSets.main.allSource
 }
 
-
 clean {
 	delete("src/generated/java")
 	delete("src/main/resources/namespace-prefix.xjb")
@@ -180,7 +179,6 @@ artifacts {
 }
 
 uploadArchives {
-
 	ext."ossrhUsername" = ""
 	ext."ossrhPassword" = ""
 
@@ -230,7 +228,6 @@ uploadArchives {
 }
 
 buildscript {
-
 	repositories {
 		jcenter()
 		mavenCentral()
