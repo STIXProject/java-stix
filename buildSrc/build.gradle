@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2015, The MITRE Corporation. All rights reserved.
+ * See LICENSE for complete terms.
+ *
+ * Gradle Buildscrip for the tasks. Needed for dependency declarations.
+ 
+ *
+ * nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
+ *
+ */
 apply plugin: 'groovy'
 
 repositories {

@@ -12,7 +12,7 @@ We'd welcome you contributing to java-stix. Here are the guidelines to follow:
 Help us keep java-stix open and inclusive.
 
 ## <a name="question"></a> Got a Question or Problem?
-If you have questions about how to use java-stix, please direct these to the [STIX Community Mailing List][list].
+If you have questions about how to use java-stix, please direct these to the [STIX discussion list][list].
 
 ## <a name="issue"></a> Found an Issue?
 If you find a bug in the source code or a mistake in the documentation, you can help us by submitting an issue to our [GitHub Repository][github]. Please see the Submission Guidelines below.

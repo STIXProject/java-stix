@@ -3,23 +3,23 @@
 Java bindings for STIX, the Structured Threat Information eXpression 
 language used for representing structured cyber threat information.
 
-This effort is being developed under the official [STIXProject](http://stixproject.github.io/).
+This effort is being developed under the official [STIXProject][stix project].
 
-For more information, see [http://stix.mitre.org/](http://stix.mitre.org/).
+For more information, see [http://stix.mitre.org/][stix].
 
 ## Overview
 
 A primary goal of java-stix is to remain faithful to both the STIX
 specifications and to customary Java practices. java-stix is designed
 to be intuitive both to Java developers and JAXB XML developers, but
-it is not a one-for-one replacement for the [python-stix](https://github.com/STIXProject/python-stix) API.
+it is not a one-for-one replacement for the [python-stix][python stix] API.
 
 ## Versioning
 
 Releases of java-stix will comply with the Semantic Versioning
-specification at [http://semver.org/](http://semver.org/). Java-stix
+specification at [http://semver.org/][semver]. Java-stix
 is currently under active development; see TODO.txt for a tentative
-roadmap.  Releases will be announced on the [STIX discussion list](http://stix.mitre.org/community/registration.html).
+roadmap.  Releases will be announced on the [STIX discussion list][list].
 
 ## Snapshots
 
@@ -68,9 +68,9 @@ platform.  You can find these in the root of the project, and try
 executing them yourself or you can follow the steps enumerated in
 the next section for retrieving the schemas.
 
-Afterward, the cybOX schemas are patched for the flaw described in (cybOX Schema issue #340)[https://github.com/CybOXProject/schemas/issues/340].
+Afterward, the cybOX schemas are patched for the flaw described in [cybOX Schema issue #340][issue 340].
 Until the issue is resolved please be aware of the patch.  The
-(patch)[https://raw.githubusercontent.com/nemonik/java_stix/master/cybox_object_archive_file_object.patch] is found at the root of the project.
+[patch][patch 340] is found at the root of the project.
 
 ### The STIX schemas
 
@@ -115,11 +115,11 @@ If you're using OS X and using brew simply install gradle via
     brew install gradle
 
 Otherwise, install the Gradle command-line binaries from
-[gradle.org](http://www.gradle.org) following their instructions.
+[gradle.org][gradle] following their instructions.
 
 If you're using the Eclipse IDE consider installing the latest
-[Gradle IDE Pack](http://marketplace.eclipse.org/content/gradle-ide-pack) 
-or use [Nodeclipse/Enide Gradle for Eclipse](http://marketplace.eclipse.org/content/gradle). 
+[Gradle IDE Pack][gradle ide pack] 
+or use [Nodeclipse/Enide Gradle for Eclipse][nodeclipse]. 
 Gradle Eclipse integration is somewhat emergent.  I'd advise using the Gradle command-line.
 
 ### Building via Gradle buildscript
@@ -290,7 +290,18 @@ idea.
 ### Opening the project into NetBeans
 
 I've tested the project with NetBeans 8.0.1 and it works great with the
-[Gradle JavaEE Support plugin](http://plugins.netbeans.org/plugin/55529/gradle-javaee-support).
+[Gradle JavaEE Support plugin][netbeans gradle].
 With the plugin installed, open the project and right-click on the project 
 root and select `build` from the `task` panel.
 
+[stix project]: http://stixproject.github.io/
+[stix]: http://stix.mitre.org/
+[python stix]: https://github.com/STIXProject/python-stix
+[semver]: http://semver.org/
+[list]: https://stix.mitre.org/community/registration.html
+[gradle]: http://www.gradle.org
+[issue 340]: https://github.com/CybOXProject/schemas/issues/340
+[patch 340]: https://raw.githubusercontent.com/nemonik/java_stix/master/cybox_object_archive_file_object.patch
+[gradle ide pack]: http://marketplace.eclipse.org/content/gradle-ide-pack
+[nodeclipse]: http://marketplace.eclipse.org/content/gradle
+[netbeans gradle]:http://plugins.netbeans.org/plugin/55529/gradle-javaee-support

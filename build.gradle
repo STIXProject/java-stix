@@ -100,11 +100,11 @@ dependencies {
 	compile "org.apache.httpcomponents:httpclient-cache:4.3.5"
 	compile "org.apache.httpcomponents:httpmime:4.3.5"
 	compile "org.apache.httpcomponents:fluent-hc:4.3.5"
-
+	
 	compile "org.springframework:spring-core:4.1.4.RELEASE"
-
+	
 	compile "commons-io:commons-io:2.4"
-
+	
 	compile "commons-lang:commons-lang:2.6"
 }
 
@@ -138,15 +138,15 @@ gradle.taskGraph.whenReady { taskGraph ->
 				repositories {
 					mavenDeployer {
 						beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-			
+						
 						repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
 							authentication(userName: ossrhUsername, password: ossrhPassword)
 						}
-				
+						
 						snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
 							authentication(userName: ossrhUsername, password: ossrhPassword)
 						}
-				
+						
 						pom.project {
 							name 'stix'
 							packaging 'jar'
@@ -154,20 +154,20 @@ gradle.taskGraph.whenReady { taskGraph ->
 							// optionally artifactId can be defined here 
 							description "The JAXB Bindings for STIX v." + version
 							url "https://github.com/nemonik/java_stix"
-			
+							
 							scm {
 								connection "https://github.com/nemonik/java_stix.git"
 								developerConnection "https://github.com/nemonik/java_stix.git"
 								url "https://github.com/nemonik/java_stix"
 							}
-			
+							
 							licenses {
 								license {
 									name "The BSD 3-Clause License"
 									url "https://raw.githubusercontent.com/nemonik/java_stix/master/LICENSE"
 								}
 							}
-			
+							
 							developers {
 								developer {
 									id 'nemonik'
@@ -197,7 +197,7 @@ javadoc {
 	include "**/org/mitre/**/*"
 	include "**/org/purl/**/*"
 	include "**/org/w3/**/*"
-
+	
 	// options.memberLevel = JavadocMemberLevel.PRIVATE
 	options.overview = "src/main/javadoc/overview.html";
 	options.showAll()
@@ -208,7 +208,7 @@ javadoc {
 	options.windowTitle("java-stix v." + version)
 	options.docTitle("java-stix v." + version)
 	options.footer("Copyright (c) 2015, The MITRE Corporation. All rights reserved.")
-
+	
 	doFirst {
 		javadoc.title = "java-stix v." + version
 		javadoc.options.docTitle = javadoc.title
@@ -231,12 +231,12 @@ buildscript {
 		jcenter()
 		mavenCentral()
 		mavenLocal()
-
+		
 		flatDir { dirs "libs" }
 	}
 
 	dependencies {
-
+		
 		// Needed for GeneratedSourceTransformationTask
 		classpath name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
 		classpath name: "org.eclipse.osgi_3.10.0.v20140606-1445"
@@ -248,12 +248,12 @@ buildscript {
 		classpath name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
 		classpath name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
 		classpath name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
-
+		
 		// Needed for GenerateJAXBTask
 		classpath "com.sun.xml.bind:jaxb-xjc:2.2.5-2"
 		classpath "com.sun.xml.bind:jaxb-impl:2.2.5-2"
 		classpath "javax.xml.bind:jaxb-api:2.2.+"
-
+		
 		classpath "org.jvnet.jaxb2_commons:jaxb2-basics:0.6.5"
 		classpath "org.jvnet.jaxb2_commons:jaxb2-basics-ant:0.6.5"
 		classpath "org.jvnet.jaxb2_commons:jaxb2-fluent-api:3.0"
