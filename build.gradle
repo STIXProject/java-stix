@@ -130,7 +130,7 @@ gradle.taskGraph.whenReady { taskGraph ->
 		// or via ~/.gradle/gradle.properties as 
 		//
 		// systemProp.signingKeyId=value
-		// systemProp.signingPassword=value=value
+		// systemProp.signingPassword=value
 		// systemProp.secretKeyFile=value
 		// systemProp.ossrhUsername=value
 		// systemProp.ossrhPassword=value
