@@ -22,7 +22,7 @@ You can request a new feature by submitting an issue to our [GitHub Repository][
 
 If you would like to implement a new feature on your own, then consider the change's scope:
 
-* **Major Changes** should be discussed first on our [STIX Community Mailing List][list] so that we can better coordinate our efforts, prevent duplication of work, and help you to craft the change so that it is successfully accepted into the project.
+* **Major Changes** should be discussed first on our [STIX discussion list][list] so that we can better coordinate our efforts, prevent duplication of work, and help you to craft the change so that it is successfully accepted into the project.
 * **Small Changes** can be crafted and submitted to the [GitHub Repository][github] as a Pull Request.
 
 ## <a name="docs"></a> Want a Documentation Fix?
