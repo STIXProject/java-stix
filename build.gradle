@@ -10,7 +10,7 @@
  *
  *	gradle
  *
- * from the commnand-line will default to "gradle jar".
+ * from the commnand-line and the build task will execute by default.
  *
  * The Jar will be built to 
  *
