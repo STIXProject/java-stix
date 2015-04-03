@@ -122,30 +122,28 @@ jar {
 
 gradle.taskGraph.whenReady { taskGraph ->
 	if (taskGraph.allTasks.any { it instanceof Upload }) {
-		// signingKeyId, signingPassword, secretKeyFile, ossrhUsername, ossrhPassword
-		// should be define out of the repository either on the command-line via
-		//
-		// gradle -DsigningKeyId=value -DsigningPassword=value -DsecretKeyFile=value -DossrhUsername=value -DossrhPassword=value
-		//
-		// or via ~/.gradle/gradle.properties as 
-		//
-		// systemProp.signingKeyId=value
-		// systemProp.signingPassword=value
-		// systemProp.secretKeyFile=value
-		// systemProp.ossrhUsername=value
-		// systemProp.ossrhPassword=value
-		
-		allprojects { ext."signing.keyId" = System.properties["signingKeyId"] ?: "change me but not here" }
-		allprojects { ext."signing.password" = System.properties["signingPassword"] ?: "change me but not here" }
-		allprojects { ext."signing.secretKeyRingFile" = System.properties["secretKeyFile"] ?: "change me but not here" }
-		
-		allprojects { ext."ossrhUsername" = System.properties["ossrhUsername"] ?: "change me but not here" }
-		allprojects { ext."ossrhPassword" = System.properties["ossrhPassword"] ?: "change me but not here" }
-		
-		allprojects { 
+		allprojects {
+			// signingKeyId, signingPassword, secretKeyFile, ossrhUsername, ossrhPassword
+			// should be define out of the repository either on the command-line via
+			//
+			// gradle -DsigningKeyId=value -DsigningPassword=value -DsecretKeyFile=value -DossrhUsername=value -DossrhPassword=value
+			//
+			// or via ~/.gradle/gradle.properties as 
+			//
+			// systemProp.signingKeyId=value
+			// systemProp.signingPassword=value
+			// systemProp.secretKeyFile=value
+			// systemProp.ossrhUsername=value
+			// systemProp.ossrhPassword=value
+			
+			ext."signing.keyId" = System.properties["signingKeyId"]
+			ext."signing.password" = System.properties["signingPassword"]
+			ext."signing.secretKeyRingFile" = System.properties["secretKeyFile"]
+			
+			ext."ossrhUsername" = System.properties["ossrhUsername"]
+			ext."ossrhPassword" = System.properties["ossrhPassword"]
 			
 			signing {
-				// required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
 				sign configurations.archives
 			}
 			
