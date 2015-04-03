@@ -122,17 +122,36 @@ jar {
 
 gradle.taskGraph.whenReady { taskGraph ->
 	if (taskGraph.allTasks.any { it instanceof Sign }) {
-		// signingKeyId, signingPassword, secretKeyFile should be defined out of the repository,
-		// for example, in ~/.gradle/gradle.properties or alternatively as environment variables
-		allprojects { ext."signing.keyId" = signingKeyId }
-		allprojects { ext."signing.password" = signingPassword }
-		allprojects { ext."signing.secretKeyRingFile" = secretKeyFile }
+		// signingKeyId, signingPassword, secretKeyFile should be define out of the repository
+		// either on the command-line via
+		//
+		// gradle -DsigningKeyId=value -DsigningPassword=value -DsecretKeyFile=value
+		//
+		// or via ~/.gradle/gradle.properties as 
+		//
+		// systemProp.signingKeyId=value
+		// systemProp.signingPassword=value=value
+		// systemProp.secretKeyFile=value
+		
+		allprojects { ext."signing.keyId" = System.properties["signingKeyId"] ?: "change me but not here" }
+		allprojects { ext."signing.password" = System.properties["signingPassword"] ?: "change me but not here" }
+		allprojects { ext."signing.secretKeyRingFile" = System.properties["secretKeyFile"] ?: "change me but not here" }
 	}
 
 	if (taskGraph.allTasks.any { it instanceof Upload }) {
-		// ossrhUsername, ossrhPassword should be defined out of the repository,
-		// for example, in ~/.gradle/gradle.properties or alternatively as 
-		// environment variables
+		// ossrhUsername, ossrhPassword should be define out of the repository
+		// either on the command-line via
+		//
+		// gradle -DossrhUsername=value -DossrhPassword=value
+		//
+		// or via ~/.gradle/gradle.properties as 
+		//
+		// systemProp.ossrhUsername=value
+		// systemProp.ossrhPassword=value
+		
+		allprojects { ext."ossrhUsername" = System.properties["ossrhUsername"] ?: "change me but not here" }
+		allprojects { ext."ossrhPassword" = System.properties["ossrhPassword"] ?: "change me but not here" }
+		
 		allprojects { 
 			uploadArchives {
 				repositories {
