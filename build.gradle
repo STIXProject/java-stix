@@ -61,7 +61,7 @@ task cleanSchema(type: CleanSchemaTask) {
 	schemaVersion = project.schemaVersion
 }
 
-//compileJava.dependsOn createPackageInfo
+compileJava.dependsOn createPackageInfo
 
 task javadocJar(type: Jar) {
 	classifier = 'javadoc'
