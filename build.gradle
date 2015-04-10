@@ -45,14 +45,16 @@ task retrieveSchemas(type: RetrieveSchemasTask, dependsOn: clean) {
 	schemaVersion = project.schemaVersion
 }
 
-task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask, dependsOn: retrieveSchemas)
+task createPrefixNamespaceBindings(type: PrefixNamespaceBindingsTask, dependsOn: retrieveSchemas) {
+	schemaVersion = project.schemaVersion
+}
 
 task generateJAXB(type: GenerateJAXBTask, dependsOn: createPrefixNamespaceBindings) {
 	classpath= buildscript.configurations.classpath
 	schemaVersion = project.schemaVersion
 }
 
-task generatedSourceTransformation(type: GeneratedSourceTransformationTask, dependsOn:  generateJAXB)
+task generatedSourceTransformation(type: GeneratedSourceTransformationTask, dependsOn: generateJAXB)
 
 task createPackageInfo(type: CreatePackageInfoTask, dependsOn: generatedSourceTransformation) {
 	schemaVersion = project.schemaVersion
