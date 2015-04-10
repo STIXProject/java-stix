@@ -11,7 +11,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
@@ -29,6 +28,7 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -80,15 +80,16 @@ public class STIXSchema {
 	 */
 	private STIXSchema() {
 
-		// TODO Pull from model
-		this.version = "1.1.1";
+		this.version = ((Version) this.getClass().getPackage()
+				.getAnnotation(Version.class)).schema();
 
 		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
 		Resource[] schemaResources;
 
 		try {
 			schemaResources = patternResolver
-					.getResources("classpath*:schemas/v1.1.1/**/*.xsd");
+					.getResources("classpath*:schemas/v" + version
+							+ "/**/*.xsd");
 
 			prefixSchemaBindings = new HashMap<String, String>();
 
@@ -123,7 +124,7 @@ public class STIXSchema {
 
 						if ((prefixSchemaBindings.containsKey(prefix))
 								&& (prefixSchemaBindings.get(prefix).split(
-										"schemas/v1.1.1/")[1]
+										"schemas/v" + version + "/")[1]
 										.startsWith("external"))) {
 
 							continue;
@@ -179,14 +180,13 @@ public class STIXSchema {
 	public boolean validate(URL url) {
 
 		String xmlText = null;
-
+		
 		try {
-			xmlText = new Scanner(url.openStream(), "UTF-8")
-					.useDelimiter("\\A").next();
+			xmlText =IOUtils.toString(url.openStream());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-
+		
 		return validate(xmlText);
 	}
 
@@ -266,5 +266,4 @@ public class STIXSchema {
 						.validate(new URL(
 								"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml")));
 	}
-
 }

@@ -8,12 +8,7 @@ import groovy.io.FileType
 import groovy.xml.StreamingMarkupBuilder
 import groovy.xml.XmlUtil
 
-import java.io.File
-import java.io.FileInputStream
-
 import java.text.SimpleDateFormat
-
-import java.util.Date
 
 import javax.xml.parsers.DocumentBuilderFactory
 

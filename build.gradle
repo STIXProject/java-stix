@@ -22,13 +22,15 @@ import org.gradle.plugins.signing.Sign
 import org.mitre.stix.RetrieveSchemasTask
 import org.mitre.stix.PrefixNamespaceBindingsTask
 import org.mitre.stix.GenerateJAXBTask
+import org.mitre.stix.CreatePackageInfoTask
 import org.mitre.stix.GeneratedSourceTransformationTask
 import org.mitre.stix.CleanSchemaTask
 
 apply plugin: "java"
+apply plugin: "groovy"
 apply plugin: "eclipse"
-apply plugin: 'maven'
-apply plugin: 'signing'
+apply plugin: "maven"
+apply plugin: "signing"
 
 defaultTasks "build"
 
@@ -50,19 +52,21 @@ task generateJAXB(type: GenerateJAXBTask, dependsOn: createPrefixNamespaceBindin
 	schemaVersion = project.schemaVersion
 }
 
-task generatedSourceTransformation(type: GeneratedSourceTransformationTask, dependsOn: generateJAXB)
+task generatedSourceTransformation(type: GeneratedSourceTransformationTask, dependsOn:  generateJAXB)
 
+task createPackageInfo(type: CreatePackageInfoTask, dependsOn: generatedSourceTransformation) {
+	schemaVersion = project.schemaVersion
+}
 task cleanSchema(type: CleanSchemaTask) {
 	schemaVersion = project.schemaVersion
 }
 
-compileJava.dependsOn generatedSourceTransformation
+//compileJava.dependsOn createPackageInfo
 
 task javadocJar(type: Jar) {
 	classifier = 'javadoc'
 	from 'LICENSE'
 	from javadoc
-	// from javadoc.destinationDir
 }
 
 task sourcesJar(type: Jar, dependsOn: javadoc) {
@@ -106,6 +110,9 @@ dependencies {
 	compile "commons-io:commons-io:2.4"
 	
 	compile "commons-lang:commons-lang:2.6"
+	
+	testCompile "org.codehaus.groovy:groovy:2.4.3"
+	testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
 }
 
 jar {
@@ -206,7 +213,6 @@ javadoc {
 	include "**/org/purl/**/*"
 	include "**/org/w3/**/*"
 	
-	// options.memberLevel = JavadocMemberLevel.PRIVATE
 	options.overview = "src/main/javadoc/overview.html";
 	options.showAll()
 	options.encoding("UTF-8")
