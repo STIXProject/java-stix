@@ -6,8 +6,9 @@
  * 
  * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
  */
- import org.mitre.stix.STIXSchema
- import org.apache.commons.io.IOUtils
+import org.mitre.stix.STIXSchema
+import org.apache.commons.io.IOUtils
+import org.mitre.stix.stix_1.STIXPackage
  
 class STIXSchemaSpec extends spock.lang.Specification{ 
 
@@ -41,5 +42,12 @@ class STIXSchemaSpec extends spock.lang.Specification{
  			def xmlText = IOUtils.toString(url.openStream());
  		then: "it should validate"
  			schema.validate(xmlText) == true
+	}
+	
+	def "STIXPackage model objects has the expected namespace URI"() {
+		when: "STIXPackage object is created"
+			def stixPackage = new STIXPackage()
+ 		then: 'Messaged to STIXSchema.getNamespaceURI, it returns "http://stix.mitre.org/stix-1"'
+ 			"http://stix.mitre.org/stix-1" == STIXSchema.getNamespaceURI(stixPackage)
 	}
 }

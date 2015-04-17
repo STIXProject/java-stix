@@ -183,18 +183,18 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 								"javax.xml.namespace.QName",
 								"javax.xml.parsers.DocumentBuilderFactory",
 								"javax.xml.parsers.ParserConfigurationException",
-								"org.mitre.stix.Utilities",
+								"org.mitre.stix.DocumentUtilities",
 								"org.mitre.stix.STIXSchema",
 								"org.mitre.stix.ValidationEventHandler"
 							],
 							template:
 								"""\
 	/**
-	 * Returns XML String for JAXB Document Object Model object.
+	 * Returns Document for JAXB Document Object Model object.
 	 *
 	 * @return the XML String for the JAXB object
 	 */
-	public String toXMLString() {
+	public org.w3c.dom.Document toDocument() {
 		org.w3c.dom.Document document;
 		Marshaller marshaller;
 		
@@ -216,7 +216,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 				marshaller.marshal(this, document);
 			} catch (JAXBException e) {
 				// otherwise handle non-XMLRootElements
-				QName qualifiedName = new QName(Utilities.getnamespaceURI(this),
+				QName qualifiedName = new QName(STIXSchema.getNamespaceURI(this),
 						this.getClass().getSimpleName());
 				
 				@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -226,15 +226,32 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 				marshaller.marshal(root, document);
 			}
 			
-			Utilities.removeUnusedNamespaces(document);
+			DocumentUtilities.removeUnusedNamespaces(document);
 			
-			return Utilities.getXMLString(document);		
+			return document;
 			
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
-		}	
+		}
+	}
+"""
+						],
+						[
+							imports: 
+							[
+								"org.mitre.stix.DocumentUtilities"
+							],
+							template:
+								"""\
+	/**
+	 * Returns XML String for JAXB Document Object Model object.
+	 *
+	 * @return the XML String for the JAXB object
+	 */
+	public String toXMLString() {
+		return DocumentUtilities.getXMLString(toDocument());
 	}
 """
 						],

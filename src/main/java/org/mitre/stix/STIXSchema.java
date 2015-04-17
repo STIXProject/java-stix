@@ -10,10 +10,13 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
+import javax.xml.bind.annotation.XmlSchema;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,6 +39,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -180,13 +184,13 @@ public class STIXSchema {
 	public boolean validate(URL url) {
 
 		String xmlText = null;
-		
+
 		try {
-			xmlText =IOUtils.toString(url.openStream());
+			xmlText = IOUtils.toString(url.openStream());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		return validate(xmlText);
 	}
 
@@ -265,5 +269,21 @@ public class STIXSchema {
 				.println(schema
 						.validate(new URL(
 								"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml")));
+	}
+
+	/**
+	 * Pull the namespace URI from the package for the class of the object.
+	 * 
+	 * @param obj
+	 *            Expects a JAXB model object.
+	 * @return Name of the XML namespace.
+	 */
+	public static String getNamespaceURI(Object obj) {
+
+		Package pkg = obj.getClass().getPackage();
+
+		XmlSchema xmlSchemaAnnotation = pkg.getAnnotation(XmlSchema.class);
+
+		return xmlSchemaAnnotation.namespace();
 	}
 }

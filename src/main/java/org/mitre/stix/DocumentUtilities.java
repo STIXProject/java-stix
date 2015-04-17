@@ -5,6 +5,8 @@
 package org.mitre.stix;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,8 +16,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.annotation.XmlSchema;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -28,51 +30,22 @@ import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSSerializer;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * A collection of utility helper methods.
  * 
  * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
  */
-public class Utilities {
-
-	@SuppressWarnings("unused")
-	private static final Logger LOGGER = Logger.getLogger(Utilities.class
-			.getName());
+public class DocumentUtilities {
 
 	private static final String XML_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
 	private static final String XML_NAMESPACE = "http://www.w3.org/2000/xmlns/";
 
-	private interface ElementVisitor {
-
-		void visit(Element element);
-
-	}
-
-	/**
-	 * Used to traverse an XML document.
-	 * 
-	 * @param element
-	 *            Represents an element in an XML document.
-	 * @param visitor
-	 *            Code to be executed.
-	 * 
-	 */
-	private final static void traverse(Element element, ElementVisitor visitor) {
-
-		visitor.visit(element);
-
-		NodeList children = element.getChildNodes();
-
-		for (int i = 0; i < children.getLength(); i++) {
-			Node node = children.item(i);
-
-			if (node.getNodeType() != Node.ELEMENT_NODE)
-				continue;
-
-			traverse((Element) node, visitor);
-		}
-	}
+	@SuppressWarnings("unused")
+	private static final Logger LOGGER = Logger
+			.getLogger(DocumentUtilities.class.getName());
 
 	/**
 	 * Returns a pretty printed String for a JAXBElement
@@ -86,16 +59,13 @@ public class Utilities {
 	}
 
 	/**
-	 * Returns a String for a JAXBElement
+	 * Returns a Document for a JAXBElement
 	 * 
 	 * @param jaxbElement
-	 *            JAXB representation of an Xml Element to be printed.
-	 * @param prettyPrint
-	 *            True for pretty print, otherwise false
-	 * @return String containing the XML mark-up.
+	 *            JAXB representation of an XML Element
+	 * @return Document.
 	 */
-	public static String getXMLString(JAXBElement<?> jaxbElement,
-			boolean prettyPrint) {
+	public static Document getDocument(JAXBElement<?> jaxbElement) {
 
 		try {
 			Document document = DocumentBuilderFactory.newInstance()
@@ -115,7 +85,7 @@ public class Utilities {
 			} catch (JAXBException e) {
 				// otherwise handle non-XMLRootElements
 				QName qualifiedName = new QName(
-						Utilities.getnamespaceURI(jaxbElement), jaxbElement
+						STIXSchema.getNamespaceURI(jaxbElement), jaxbElement
 								.getClass().getSimpleName());
 
 				@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -125,15 +95,33 @@ public class Utilities {
 				marshaller.marshal(root, document);
 			}
 
-			Utilities.removeUnusedNamespaces(document);
+			removeUnusedNamespaces(document);
 
-			return Utilities.getXMLString(document, prettyPrint);
+			return document;
 
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	/**
+	 * Returns a String for a JAXBElement
+	 * 
+	 * @param jaxbElement
+	 *            JAXB representation of an XML Element to be printed.
+	 * @param prettyPrint
+	 *            True for pretty print, otherwise false
+	 * @return String containing the XML mark-up.
+	 */
+	public static String getXMLString(JAXBElement<?> jaxbElement,
+			boolean prettyPrint) {
+
+		Document document = getDocument(jaxbElement);
+
+		return getXMLString(document, prettyPrint);
+
 	}
 
 	/**
@@ -196,6 +184,37 @@ public class Utilities {
 			throw new RuntimeException(e);
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private interface ElementVisitor {
+
+		void visit(Element element);
+
+	}
+
+	/**
+	 * Used to traverse an XML document.
+	 * 
+	 * @param element
+	 *            Represents an element in an XML document.
+	 * @param visitor
+	 *            Code to be executed.
+	 * 
+	 */
+	private final static void traverse(Element element, ElementVisitor visitor) {
+
+		visitor.visit(element);
+
+		NodeList children = element.getChildNodes();
+
+		for (int i = 0; i < children.getLength(); i++) {
+			Node node = children.item(i);
+
+			if (node.getNodeType() != Node.ELEMENT_NODE)
+				continue;
+
+			traverse((Element) node, visitor);
 		}
 	}
 
@@ -307,18 +326,79 @@ public class Utilities {
 	}
 
 	/**
-	 * Pull the namespace URI from the package for the class of the object.
+	 * Creates a Document from XML String
 	 * 
-	 * @param obj
-	 *            Expects a JAXB model object.
-	 * @return Name of the XML namespace.
+	 * @param xml
+	 *            The XML String
+	 * @return The Document representation
 	 */
-	public static String getnamespaceURI(Object obj) {
+	public static Document getDocument(String xml) {
+		try {
 
-		Package pkg = obj.getClass().getPackage();
+			DocumentBuilder documentBuilder = DocumentBuilderFactory
+					.newInstance().newDocumentBuilder();
+			InputSource inputSource = new InputSource();
 
-		XmlSchema xmlSchemaAnnotation = pkg.getAnnotation(XmlSchema.class);
+			inputSource.setCharacterStream(new StringReader(xml));
 
-		return xmlSchemaAnnotation.namespace();
+			Document document = documentBuilder.parse(inputSource);
+
+			removeUnusedNamespaces(document);
+
+			return document;
+
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException(e);
+		} catch (SAXException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Strings blank space formatting from a pretty printed XML String
+	 * 
+	 * @param xml
+	 *            The XML String to reformatted
+	 * @return The XML String as on line.
+	 */
+	public static String stripFormattingfromXMLString(String xml) {
+		try {
+			Document document = DocumentUtilities.getDocument(xml);
+
+			DOMImplementationRegistry registry = DOMImplementationRegistry
+					.newInstance();
+			DOMImplementationLS domImplementationLS = (DOMImplementationLS) registry
+					.getDOMImplementation("LS");
+			LSSerializer serializaer = domImplementationLS.createLSSerializer();
+
+			serializaer.getDomConfig().setParameter("format-pretty-print",
+					Boolean.FALSE);
+
+			serializaer.getDomConfig().setParameter("xml-declaration",
+					Boolean.TRUE);
+
+			// otherwise UTF-16 is used by default
+			LSOutput lsOutput = domImplementationLS.createLSOutput();
+			lsOutput.setEncoding("UTF-8");
+			ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+			lsOutput.setByteStream(byteStream);
+
+			serializaer.write(document, lsOutput);
+
+			return new String(byteStream.toByteArray(), "UTF-8");
+
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		} catch (ClassCastException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
