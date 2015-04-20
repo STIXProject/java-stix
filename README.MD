@@ -3,7 +3,7 @@
 This project is the Java bindings for STIX, the Structured Threat Information 
 eXpression language used for representing structured cyber threat information.
 
-It is being developed under the official [STIXProject][stix project].
+java-stix is being developed under the official [STIXProject][stix project].
 
 For more information, see [http://stix.mitre.org/][stix].
 
@@ -134,7 +134,7 @@ If you're using the Eclipse IDE consider installing the latest
 or use [Nodeclipse/Enide Gradle for Eclipse][nodeclipse]. 
 Gradle Eclipse integration is somewhat emergent.  I'd advise using the Gradle command-line.
 
-### <a name=building_via_gradle"></a>Building via Gradle build script
+### <a name="building_via_gradle"></a>Building via Gradle build script
 
 It is really unnecesary to build by hand, if your intention is to use the java-stix in your
 project as [snapshot](#importing_into_eclipse) exist in the Maven Central Snapshot repository,
