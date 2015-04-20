@@ -1,27 +1,28 @@
 # java-stix 
 
-Java bindings for STIX, the Structured Threat Information eXpression 
-language used for representing structured cyber threat information.
+This project is the Java bindings for STIX, the Structured Threat Information 
+eXpression language used for representing structured cyber threat information.
 
-This effort is being developed under the official [STIXProject][stix project].
+It is being developed under the official [STIXProject][stix project].
 
 For more information, see [http://stix.mitre.org/][stix].
 
-## Overview
+## <a name="overview"></a>Overview
 
 A primary goal of java-stix is to remain faithful to both the STIX
-specifications and to customary Java practices. java-stix is designed
-to be intuitive both to Java developers and JAXB XML developers, but
-it is not a one-for-one replacement for the [python-stix][python stix] API.
+specifications and customary Java practices. java-stix is designed
+to be intuitive both to Java developers and JAXB XML developers,
+provide convenience on the JAXB model, but it is not a one-for-one
+replacement for the [python-stix][python stix] API.
 
-## Versioning
+## <a name="versioning"></a>Versioning
 
 Releases of java-stix will comply with the Semantic Versioning
 specification at [http://semver.org/][semver]. Java-stix
 is currently under active development; see TODO.txt for a tentative
 roadmap.  Releases will be announced on the [STIX discussion list][list].
 
-## Snapshots
+## <a name="snapshots"></a>Snapshots
 
 Snapshots are being pushed to 
 
@@ -46,23 +47,25 @@ So, users can simply retrieve java-stix directly via the Central Repository.
 		</dependency>
 	</dependencies>
 
-# Building
+At a later date, release artifacts will appear in the Maven Central Repository.
 
-## Clone the repository
+# <a name="building"></a>Building
+
+## <a name="cloning"></a>Clone the repository
 
 git clone https://github.com/nemonik/java_stix.git
 
 A `git clone` command will not retrieve schemas project
-automatically, but the Gradle Buildscript will attempt to
+automatically, but the Gradle build script will attempt to
 retrieve them on execution.
 
-## Retrieve the schemas
+## <a name="retrieving_schemas"></a>Retrieve the schemas
 
-The Gradle buildscript will attempt to retreive and patch the 
+The Gradle build script will attempt to retreive and patch the 
 schemas for you, but if it cannot for some reason you will need
 to retrieve them yourself.
 
-The Buildscript executes either the retrieve_schemas.sh shell script
+Gradle will execute either the retrieve_schemas.sh shell script
 or the retreieve_schemas.bat batch script as appopriate for your 
 platform.  You can find these in the root of the project, and try
 executing them yourself or you can follow the steps enumerated in
@@ -72,7 +75,16 @@ Afterward, the cybOX schemas are patched for the flaw described in [cybOX Schema
 Until the issue is resolved please be aware of the patch.  The
 [patch][patch 340] is found at the root of the project.
 
-### The STIX schemas
+## <a name="re_retrieving_schemas"></a>Re-retrieve the schemas
+
+If you should need to re-retrieve the schemas have the Gradle
+build script do it for you:
+
+    gradle cleanSchema
+
+Then [build](#building_via_gradle) as normal.
+
+### <a name="stix_schemas"></a>The STIX schemas
 
 To manually retrieve the schemas, enter the project and run 
 these  additonal git commands on the command line:
@@ -84,7 +96,7 @@ these  additonal git commands on the command line:
     
 Your not done.  You'll also need to retrieve the CybOX schemas.
 
-### The CybOX schemas
+### <a name="cybox_schemas"></a>The CybOX schemas
 
 While in the project:
 
@@ -92,19 +104,19 @@ While in the project:
     git submodule update --force
     git checkout 3442ebe50385d3bd0b3305952b90d296e0a1242c
 
-When the Buildscript first runs it will also patch the CybOX schemas 
-so  that the JAXB2 Simple Document Object Model can be generated.
-Once patched, it will remained patched locally.  If the Buildscript
+When Gradle build script first runs it will also patch the CybOX schemas 
+so that the JAXB2 Simple Document Object Model can be generated.
+Once patched, it will remained patched locally.  If Gradle
 fails to retrieve the schemas, you will need to patch the schemas
 by hand from the command-line.  The patch file, `cybox_object_archive_object_patch` 
 is in  the root of the project.  NetBeans can also apply patches via
 `Team` -> `Patches` -> `Apply Diff Patch`. 
 
-## Creating the JAXB2 Document Model
+## <a name="creating_document_object_model"></a>Creating the JAXB2 Document Model
 
-### You need Gradle installed
+### <a name="need_gradle_installed"></a>You need Gradle installed
 
-This project uses a Gradle Buildscript.  You will need to install
+This project uses a Gradle build script.  You will need to install
 Gradle.
 
 I use typially use the Gradle command-line interface and this can be
@@ -122,11 +134,21 @@ If you're using the Eclipse IDE consider installing the latest
 or use [Nodeclipse/Enide Gradle for Eclipse][nodeclipse]. 
 Gradle Eclipse integration is somewhat emergent.  I'd advise using the Gradle command-line.
 
-### Building via Gradle buildscript
+### <a name=building_via_gradle"></a>Building via Gradle build script
 
-Change directories into the project and enter on the command-line:
+It is really unnecesary to build by hand, if your intention is to use the java-stix in your
+project as [snapshot](#importing_into_eclipse) exist in the Maven Central Snapshot repository,
+and soon releases will exist too. 
+
+If you want to build, you will need to have earlier [installed Gradle](#need_gradle_installed). 
+
+First change directories into the project and enter on the command-line:
 
     gradle
+
+as `build` is the default Gradle task.
+
+If you have trouble builidng via Gradle, see the [Trouble Building](trouble_building) section below.
 
 Success will look like this on UNIX:
 
@@ -172,12 +194,13 @@ Success will look like this on UNIX:
 	
 	Total time: 1 mins 24.123 secs
 
-If the build goes well you will find the JAXB Document Model in jar
-at
+If the build goes well you will find the jars: 
 
 	build/libs/stix-${version}.jar
+	build/libs/stix-${version}-javadoc.jar 
+	build/libs/stix-${version}.jar-sources.jar
 
-where `${version}` is replaced with the `version` number in the Gradle Buildscript.
+where `${version}` is replaced with the `version` number in the Gradle build script.
 
 A build will go like so on Windows:
 
@@ -220,18 +243,19 @@ A build will go like so on Windows:
 	
 	Total time: 3 mins 21.132 secs
 
-If the build goes well you will find the JAXB Document Model in jar
-at
+If the build goes well you will find the jars: 
 
 	build\libs\stix-${version}.jar
-	
-where `${version}` is replaced with the `version` number in the Gradle Buildscript.
+	build\libs\stix-${version}-javadoc.jar 
+	build\libs\stix-${version}.jar-sources.jar
 
-## Trouble building?
+where `${version}` is replaced with the `version` number in the Gradle build script.
+
+## <a name="trouble_building"></a>Trouble building?
 
 `You are less likely to see the following happen now that the Gradle 
-Buildscript will attempt to retreive the scheas, and if not will
-continue.`
+build script will attempt to retreive the scheas, but if it is not successful it
+will continue resulting in an error.`
 
 If while building you get this error:
 
@@ -247,7 +271,7 @@ If while building you get this error:
     * Try:
     Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
 
- You likely didn't retrieve the schema decribed in the section above.
+You likely didn't retrieve the schema decribed in the section above.
 
 Or if you get this error while building:
 
@@ -264,16 +288,19 @@ Or if you get this error while building:
 then you likely missed the step above where you must retrieved the
 CybOX schemas.
 
-### Importing the project into Eclipse
+### <a name="importing_into_eclipse"></a>Importing the project into Eclipse
+
+The author sees this section out of scope, but added it in hopes it 
+will help you over the hurdle.
 
 As Eclipse's various Gradle plugins have varying degrees of usefulness,
 I usually import the project as a `Java Project` and not a `Gradle Project`.
 
-You can still use `Gradle EnIDE` plugin to run the buildscript 
+You can still use `Gradle EnIDE` plugin to run the Gradle build script 
 from the IDE, but you'll need to configure your `Gradle Home to use` 
 via the Eclipse IDE preference panel.
 
-After running the Gradle buildscript, if you are using the Eclipse IDE
+After running the Gradle build script, if you are using the Eclipse IDE
 you may want to run the following from the command-line to set up the
 Ecipse environment:
 
@@ -287,7 +314,10 @@ source of JAXB Document Model. By default the generated source files are
 not editable to remmind you that changes to these files is usually a bad 
 idea.
 
-### Opening the project into NetBeans
+### <a name="opening_in_netbeans"></a>Opening the project into NetBeans
+
+Like the [eclipse section above](#importing_into_eclipse), the author sees this section out of scope, 
+but added it in hopes it will help you over the hurdle.
 
 I've tested the project with NetBeans 8.0.1 and it works great with the
 [Gradle JavaEE Support plugin][netbeans gradle].
