@@ -148,7 +148,8 @@ First change directories into the project and enter on the command-line:
 
 as `build` is the default Gradle task.
 
-If you have trouble builidng via Gradle, see the [Trouble Building](trouble_building) section below.
+If you have trouble builidng via Gradle, see the ["Trouble Building"](#trouble_building) section
+that follows this section.
 
 Success will look like this on UNIX:
 
