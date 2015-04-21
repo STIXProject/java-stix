@@ -215,9 +215,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 			try {
 				marshaller.marshal(this, document);
 			} catch (JAXBException e) {
-				// otherwise handle non-XMLRootElements
-				QName qualifiedName = new QName(STIXSchema.getNamespaceURI(this),
-						this.getClass().getSimpleName());
+				QName qualifiedName = STIXSchema.getQualifiedName(this);
 				
 				@SuppressWarnings({ "rawtypes", "unchecked" })
 				JAXBElement root = new JAXBElement(qualifiedName, this.getClass(),
@@ -241,6 +239,28 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 						[
 							imports: 
 							[
+								"javax.xml.bind.JAXBElement",
+								"javax.xml.namespace.QName",
+								"org.mitre.stix.STIXSchema"
+							],
+							template:
+								"""\
+	/**
+	 * Returns JAXBElement for JAXB Document Object Model object.
+	 *
+	 * @return the XML String for the JAXB object
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public JAXBElement<?> toJAXBElement() {
+		QName qualifiedName = STIXSchema.getQualifiedName(this);
+		
+		return new JAXBElement(qualifiedName, \${name}.class, this); 
+	}
+"""
+						],
+						[
+							imports: 
+							[
 								"org.mitre.stix.DocumentUtilities"
 							],
 							template:
@@ -251,7 +271,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	 * @return the XML String for the JAXB object
 	 */
 	public String toXMLString() {
-		return DocumentUtilities.getXMLString(toDocument());
+		return DocumentUtilities.toXMLString(toDocument());
 	}
 """
 						],
