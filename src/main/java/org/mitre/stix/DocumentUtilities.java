@@ -54,8 +54,19 @@ public class DocumentUtilities {
 	 *            JAXB representation of an Xml Element to be printed.
 	 * @return String containing the XML mark-up.
 	 */
-	public static String getXMLString(JAXBElement<?> jaxbElement) {
-		return getXMLString(jaxbElement, true);
+	public static String toXMLString(JAXBElement<?> jaxbElement) {
+		return toXMLString(jaxbElement, true);
+	}
+
+	/**
+	 * Returns Document that is not formatted for a JAXBElement
+	 * 
+	 * @param jaxbElement
+	 *            JAXB representation of an XML Element
+	 * @return Document.
+	 */
+	public static Document toDocument(JAXBElement<?> jaxbElement) {
+		return toDocument(jaxbElement, false);
 	}
 
 	/**
@@ -63,20 +74,31 @@ public class DocumentUtilities {
 	 * 
 	 * @param jaxbElement
 	 *            JAXB representation of an XML Element
-	 * @return Document.
+	 * @param prettyPrint
+	 *            True for pretty print, otherwise false
+	 * @return
 	 */
-	public static Document getDocument(JAXBElement<?> jaxbElement) {
+	public static Document toDocument(JAXBElement<?> jaxbElement,
+			boolean prettyPrint) {
 
 		try {
-			Document document = DocumentBuilderFactory.newInstance()
-					.newDocumentBuilder().newDocument();
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+					.newInstance();
+			documentBuilderFactory.setNamespaceAware(true);
+			documentBuilderFactory.setIgnoringElementContentWhitespace(true);
+			documentBuilderFactory.isIgnoringComments();
+			documentBuilderFactory.setCoalescing(true);
+
+			Document document = documentBuilderFactory.newDocumentBuilder()
+					.newDocument();
 
 			JAXBContext jaxbContext = JAXBContext.newInstance(jaxbElement
 					.getDeclaredType().getPackage().getName());
 
 			Marshaller marshaller = jaxbContext.createMarshaller();
 
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
+					prettyPrint);
 
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 
@@ -115,17 +137,17 @@ public class DocumentUtilities {
 	 *            True for pretty print, otherwise false
 	 * @return String containing the XML mark-up.
 	 */
-	public static String getXMLString(JAXBElement<?> jaxbElement,
+	public static String toXMLString(JAXBElement<?> jaxbElement,
 			boolean prettyPrint) {
 
-		Document document = getDocument(jaxbElement);
+		Document document = toDocument(jaxbElement);
 
-		return getXMLString(document, prettyPrint);
+		return toXMLString(document, prettyPrint);
 
 	}
 
 	/**
-	 * Returns a pretty printed String for a Document object representing the
+	 * Returns String that is not formatted for a Document object representing the
 	 * entire XML document.
 	 * 
 	 * @param document
@@ -133,8 +155,8 @@ public class DocumentUtilities {
 	 * 
 	 * @return Pretty printed String containing the XML mark-up.
 	 */
-	public static String getXMLString(Document document) {
-		return getXMLString(document, true);
+	public static String toXMLString(Document document) {
+		return toXMLString(document, false);
 	}
 
 	/**
@@ -148,7 +170,7 @@ public class DocumentUtilities {
 	 * 
 	 * @return String containing the XML mark-up.
 	 */
-	public static String getXMLString(Document document, boolean prettyPrint) {
+	public static String toXMLString(Document document, boolean prettyPrint) {
 
 		try {
 			DOMImplementationRegistry registry = DOMImplementationRegistry
@@ -236,6 +258,8 @@ public class DocumentUtilities {
 	public static void removeUnusedNamespaces(Document document) {
 
 		final Set<String> namespaces = new HashSet<String>();
+
+		document.normalizeDocument();
 
 		Element element = document.getDocumentElement();
 
@@ -332,11 +356,19 @@ public class DocumentUtilities {
 	 *            The XML String
 	 * @return The Document representation
 	 */
-	public static Document getDocument(String xml) {
+	public static Document toDocument(String xml) {
 		try {
 
-			DocumentBuilder documentBuilder = DocumentBuilderFactory
-					.newInstance().newDocumentBuilder();
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+					.newInstance();
+			documentBuilderFactory.setNamespaceAware(true);
+			documentBuilderFactory.setIgnoringElementContentWhitespace(true);
+			documentBuilderFactory.isIgnoringComments();
+			documentBuilderFactory.setCoalescing(true);
+
+			DocumentBuilder documentBuilder = documentBuilderFactory
+					.newDocumentBuilder();
+
 			InputSource inputSource = new InputSource();
 
 			inputSource.setCharacterStream(new StringReader(xml));
@@ -357,7 +389,7 @@ public class DocumentUtilities {
 	}
 
 	/**
-	 * Strings blank space formatting from a pretty printed XML String
+	 * Strips formatting from an XML String
 	 * 
 	 * @param xml
 	 *            The XML String to reformatted
@@ -365,7 +397,7 @@ public class DocumentUtilities {
 	 */
 	public static String stripFormattingfromXMLString(String xml) {
 		try {
-			Document document = DocumentUtilities.getDocument(xml);
+			Document document = DocumentUtilities.toDocument(xml);
 
 			DOMImplementationRegistry registry = DOMImplementationRegistry
 					.newInstance();

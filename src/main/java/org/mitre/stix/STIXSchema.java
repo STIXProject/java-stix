@@ -15,8 +15,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.xml.bind.annotation.XmlType;
+
 import javax.xml.XMLConstants;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchema;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -272,7 +276,7 @@ public class STIXSchema {
 	}
 
 	/**
-	 * Pull the namespace URI from the package for the class of the object.
+	 * Return the namespace URI from the package for the class of the object.
 	 * 
 	 * @param obj
 	 *            Expects a JAXB model object.
@@ -285,5 +289,34 @@ public class STIXSchema {
 		XmlSchema xmlSchemaAnnotation = pkg.getAnnotation(XmlSchema.class);
 
 		return xmlSchemaAnnotation.namespace();
+	}
+
+	/**
+	 * Return the name from the JAXB model object.
+	 * 
+	 * @param obj
+	 *            Expects a JAXB model object.
+	 * @return element name
+	 */
+	public static String getName(Object obj) {
+		try {
+			return obj.getClass().getAnnotation(
+					XmlRootElement.class).name();
+		} catch (NullPointerException e) {
+			return obj.getClass().getAnnotation(
+					XmlType.class).name();
+		}
+	}
+
+	/**
+	 * Return the QualifiedNam from the JAXB model object.
+	 * 
+	 * @param obj
+	 *            Expects a JAXB model object.
+	 * @return Qualified dName as defined by JAXB model
+	 */
+	public static QName getQualifiedName(Object obj) {
+		return new QName(STIXSchema.getNamespaceURI(obj),
+				STIXSchema.getName(obj));
 	}
 }
