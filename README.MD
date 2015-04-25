@@ -326,8 +326,6 @@ With the plugin installed, open the project and right-click on the project
 root and select `build` from the `task` panel.
 
 [stix project]: http://stixproject.github.io/
-[java_stix]: https://github.com/STIXProject/java-stix
-[java_stix_readme]: https://github.com/nemonik/java_stix/blob/master/README.MD
 [stix]: http://stix.mitre.org/
 [python stix]: https://github.com/STIXProject/python-stix
 [semver]: http://semver.org/
