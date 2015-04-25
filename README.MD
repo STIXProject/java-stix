@@ -1,9 +1,9 @@
 # java-stix 
 
-This project is the Java bindings for STIX, the Structured Threat Information 
+The Java bindings for STIX, the Structured Threat Information 
 eXpression language used for representing structured cyber threat information.
 
-java-stix is being developed under the official [STIXProject][stix project].
+java-stix is being developed under the official [STIXProject][stix project]
 
 For more information, see [http://stix.mitre.org/][stix].
 
@@ -326,6 +326,8 @@ With the plugin installed, open the project and right-click on the project
 root and select `build` from the `task` panel.
 
 [stix project]: http://stixproject.github.io/
+[java_stix]: https://github.com/STIXProject/java-stix
+[java_stix_readme]: https://github.com/nemonik/java_stix/blob/master/README.MD
 [stix]: http://stix.mitre.org/
 [python stix]: https://github.com/STIXProject/python-stix
 [semver]: http://semver.org/
