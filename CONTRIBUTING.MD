@@ -107,6 +107,6 @@ from the main (upstream) repository:
     ```
 
 [list]: https://stix.mitre.org/community/registration.html
-[github]: https://github.com/nemonik/java_stix
-[issues]: https://github.com/nemonik/java_stix/issues
-[pulls]: https://github.com/nemonik/java_stix/pulls
+[github]: https://github.com/STIXProject/java-stix
+[issues]: https://github.com/STIXProject/java-stix/issues
+[pulls]: https://github.com/STIXProject/java-stix/pulls
