@@ -68,7 +68,7 @@ class RetrieveSchemasTask extends DefaultTask {
 		}
 	
 		
-		if ((!project.file("src/main/resources/schemas/v${schemaVersion}").exists()) || (project.file("src/main/resources/schemas/v${schemaVersion}").list() == null) || (project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null)) {
+		if (project.fileTree("src/main/resources/schemas/v${schemaVersion}").isEmpty() || project.fileTree("src/main/resources/schemas/v${schemaVersion}/cybox").isEmpty()) {
 			pull()
 			patch()
 			if ((project.file("src/main/resources/schemas/v${schemaVersion}").list().size() == 0) || (project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null)) {
