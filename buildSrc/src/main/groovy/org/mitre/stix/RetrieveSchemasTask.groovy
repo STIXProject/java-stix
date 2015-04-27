@@ -61,6 +61,7 @@ class RetrieveSchemasTask extends DefaultTask {
 		dir.eachFileRecurse (FileType.FILES) { file ->
  				println file
 		}
+	
 		
 		if ((!project.file("src/main/resources/schemas/v${schemaVersion}").exists()) || (project.file("src/main/resources/schemas/v${schemaVersion}").list() == null) || (project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null)) {
 			pull()
