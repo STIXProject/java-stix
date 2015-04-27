@@ -52,26 +52,17 @@ class RetrieveSchemasTask extends DefaultTask {
 
 	@TaskAction
 	def retrieve() {
-		println "src/main/resources/schemas/v${schemaVersion}"
-		
-		println project.fileTree("src/main/resources/schemas/v${schemaVersion}").isEmpty()
-		println project.fileTree("src/main/resources/schemas/v${schemaVersion}/cybox").isEmpty()
-		
-		println !project.file("src/main/resources/schemas/v${schemaVersion}").exists()
-		println project.file("src/main/resources/schemas/v${schemaVersion}").list() == null
-		println !project.file("src/main/resources/schemas/v${schemaVersion}/cybox").exists()
-		println project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null
-		
-		def dir = project.file("src/main/resources/schemas/v${schemaVersion}")
-		dir.eachFileRecurse (FileType.FILES) { file ->
- 				println file
-		}
+	
+		//def dir = project.file("src/main/resources/schemas/v${schemaVersion}")
+		//dir.eachFileRecurse (FileType.FILES) { file ->
+ 		//		println file
+		//}
 	
 		
 		if (project.fileTree("src/main/resources/schemas/v${schemaVersion}").isEmpty() || project.fileTree("src/main/resources/schemas/v${schemaVersion}/cybox").isEmpty()) {
 			pull()
 			patch()
-			if ((project.file("src/main/resources/schemas/v${schemaVersion}").list().size() == 0) || (project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null)) {
+			if (project.fileTree("src/main/resources/schemas/v${schemaVersion}").isEmpty() || project.fileTree("src/main/resources/schemas/v${schemaVersion}/cybox").isEmpty()) {
 				throw new GradleException("    Build error occurred: You will need retrieve schemas by hand. See README.md file.");
 			}
 		} else {
