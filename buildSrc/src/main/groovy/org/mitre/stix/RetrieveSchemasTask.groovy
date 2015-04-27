@@ -53,6 +53,10 @@ class RetrieveSchemasTask extends DefaultTask {
 	@TaskAction
 	def retrieve() {
 		println "src/main/resources/schemas/v${schemaVersion}"
+		
+		println project.fileTree("src/main/resources/schemas/v${schemaVersion}").isEmpty()
+		println project.fileTree("src/main/resources/schemas/v${schemaVersion}/cybox").isEmpty()
+		
 		println !project.file("src/main/resources/schemas/v${schemaVersion}").exists()
 		println project.file("src/main/resources/schemas/v${schemaVersion}").list() == null
 		println !project.file("src/main/resources/schemas/v${schemaVersion}/cybox").exists()
