@@ -357,7 +357,8 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 				
 				if ( obj.package + "." + obj.name ==~ regex) {
 					
-					logger.debug("    handling ${obj.package + "." + obj.name}")
+					//logger.debug("    handling ${obj.package + "." + obj.name}")
+					println "    handling ${obj.package + "." + obj.name}"
 					
 					methodDeclarations.each {  methodDeclaration ->
 						
@@ -370,7 +371,8 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 					}
 				} else {
 					// handle package-info
-					logger.debug("    ignoring ${obj.package + "." + obj.name}")
+					//logger.debug("    ignoring ${obj.package + "." + obj.name}")
+					println "    ignoring ${obj.package + "." + obj.name}"
 				}
 				
 				source = addCopyright(source, """
