@@ -9,6 +9,8 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.GradleException
 
+import groovy.io.FileType
+
 import org.apache.tools.ant.taskdefs.condition.Os
 
 /**
@@ -55,9 +57,10 @@ class RetrieveSchemasTask extends DefaultTask {
 		println project.file("src/main/resources/schemas/v${schemaVersion}").list() == null
 		println project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null
 		
-		collection = files { project.file("src/main/resources/schemas/v${schemaVersion}").listFiles() }
-		
-		collection.collect { relativePath(it) }.sort().each { println "> ${it}" }
+		def dir = project.file("src/main/resources/schemas/v${schemaVersion}")
+		dir.eachFileRecurse (FileType.FILES) { file ->
+ 				println file
+		}
 		
 		if ((!project.file("src/main/resources/schemas/v${schemaVersion}").exists()) || (project.file("src/main/resources/schemas/v${schemaVersion}").list() == null) || (project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null)) {
 			pull()
