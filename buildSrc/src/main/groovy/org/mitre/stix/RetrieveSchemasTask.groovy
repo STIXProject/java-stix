@@ -55,6 +55,7 @@ class RetrieveSchemasTask extends DefaultTask {
 		println "src/main/resources/schemas/v${schemaVersion}"
 		println !project.file("src/main/resources/schemas/v${schemaVersion}").exists()
 		println project.file("src/main/resources/schemas/v${schemaVersion}").list() == null
+		println !project.file("src/main/resources/schemas/v${schemaVersion}/cybox").exists
 		println project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null
 		
 		def dir = project.file("src/main/resources/schemas/v${schemaVersion}")
