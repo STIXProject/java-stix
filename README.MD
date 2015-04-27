@@ -53,7 +53,7 @@ At a later date, release artifacts will appear in the Maven Central Repository.
 
 ## <a name="cloning"></a>Clone the repository
 
-git clone https://github.com/nemonik/java_stix.git
+git clone https://github.com/STIXProject/java_stix.git
 
 A `git clone` command will not retrieve schemas project
 automatically, but the Gradle build script will attempt to
@@ -332,7 +332,7 @@ root and select `build` from the `task` panel.
 [list]: https://stix.mitre.org/community/registration.html
 [gradle]: http://www.gradle.org
 [issue 340]: https://github.com/CybOXProject/schemas/issues/340
-[patch 340]: https://raw.githubusercontent.com/nemonik/java_stix/master/cybox_object_archive_file_object.patch
+[patch 340]: https://raw.githubusercontent.com/STIXProject/java-stix/master/cybox_object_archive_file_object.patch
 [gradle ide pack]: http://marketplace.eclipse.org/content/gradle-ide-pack
 [nodeclipse]: http://marketplace.eclipse.org/content/gradle
 [netbeans gradle]:http://plugins.netbeans.org/plugin/55529/gradle-javaee-support
