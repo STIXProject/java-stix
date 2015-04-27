@@ -4,9 +4,6 @@ src/generated
 .project
 .settings/
 settings.gradle
-gradlew.bat
-gradlew
-gradle/wrapper
 .gradle/2.1/taskArtifacts
 src/main/resources/namespace-prefix.xjb
 src/main/resource/schemas

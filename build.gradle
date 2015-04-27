@@ -65,6 +65,10 @@ task cleanSchema(type: CleanSchemaTask) {
 
 compileJava.dependsOn createPackageInfo
 
+task wrapper(type: Wrapper) {
+	gradleVersion = '2.3'
+}
+
 task javadocJar(type: Jar) {
 	classifier = 'javadoc'
 	from 'LICENSE'
