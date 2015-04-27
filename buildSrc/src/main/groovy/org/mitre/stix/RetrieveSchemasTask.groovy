@@ -55,9 +55,7 @@ class RetrieveSchemasTask extends DefaultTask {
 		println project.file("src/main/resources/schemas/v${schemaVersion}").list().size() == 0
 		println project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null
 		
-		if ((!project.file("src/main/resources/schemas/v${schemaVersion}").exists()) 
-			|| (project.file("src/main/resources/schemas/v${schemaVersion}").list().size() == 0) 
-			|| (project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null)) {
+		if ((!project.file("src/main/resources/schemas/v${schemaVersion}").exists()) || (project.file("src/main/resources/schemas/v${schemaVersion}").list().size() == 0) || (project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null)) {
 			pull()
 			patch()
 			if ((project.file("src/main/resources/schemas/v${schemaVersion}").list().size() == 0) || (project.file("src/main/resources/schemas/v${schemaVersion}/cybox").list() == null)) {
