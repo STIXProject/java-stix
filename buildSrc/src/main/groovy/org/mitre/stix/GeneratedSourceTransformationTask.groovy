@@ -33,22 +33,25 @@ import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
  *
  */
 class GeneratedSourceTransformationTask extends DefaultTask {
+	def lineSeperator
+	def options
+	def codeFormatter
 	
 	GeneratedSourceTransformationTask() {
 		description = "Perform syntactical analysis and transformations on the model (e.g., adding convenience methods)"
-	}
-	
-	def lineSeperator = System.getProperty("line.separator")
-	
-	// Format src
-	def format(src) {
 		
-		def options = DefaultCodeFormatterConstants.getEclipseDefaultSettings()
+		lineSeperator = System.getProperty("line.separator")
+		
+		options = DefaultCodeFormatterConstants.getEclipseDefaultSettings()
 		options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_5)
 		options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_5)
 		options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_5)
 		
-		def codeFormatter = ToolFactory.createCodeFormatter(options)
+		codeFormatter = ToolFactory.createCodeFormatter(options)
+	}
+	
+	// Format src
+	def format(src) {
 		
 		def edit = codeFormatter.format(
 				CodeFormatter.K_COMPILATION_UNIT,
@@ -74,20 +77,16 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	def addCopyright(source, comment) {
 		comment + source
 	}
-	
+
 	// Add a imports to source and organizes them
 	def addImportsToSrc(source, importsToAdd) {
 		def document = new org.eclipse.jface.text.Document(source)
 		
 		def parser = ASTParser.newParser(AST.JLS8)
-		
-		def options = JavaCore.getOptions()
-		options.put(JavaCore.COMPILER_COMPLIANCE, "1.5")
-		options.put(JavaCore.COMPILER_SOURCE, "1.5")
 		parser.setCompilerOptions(options)
+		parser.setKind(ASTParser.K_COMPILATION_UNIT)
 		
 		parser.setSource(document.get().toCharArray())
-		parser.setKind(ASTParser.K_COMPILATION_UNIT)
 		
 		def cu = (CompilationUnit) parser.createAST(null)
 		
@@ -130,16 +129,12 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	def addMethodsToSrc(source, methodTemplate, templateBindings) {
 		
 		def document = new org.eclipse.jface.text.Document(source)
+
 		def parser = ASTParser.newParser(AST.JLS8)
-		
-		def options = JavaCore.getOptions()
-		options.put(JavaCore.COMPILER_COMPLIANCE, "1.5")
-		options.put(JavaCore.COMPILER_SOURCE, "1.5")
-		
 		parser.setCompilerOptions(options)
+		parser.setKind(ASTParser.K_COMPILATION_UNIT)
 		
 		parser.setSource(document.get().toCharArray())
-		parser.setKind(ASTParser.K_COMPILATION_UNIT)
 		
 		def cu = (CompilationUnit) parser.createAST(null)
 		
@@ -329,65 +324,53 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		return STIXSchema.getInstance().validate(toXMLString());
 	}
 """
+
 						]
 					]
 			]
 		
-		def dom = []
-		
 		project.file("src/generated/java").eachFileRecurse(FileType.FILES) { file ->
 			if (!file.name.endsWith("EnumType.java") && !file.name.endsWith("TypeEnum.java")) {
 
-				def obj = new LinkedHashMap();
-				obj.uri = file.toURI()
-				obj.name = file.getName().split(/\./)[0]
-				obj.package = file.getParent().replaceAll(project.file("src/generated/java").path, "").substring(1).replaceAll(System.getProperty("file.separator"),'.')
-				
-				dom << obj
-			}
-		}
-		
-		dom.each() { obj ->
-			def templateBindings = ["pkg":obj.package, "name":obj.name]
+				def uri = file.toURI()
+				def name = file.getName().split(/\./)[0]
+				def pkg = file.getParent().replaceAll(project.file("src/generated/java").path, "").substring(1).replaceAll(System.getProperty("file.separator"),'.')
 			
-			def source = project.file(obj.uri).readLines().iterator()
-					.join(lineSeperator)
+				def source = project.file(uri).readLines().iterator().join(lineSeperator)
 			
-			addMethods.each { regex, methodDeclarations ->
+				addMethods.each { regex, methodDeclarations ->
 				
-				if ( obj.package + "." + obj.name ==~ regex) {
-					
-					//logger.debug("    handling ${obj.package + "." + obj.name}")
-					println "    handling ${obj.package + "." + obj.name}"
-					
-					methodDeclarations.each {  methodDeclaration ->
+					if ( "${pkg}.${name}" ==~ regex) {
 						
-						source = addImportsToSrc(source,
-								methodDeclaration["imports"])
+						logger.debug("    handling ${pkg + "." + name}")
 						
-						source = addMethodsToSrc(source,
-								methodDeclaration["template"], templateBindings)
-						
+						methodDeclarations.each {  methodDeclaration ->
+							
+							source = addImportsToSrc(source,
+									methodDeclaration["imports"])
+							
+							source = addMethodsToSrc(source,
+									methodDeclaration["template"], ["pkg":pkg, "name":name])
+							
+						}
+					} else {
+						// handle package-info
+						logger.debug("    ignoring ${pkg}.${name}")
 					}
-				} else {
-					// handle package-info
-					//logger.debug("    ignoring ${obj.package + "." + obj.name}")
-					println "    ignoring ${obj.package + "." + obj.name}"
-				}
-				
-				source = addCopyright(source, """
+					
+					source = addCopyright(source, """
 /**
  * Copyright (c) ${Calendar.instance.get(Calendar.YEAR)}, The MITRE Corporation. All rights reserved.
  * See LICENSE for complete terms.
  */
  
  """) 
-				project.file(obj.uri).with { outFile ->
-					outFile.setWritable(true)
-					outFile.withWriter{ out -> out.println format(source) }
-					outFile.setWritable(false)
+					project.file(uri).with { outFile ->
+						outFile.setWritable(true)
+						outFile.withWriter{ out -> out.println format(source) }
+						outFile.setWritable(false)
+					}
 				}
-				
 			}
 		}
 	}
