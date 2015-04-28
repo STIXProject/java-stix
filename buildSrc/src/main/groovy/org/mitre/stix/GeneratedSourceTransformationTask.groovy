@@ -23,8 +23,6 @@ import org.eclipse.jdt.core.dom.rewrite.ListRewrite
 import org.eclipse.jdt.core.formatter.CodeFormatter
 import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
 
-//import java.util.regex.Pattern
-
 /**
  * Gradle Task used to perform syntactical analysis and transformations on the model 
  * (e.g., adding convenience methods)
@@ -34,7 +32,8 @@ import org.eclipse.jdt.core.formatter.DefaultCodeFormatterConstants
  */
 class GeneratedSourceTransformationTask extends DefaultTask {
 	def lineSeperator
-	def options
+	def codeFormatterOptions
+	def parserOptions
 	def codeFormatter
 	
 	GeneratedSourceTransformationTask() {
@@ -42,12 +41,16 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		
 		lineSeperator = System.getProperty("line.separator")
 		
-		options = DefaultCodeFormatterConstants.getEclipseDefaultSettings()
-		options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_5)
-		options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_5)
-		options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_5)
+		codeFormatterOptions = DefaultCodeFormatterConstants.getEclipseDefaultSettings()
+		codeFormatterOptions.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_5)
+		codeFormatterOptions.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_5)
+		codeFormatterOptions.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_5)
 		
-		codeFormatter = ToolFactory.createCodeFormatter(options)
+		codeFormatter = ToolFactory.createCodeFormatter(codeFormatterOptions)
+		
+		parserOptions  = JavaCore.getOptions()
+		parserOptions.put(JavaCore.COMPILER_COMPLIANCE, "1.5")
+		parserOptions.put(JavaCore.COMPILER_SOURCE, "1.5")
 	}
 	
 	// Format src
@@ -83,12 +86,11 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		def document = new org.eclipse.jface.text.Document(source)
 		
 		def parser = ASTParser.newParser(AST.JLS8)
-		parser.setCompilerOptions(options)
+		parser.setCompilerOptions(parserOptions)
 		parser.setKind(ASTParser.K_COMPILATION_UNIT)
-		
 		parser.setSource(document.get().toCharArray())
 		
-		def cu = (CompilationUnit) parser.createAST(null)
+		def cu = (CompilationUnit) parser.createAST(null) // supposed to reset for re-used, but doesn't
 		
 		if (!(cu.types().get(0) instanceof org.eclipse.jdt.core.dom.EnumDeclaration)) {
 			cu.recordModifications()
@@ -129,14 +131,13 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	def addMethodsToSrc(source, methodTemplate, templateBindings) {
 		
 		def document = new org.eclipse.jface.text.Document(source)
-
+	
 		def parser = ASTParser.newParser(AST.JLS8)
-		parser.setCompilerOptions(options)
+		parser.setCompilerOptions(parserOptions)
 		parser.setKind(ASTParser.K_COMPILATION_UNIT)
-		
 		parser.setSource(document.get().toCharArray())
 		
-		def cu = (CompilationUnit) parser.createAST(null)
+		def cu = (CompilationUnit) parser.createAST(null) // supposed to reset for re-used, but doesn't
 		
 		if (!(cu.types().get(0) instanceof org.eclipse.jdt.core.dom.EnumDeclaration)) {
 			cu.recordModifications()
@@ -343,6 +344,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 					if ( "${pkg}.${name}" ==~ regex) {
 						
 						logger.debug("    handling ${pkg + "." + name}")
+						println("    handling ${pkg + "." + name}")
 						
 						methodDeclarations.each {  methodDeclaration ->
 							

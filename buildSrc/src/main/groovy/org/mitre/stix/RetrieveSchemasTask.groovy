@@ -52,12 +52,6 @@ class RetrieveSchemasTask extends DefaultTask {
 
 	@TaskAction
 	def retrieve() {
-	
-		//def dir = project.file("src/main/resources/schemas/v${schemaVersion}")
-		//dir.eachFileRecurse (FileType.FILES) { file ->
- 		//		println file
-		//}
-	
 		
 		if (project.fileTree("src/main/resources/schemas/v${schemaVersion}").isEmpty() || project.fileTree("src/main/resources/schemas/v${schemaVersion}/cybox").isEmpty()) {
 			pull()
