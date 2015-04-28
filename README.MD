@@ -7,6 +7,8 @@ java-stix is being developed under the official [STIXProject][stix project]
 
 For more information, see [http://stix.mitre.org/][stix].
 
+[![Circle CI](https://circleci.com/gh/STIXProject/java-stix.svg?style=svg)](https://circleci.com/gh/STIXProject/java-stix)
+
 ## <a name="overview"></a>Overview
 
 A primary goal of java-stix is to remain faithful to both the STIX
