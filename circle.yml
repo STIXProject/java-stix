@@ -1,0 +1,5 @@
+machine:
+  java:
+    version: oraclejdk7
+  environment:
+    GRADLE_OPTS: --stacktrace --debug
