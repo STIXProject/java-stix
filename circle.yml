@@ -2,4 +2,5 @@ machine:
   java:
     version: oraclejdk7
   environment:
-    GRADLE_OPTS: --stacktrace --debug
+    GRADLE_OPTS:-Dorg.gradle.daemon=true
+    CI_OPTS: --stacktrace --debug
