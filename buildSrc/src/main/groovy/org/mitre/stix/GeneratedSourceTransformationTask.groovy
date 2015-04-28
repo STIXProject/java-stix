@@ -371,10 +371,6 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 						outFile.withWriter{ out -> out.println format(source) }
 						outFile.setWritable(false)
 					}
-					
-					def r = Runtime.getRuntime()
-					println r.freeMemory()
-					//r.gc()
 				}
 			}
 		}
