@@ -90,7 +90,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		parser.setKind(ASTParser.K_COMPILATION_UNIT)
 		parser.setSource(document.get().toCharArray())
 		
-		def cu = (CompilationUnit) parser.createAST(null) // supposed to reset for re-used, but doesn't
+		def cu = (CompilationUnit) parser.createAST(null) // parser is supposed to reset for re-used, but doesn't
 		
 		if (!(cu.types().get(0) instanceof org.eclipse.jdt.core.dom.EnumDeclaration)) {
 			cu.recordModifications()
@@ -137,7 +137,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		parser.setKind(ASTParser.K_COMPILATION_UNIT)
 		parser.setSource(document.get().toCharArray())
 		
-		def cu = (CompilationUnit) parser.createAST(null) // supposed to reset for re-used, but doesn't
+		def cu = (CompilationUnit) parser.createAST(null) // parser is supposed to reset for re-used, but doesn't
 		
 		if (!(cu.types().get(0) instanceof org.eclipse.jdt.core.dom.EnumDeclaration)) {
 			cu.recordModifications()
@@ -344,7 +344,6 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 					if ( "${pkg}.${name}" ==~ regex) {
 						
 						logger.debug("    handling ${pkg + "." + name}")
-						println("    handling ${pkg + "." + name}")
 						
 						methodDeclarations.each {  methodDeclaration ->
 							
@@ -372,6 +371,10 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 						outFile.withWriter{ out -> out.println format(source) }
 						outFile.setWritable(false)
 					}
+					
+					def r = Runtime.getRuntime()
+					println r.freeMemory()
+					//r.gc()
 				}
 			}
 		}
