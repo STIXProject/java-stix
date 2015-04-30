@@ -130,7 +130,7 @@ So, for a UNIX platform, you can run gradle from the project root via:
 
 Or if you are Windows via:
 
-     gradlew.bat
+     .\gradlew.bat
 
 If you're using the Eclipse IDE consider installing the latest
 [Gradle IDE Pack][gradle ide pack] 
@@ -147,7 +147,7 @@ If you want to build, you will need to have earlier [installed Gradle](#need_gra
 
 First change directories into the project and enter on the command-line:
 
-    gradlew
+    ./gradlew
 
 as `build` is the default Gradle task.
 
@@ -242,7 +242,7 @@ I don't frequently build on Windows so there is a chance the build may fail on t
 to install git and GNU patch via either cygwin, Chocolatey, or directly.  Then work out permission evalation 
 issues so Gradle can use Ant to execute the command-line GNU patch command.
 
-To build on Windows use the gradlw batch script like so:
+To build on Windows use the gradlew batch script like so:
 
 	$ .\gradlew.bat
 
