@@ -24,75 +24,64 @@ import org.xml.sax.InputSource;
 import org.custommonkey.xmlunit.DetailedDiff
 import org.custommonkey.xmlunit.XMLUnit
 
+import spock.lang.*
+
 class DocumentUtilitiesSpec extends spock.lang.Specification{
+
+	@Shared def version = "1.1.1"
+		
+	@Shared def controlXML = """<?xml version="1.0" encoding="UTF-8"?>
+<stix:STIX_Package
+    id="example:package-af59abd3-102c-43d0-89ed-e0a90525d747"
+    timestamp="1970-01-01T00:00:00.000Z" version="${version}"
+    xmlns="http://xml/metadataSharing.xsd"
+    xmlns:example="http://example.com/" xmlns:stix="http://stix.mitre.org/stix-1"/>"""
 	
-	def "Converting a JAXBElement to Document returns an expected result"() {
-		when: "A STIX Package model is created and Document representation for the same is created"
-			def version = "1.1.1" 
-			
-			def c = new GregorianCalendar(TimeZone.getTimeZone("UTC"))
-			c.setTimeInMillis(0)
-			
-			def epoch = DatatypeFactory.newInstance().newXMLGregorianCalendar(c)
-			
+	@Shared def c = new GregorianCalendar(TimeZone.getTimeZone("UTC"))
+	@Shared epoch
+	
+	def setup() {
+		c.setTimeInMillis(0)
+		epoch = DatatypeFactory.newInstance().newXMLGregorianCalendar(c)
+		
+		XMLUnit.setIgnoreWhitespace(true)
+		XMLUnit.setIgnoreAttributeOrder(true)
+	}
+	
+	def "Converting a JAXBElement to a Document returns an expected result"() {
+		when: "A STIX Package model is created, converted to  Document representation"
 			def stixPackage = new STIXPackage()
 								.withVersion(version)
 								.withTimestamp(epoch)
 								.withId(new QName("http://example.com/", 
 									"package-af59abd3-102c-43d0-89ed-e0a90525d747", 
 									"example"))
-
-			def documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 			
-			def inputSource = new InputSource()
-			inputSource.setCharacterStream(new StringReader(stixPackage.toXMLString()))
+			def test = DocumentUtilities.toDocument(stixPackage.toJAXBElement())
+			test.normalizeDocument()
 			
-			def doc1 = documentBuilder.parse(inputSource)
-			doc1.normalizeDocument()
-		then: "They produce identical XML"
-			def doc2 = DocumentUtilities.toDocument(stixPackage.toJAXBElement())
-			doc2.normalizeDocument()
+		then: "It is identical to the expected XML String"
 			
-			XMLUnit.setIgnoreWhitespace(true)
-			XMLUnit.setIgnoreAttributeOrder(true)
-			
-			def diff = new DetailedDiff(XMLUnit.compareXML(DocumentUtilities.toXMLString(doc1), DocumentUtilities.toXMLString(doc2)))
+			def diff = new DetailedDiff(XMLUnit.compareXML(controlXML, DocumentUtilities.toXMLString(test)))
 			
 			diff.identical()
 	}
 	
-	def "Converting an XML String to Document returns an expected result"() {
+	def "Converting an XML String to a Document returns an expected result"() {
 		when: "An XML String is used to create a Document"
-			def xml = """<?xml version="1.0" encoding="UTF-8"?>
-    <stix:STIX_Package id="example:package-af59abd3-102c-43d0-89ed-e0a90525d747" timestamp="1970-01-01T00:00:00.000Z" version="1.1.1" xmlns="http://xml/metadataSharing.xsd" xmlns:example="http://example.com/" xmlns:stix="http://stix.mitre.org/stix-1"/>"""
-
-			def documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
 			
-			def inputSource = new InputSource()
-			inputSource.setCharacterStream(new StringReader(xml))
+			def test = DocumentUtilities.toDocument(controlXML)
+			test.normalizeDocument()
 			
-			def doc1 = documentBuilder.parse(inputSource)
-			doc1.normalizeDocument()
-		then: "They are identical"
-			def doc2 = DocumentUtilities.toDocument(xml)
-			doc2.normalizeDocument()
+		then: "It is identical to the expected XML String"
 			
-			XMLUnit.setIgnoreWhitespace(true)
-			XMLUnit.setIgnoreAttributeOrder(true)
-			
-			def diff = new DetailedDiff(XMLUnit.compareXML(DocumentUtilities.toXMLString(doc1), DocumentUtilities.toXMLString(doc2)))
+			def diff = new DetailedDiff(XMLUnit.compareXML(controlXML, DocumentUtilities.toXMLString(test)))
 			
 			diff.identical()
 	}
-
-	def "Converting an JAXBElement to String returns an expected result"() {
-		when: "A JAXBElement and an XML String is created"
-			def version = "1.1.1" 
-			
-			def c = new GregorianCalendar(TimeZone.getTimeZone("UTC"))
-			c.setTimeInMillis(0)
-			
-			def epoch = DatatypeFactory.newInstance().newXMLGregorianCalendar(c)
+	
+	def "Converting a Document to a String returns an expected result"() {
+		when: "A Model is created, converted to Document representation, and then serialize to an XML String"
 			
 			def stixPackage = new STIXPackage()
 								.withVersion(version)
@@ -101,13 +90,28 @@ class DocumentUtilitiesSpec extends spock.lang.Specification{
 									"package-af59abd3-102c-43d0-89ed-e0a90525d747", 
 									"example"))
 			
-			def controlXML = """<?xml version="1.0" encoding="UTF-8"?>
-    <stix:STIX_Package id="example:package-af59abd3-102c-43d0-89ed-e0a90525d747" timestamp="1970-01-01T00:00:00.000Z" version="1.1.1" xmlns="http://xml/metadataSharing.xsd" xmlns:example="http://example.com/" xmlns:stix="http://stix.mitre.org/stix-1"/>"""
-		then: "The JAXBElement is converted to identical XML"
+			def testXML = DocumentUtilities.toXMLString(stixPackage.toDocument())
+			
+		then: "It is identical the the expected XML String."
+			
+			def diff = new DetailedDiff(XMLUnit.compareXML(controlXML, testXML ))
+			
+			diff.identical()
+	}
+	
+		def "Converting a JAXBElement to a String returns an expected result"() {
+		when: "A Model is created, converted to JAXBElement, and then serialize to an XML String"
+			
+			def stixPackage = new STIXPackage()
+								.withVersion(version)
+								.withTimestamp(epoch)
+								.withId(new QName("http://example.com/", 
+									"package-af59abd3-102c-43d0-89ed-e0a90525d747", 
+									"example"))
+			
 			def testXML = DocumentUtilities.toXMLString(stixPackage.toJAXBElement())
 			
-			XMLUnit.setIgnoreWhitespace(true)
-			XMLUnit.setIgnoreAttributeOrder(true)
+		then: "It is identical the the expected XML String."
 			
 			def diff = new DetailedDiff(XMLUnit.compareXML(controlXML, testXML ))
 			

@@ -20,14 +20,14 @@ class STIXSchemaSpec extends spock.lang.Specification{
  			schema == schema2
  	}
 	 
-	def "version must be in semantic versioning 2.0.0 form"() {
+	def "Version must be in semantic versioning 2.0.0 form"() {
 		when:
  			def schema = STIXSchema.getInstance()
  		then:
  			schema.getVersion() =~ /(\d+)(\.)(\d+)(\.)(\d+)/
  	}
 	
-	def "validate known valid STIX XML"() {
+	def "Valid STIX XML retrieved from a URL validates at true"() {
 		when: "retrieved from URL"
  			def schema = STIXSchema.getInstance()
  			def url = getClass().getClassLoader().getResource("org/mitre/stix/sample.xml")
@@ -35,7 +35,7 @@ class STIXSchemaSpec extends spock.lang.Specification{
  			schema.validate(url)== true
 	}
 	
-	def "validate known valid STIX XML"() {
+	def "A String containing valid STIX XML validates at true"() {
 		when: "contained in String"
  			def schema = STIXSchema.getInstance()
  			def url = getClass().getClassLoader().getResource("org/mitre/stix/sample.xml")
@@ -44,10 +44,10 @@ class STIXSchemaSpec extends spock.lang.Specification{
  			schema.validate(xmlText) == true
 	}
 	
-	def "STIXPackage model objects has the expected namespace URI"() {
+	def "SA TIXPackage model objects has the expected namespace URI"() {
 		when: "STIXPackage object is created"
 			def stixPackage = new STIXPackage()
- 		then: 'Messaged to STIXSchema.getNamespaceURI, it returns "http://stix.mitre.org/stix-1"'
+ 		then: 'Messaged to STIXSchema.getNamespaceURI returns "http://stix.mitre.org/stix-1"'
  			"http://stix.mitre.org/stix-1" == STIXSchema.getNamespaceURI(stixPackage)
 	}
 }

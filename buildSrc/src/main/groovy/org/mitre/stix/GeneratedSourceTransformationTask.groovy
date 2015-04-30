@@ -172,63 +172,37 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 						[
 							imports: 
 							[
-								"javax.xml.bind.JAXBContext",
-								"javax.xml.bind.JAXBElement",
-								"javax.xml.bind.JAXBException",
-								"javax.xml.bind.Marshaller",
-								"javax.xml.namespace.QName",
-								"javax.xml.parsers.DocumentBuilderFactory",
-								"javax.xml.parsers.ParserConfigurationException",
-								"org.mitre.stix.DocumentUtilities",
-								"org.mitre.stix.STIXSchema",
-								"org.mitre.stix.ValidationEventHandler"
+								"org.mitre.stix.DocumentUtilities"
 							],
 							template:
 								"""\
 	/**
-	 * Returns Document for JAXB Document Object Model object.
+	 * Returns A Document representation of this instance that is not formatted.
 	 *
-	 * @return the XML String for the JAXB object
+	 * @return The Document representation for this instance.
 	 */
 	public org.w3c.dom.Document toDocument() {
-		org.w3c.dom.Document document;
-		Marshaller marshaller;
-		
-		try {
-			document = DocumentBuilderFactory.newInstance()
-					.newDocumentBuilder().newDocument();
-			JAXBContext jaxbContext = JAXBContext.newInstance(this.getClass()
-					.getPackage().getName());
-			
-			marshaller = jaxbContext.createMarshaller();
-			// pretty print
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-			
-			marshaller.setSchema(STIXSchema.getInstance().getSchema());
-			marshaller.setEventHandler(new ValidationEventHandler());
-			
-			try {
-				marshaller.marshal(this, document);
-			} catch (JAXBException e) {
-				QName qualifiedName = STIXSchema.getQualifiedName(this);
-				
-				@SuppressWarnings({ "rawtypes", "unchecked" })
-				JAXBElement root = new JAXBElement(qualifiedName, this.getClass(),
-						this);
-				
-				marshaller.marshal(root, document);
-			}
-			
-			DocumentUtilities.removeUnusedNamespaces(document);
-			
-			return document;
-			
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		} catch (JAXBException e) {
-			throw new RuntimeException(e);
-		}
+		return toDocument(false);
+	}
+"""
+						],
+						[
+							imports: 
+							[
+								"org.mitre.stix.DocumentUtilities"
+							],
+							template:
+								"""\
+	/**
+	 * Returns A Document representation for this instance.
+	 *
+	 * @param prettyPrint
+	 *            True for pretty print, otherwise false
+	 * 
+	 * @return The Document representation for this instance.
+	 */
+	public org.w3c.dom.Document toDocument(boolean prettyPrint) {
+		return DocumentUtilities.toDocument(toJAXBElement(), prettyPrint);
 	}
 """
 						],
@@ -242,15 +216,31 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 							template:
 								"""\
 	/**
-	 * Returns JAXBElement for JAXB Document Object Model object.
+	 * Returns JAXBElement for this instance.
 	 *
-	 * @return the XML String for the JAXB object
+	 * @return The JAXBElement for this instance.
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public JAXBElement<?> toJAXBElement() {
 		QName qualifiedName = STIXSchema.getQualifiedName(this);
 		
 		return new JAXBElement(qualifiedName, \${name}.class, this); 
+	}
+"""
+						],
+						[
+							imports: 
+							[
+							],
+							template:
+								"""\
+	/**
+	 * Returns String representation of this instance that is not formatted.
+	 *
+	 * @return The String containing the XML mark-up.
+	 */
+	public String toXMLString() {
+		return toXMLString(false);
 	}
 """
 						],
@@ -264,10 +254,13 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	/**
 	 * Returns XML String for JAXB Document Object Model object.
 	 *
-	 * @return the XML String for the JAXB object
+	 * @param prettyPrint
+	 *            True for pretty print, otherwise false
+	 * 
+	 * @return The String containing the XML mark-up.
 	 */
-	public String toXMLString() {
-		return DocumentUtilities.toXMLString(toDocument());
+	public String toXMLString(boolean prettyPrint) {
+		return DocumentUtilities.toXMLString(toDocument(), prettyPrint);
 	}
 """
 						],
@@ -285,11 +278,11 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 							template:
 								"""\
 	/**
-	 * Creates JAXB Document Object Model for XML text string
+	 * Creates \${name} instance for XML String
 	 * 
 	 * @param text
-	 *            XML string for the document
-	 * @return JAXB object
+	 *            XML String for the document
+	 * @return The \${name} instance for the passed XML String
 	 */
 	public static \${name} fromXMLString(String text) {
 		JAXBContext jaxbContext;
@@ -315,9 +308,8 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 							template:
 								"""\
 	/**
-	 * Validates the XML representation of this JAXB Document 
-	 * Object Model object. Returning true indicating a successful
-	 * validation, false if not.
+	 * Validates the XML representation of this \${name} instance
+	 * Returning true indicating a successful validation, false if not.
 	 * 
 	 * @return boolean
 	 */
@@ -332,13 +324,13 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 		
 		project.file("src/generated/java").eachFileRecurse(FileType.FILES) { file ->
 			if (!file.name.endsWith("EnumType.java") && !file.name.endsWith("TypeEnum.java")) {
-
+				
 				def uri = file.toURI()
 				def name = file.getName().split(/\./)[0]
 				def pkg = file.getParent().replaceAll(project.file("src/generated/java").path, "").substring(1).replaceAll(System.getProperty("file.separator"),'.')
-			
+				
 				def source = project.file(uri).readLines().iterator().join(lineSeperator)
-			
+				
 				addMethods.each { regex, methodDeclarations ->
 				
 					if ( "${pkg}.${name}" ==~ regex) {
