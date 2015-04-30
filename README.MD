@@ -239,7 +239,7 @@ If the build goes well you will find the jars:
 where `${version}` is replaced with the `version` number in the Gradle build script.
 
 I don't frequently build on Windows so there is a chance the build may fail on this platform.  You will need
-to install git and GNU patch via either cygwin, Chocolatey, or directly.  Then work out permission evalation 
+to install git and GNU patch via either cygwin, Chocolatey, or directly.  Then work out permission elevation 
 issues so Gradle can use Ant to execute the command-line GNU patch command.
 
 To build on Windows use the gradlew batch script like so:
