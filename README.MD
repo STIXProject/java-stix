@@ -15,8 +15,9 @@ Status](https://travis-ci.org/STIXProject/java-stix.svg)](https://travis-ci.org/
 A primary goal of java-stix is to remain faithful to both the STIX
 specifications and customary Java practices. java-stix is designed
 to be intuitive both to Java developers and JAXB XML developers,
-provide convenience on the JAXB model, but it is not a one-for-one
-replacement for the [python-stix][python stix] API.
+provide convenience methods to the XJC generated JAXB model, but it 
+is obviously not a one-for-one replacement for the [python-stix][python stix] 
+API.
 
 ## <a name="versioning"></a>Versioning
 
