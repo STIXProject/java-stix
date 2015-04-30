@@ -15,8 +15,8 @@ Status](https://travis-ci.org/STIXProject/java-stix.svg)](https://travis-ci.org/
 A primary goal of java-stix is to remain faithful to both the STIX
 specifications and customary Java practices. java-stix is designed
 to be intuitive both to Java developers and JAXB XML developers,
-provide convenience methods to the XJC generated JAXB model, but it 
-is obviously not a one-for-one replacement for the [python-stix][python stix] 
+provide convenience methods to the XJC generated JAXB model, but 
+obviously is not a one-for-one replacement for the [python-stix][python stix] 
 API.
 
 ## <a name="versioning"></a>Versioning
@@ -120,18 +120,17 @@ is in  the root of the project.  NetBeans can also apply patches via
 
 ### <a name="need_gradle_installed"></a>You need Gradle installed
 
-This project uses a Gradle build script.  You will need to install
-Gradle.
+This project uses a Gradle build script.  The project comes with
+a Gradle Wrapper, a batch script on Windows, and a shell script for
+UNIX platforms including OS X. 
 
-I use typially use the Gradle command-line interface and this can be
-installed a number of ways.  
- 
-If you're using OS X and using brew simply install gradle via
+So, for a UNIX platform, you can run gradle from the project root via:
 
-    brew install gradle
+    ./gradlew 
 
-Otherwise, install the Gradle command-line binaries from
-[gradle.org][gradle] following their instructions.
+Or if you are Windows via:
+
+     gradlew.bat
 
 If you're using the Eclipse IDE consider installing the latest
 [Gradle IDE Pack][gradle ide pack] 
@@ -140,7 +139,7 @@ Gradle Eclipse integration is somewhat emergent.  I'd advise using the Gradle co
 
 ### <a name="building_via_gradle"></a>Building via Gradle build script
 
-It is really unnecesary to build by hand, if your intention is to use the java-stix in your
+It is really unnecessary to build by hand, if your intention is to use the java-stix in your
 project as [snapshot](#importing_into_eclipse) exist in the Maven Central Snapshot repository,
 and soon releases will exist too. 
 
@@ -148,56 +147,88 @@ If you want to build, you will need to have earlier [installed Gradle](#need_gra
 
 First change directories into the project and enter on the command-line:
 
-    gradle
+    gradlew
 
 as `build` is the default Gradle task.
 
-If you have trouble builidng via Gradle, see the ["Trouble Building?"](#trouble_building) section
-that follows this section.
+After the Gradle wrapper shell script has downloaded the Gradle binary distribution, a 
+successful build will look like this on UNIX:
 
-Success will look like this on UNIX:
-
-	➜  java_stix git:(master) gradle
-	To honour the JVM settings for this build a new JVM will be forked. Please consider using the daemon: http://gradle.org/docs/2.3/userguide/gradle_daemon.html.
-	:buildSrc:clean UP-TO-DATE
+	➜  java_stix git:(master) ./gradlew
 	:buildSrc:compileJava UP-TO-DATE
-	:buildSrc:compileGroovy
+	:buildSrc:compileGroovy UP-TO-DATE
 	:buildSrc:processResources UP-TO-DATE
-	:buildSrc:classes
-	:buildSrc:jar
-	:buildSrc:assemble
+	:buildSrc:classes UP-TO-DATE
+	:buildSrc:jar UP-TO-DATE
+	:buildSrc:assemble UP-TO-DATE
 	:buildSrc:compileTestJava UP-TO-DATE
 	:buildSrc:compileTestGroovy UP-TO-DATE
 	:buildSrc:processTestResources UP-TO-DATE
 	:buildSrc:testClasses UP-TO-DATE
 	:buildSrc:test UP-TO-DATE
 	:buildSrc:check UP-TO-DATE
-	:buildSrc:build
-	:clean UP-TO-DATE
+	:buildSrc:build UP-TO-DATE
+	:clean
 	:retrieveSchemas
-	    Retrieving STIX schemas...
-	Submodule 'src/main/resources/schemas/v1.1.1' (https://github.com/STIXProject/schemas.git) registered for path 'src/main/resources/schemas/v1.1.1'
-	Submodule path 'src/main/resources/schemas/v1.1.1': checked out 'deef231f0e6fa9f05122f8e0fc089f03128bfe21'
-	    Retrieving CybOX schemas...
-	Submodule 'cybox' (https://github.com/CybOXProject/schemas.git) registered for path 'cybox'
-	Submodule path 'cybox': checked out '97beb32c376a9223e91b52cb3e4c8d2af6baf786'
-	
-	    Patching src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd
+    Schemas are present. Retrieval is not needed.
 	:createPrefixNamespaceBindings
-	    schemas/v1.1.1/external/open_ioc_2010/ioc.xsd claims the same prefix "tns" as schemas/v1.1.1/external/open_ioc_2010/ioc-TR.xsd
+    schemas/v1.1.1/external/open_ioc_2010/ioc.xsd claims the same prefix "tns" as schemas/v1.1.1/external/open_ioc_2010/ioc-TR.xsd
 	:generateJAXB
-	    Generating JAXB model to src/generated/java for STIX Schema v1.1.1 found in src/main/resources/schemas/v1.1.1
+    Generating JAXB model to /Users/walsh/Development/workspace/java_stix/src/generated/java for STIX Schema v1.1.1 found in /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.1.1
 	:generatedSourceTransformation
+	:createPackageInfo
 	:compileJava
 	Note: Some input files use unchecked or unsafe operations.
 	Note: Recompile with -Xlint:unchecked for details.
+	:compileGroovy UP-TO-DATE
 	:processResources
 	:classes
 	:jar
+	:javadoc
+	/Users/walsh/Development/workspace/java_stix/src/main/java/org/mitre/stix/DocumentUtilities.java:81: warning - @return tag has no arguments.
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:297: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:297: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/SPKIData.java:115: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/X509Data.java:132: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/X509Data.java:132: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/X509Data.java:132: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:297: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
+	20 warnings
+	:javadocJar
+	:sourcesJar
+	:assemble
+	:compileTestJava UP-TO-DATE
+	:compileTestGroovy
+	:processTestResources
+	:testClasses
+	:test
+	:check
+	:build
 	
 	BUILD SUCCESSFUL
 	
-	Total time: 1 mins 24.123 secs
+	Total time: 5 mins 26.229 secs
+
+Ignore the javadoc related "warnings they have no impact on the build.
+
+If you want more detail about the build you can pass `--stacktrace --debug` on the command line like so:
+
+	./gradlew --stacktrace --debug
+
+for a more detailed build.  I set an environment `CI_OPTS` variable with this value for both Travis CI and CircleCi builds
+to be bettered informed as to why the buiid is failing.
 
 If the build goes well you will find the jars: 
 
@@ -207,46 +238,13 @@ If the build goes well you will find the jars:
 
 where `${version}` is replaced with the `version` number in the Gradle build script.
 
-A build will go like so on Windows:
+I don't frequently build on Windows so there is a chance the build may fail on this platform.  You will need
+to install git and GNU patch via either cygwin, Chocolatey, or directly.  Then work out permission evalation 
+issues so Gradle can use Ant to execute the command-line GNU patch command.
 
-	$ gradle
-	To honour the JVM settings for this build a new JVM will be forked. Please consider using the daemon: http://gradle.org/docs/2.2/userguide/gradle_daemon.html.
-	:createPrefixNamespaceBindings
-	:cleanGenerate
-	:retrieveSchemas
-	
-	C:\cygwin64\home\nemonik\Development\workplace\java_stix>echo Retrieving STIX schemas... 
-	Retrieving STIX schemas...
-	
-	C:\cygwin64\home\nemonik\Development\workplace\java_stix>git submodule init 
-	Submodule 'src/main/resources/schemas' (https://github.com/STIXProject/schemas.git) registered for path 'src/main/resources/schemas'
-	
-	C:\cygwin64\home\nemonik\Development\workplace\java_stix>git submodule update --force 
-	Submodule path 'src/main/resources/schemas': checked out 'fd6ce20a62e52a7ddeb5ab0fb0e5b760778c443e'
-	
-	C:\cygwin64\home\nemonik\Development\workplace\java_stix>cd src\main\resources\schemas 
-	
-	C:\cygwin64\home\nemonik\Development\workplace\java_stix\src\main\resources\schemas>echo Retrieving CybOX schemas... 
-	Retrieving CybOX schemas...
-	
-	C:\cygwin64\home\nemonik\Development\workplace\java_stix\src\main\resources\schemas>git submodule init 
-	Submodule 'cybox' (https://github.com/CybOXProject/schemas.git) registered for path 'cybox'
-	
-	C:\cygwin64\home\nemonik\Development\workplace\java_stix\src\main\resources\schemas>git submodule update --force 
-	Submodule path 'cybox': checked out '97beb32c376a9223e91b52cb3e4c8d2af6baf786'
-	
-	C:\cygwin64\home\nemonik\Development\workplace\java_stix\src\main\resources\schemas>exit 0 
-	
-	:generateJAXB
-	:generatedSourceTransformation
-	:compileJava
-	:processResources
-	:classes
-	:jar
-	
-	BUILD SUCCESSFUL
-	
-	Total time: 3 mins 21.132 secs
+To build on Windows use the gradlw batch script like so:
+
+	$ .\gradlew.bat
 
 If the build goes well you will find the jars: 
 
@@ -255,43 +253,6 @@ If the build goes well you will find the jars:
 	build\libs\stix-${version}.jar-sources.jar
 
 where `${version}` is replaced with the `version` number in the Gradle build script.
-
-## <a name="trouble_building"></a>Trouble building?
-
-`You are less likely to see the following happen now that the Gradle 
-build script will attempt to retreive the scheas, but if it is not successful it
-will continue resulting in an error.`
-
-If while building you get this error:
-
-    FAILURE: Build failed with an exception.
-    
-    * Where:
-    Build file '/Users/nemonik/Development/workspace/STIXProject/java_stix/build.gradle' line: 52
-    
-    * What went wrong:
-    Execution failed for task ':generate'.
-    > grammar is not specified
-
-    * Try:
-    Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
-
-You likely didn't retrieve the schema decribed in the section above.
-
-Or if you get this error while building:
-
-    [ant:xjc] [ERROR] src-resolve: Cannot resolve the name 'cyboxCommon:ToolInformationType' to a(n) 'type definition' component.
-    [ant:xjc]   line 907 of file:/Users/nemonik/Development/workspace/STIXProject/java_stix/src/main/resources/schemas/stix_common.xsd
-    [ant:xjc] 
-    [ant:xjc] [ERROR] src-resolve: Cannot resolve the name 'cybox:ObservableType' to a(n) 'type definition' component.
-    [ant:xjc]   line 439 of file:/Users/nemonik/Development/workspace/STIXProject/java_stix/src/main/resources/schemas/stix_common.xsd
-    [ant:xjc] 
-    [ant:xjc] [ERROR] src-resolve: Cannot resolve the name 'SystemObj:SystemObjectType' to a(n) 'type definition' component.
-    [ant:xjc]   line 149 of file:/Users/nemonik/Development/workspace/STIXProject/java_stix/src/main/resources/schemas/external/maec_4.1/maec_package_schema.xsd
-    -- snip --
-
-then you likely missed the step above where you must retrieved the
-CybOX schemas.
 
 ### <a name="importing_into_eclipse"></a>Importing the project into Eclipse
 

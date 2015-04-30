@@ -39,7 +39,7 @@ class RetrieveSchemasTask extends DefaultTask {
 		def command = null
 
 		if (Os.isFamily(Os.FAMILY_WINDOWS)) {
-			command = "cmd /c retrieve_schemas.bat"
+			command = "cmd /c .\retrieve_schemas.bat"
 		} else {
 			command = "sh ./retrieve_schemas.sh"
 		}
