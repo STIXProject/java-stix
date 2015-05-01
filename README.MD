@@ -66,7 +66,7 @@ Clone the java-stix project via:
 A `git clone` command will not retrieve schemas project automatically, but the 
 Gradle build script will attempt to retrieve them on execution.
 
-Alternatively, using the --recursive flag when cloning  the repository will 
+Alternatively, using the `--recursive` flag when cloning the repository will 
 automatically initialize and update the schema submodules via:
 
 	git clone --recursive https://github.com/STIXProject/java_stix.git    
