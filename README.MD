@@ -118,17 +118,18 @@ is in  the root of the project.  NetBeans can also apply patches via
 
 ## <a name="creating_document_object_model"></a>Creating the JAXB2 Document Model
 
-### <a name="need_gradle_installed"></a>You need Gradle installed
+### <a name="gradle_wrapper"></a>Using the Gradle Wrapper
 
 This project uses a Gradle build script.  The project comes with
 a Gradle Wrapper, a batch script on Windows, and a shell script for
-UNIX platforms including OS X. 
+UNIX platforms including OS X thereby removing the need to have
+Gradle installed. 
 
-So, for a UNIX platform, you can run gradle from the project root via:
+For a UNIX platform, you can run gradle from the project root via:
 
     ./gradlew 
 
-Or if you are Windows via:
+Or if you are on Windows via:
 
      .\gradlew.bat
 
@@ -151,7 +152,7 @@ First change directories into the project and enter on the command-line:
 
 as `build` is the default Gradle task.
 
-After the Gradle wrapper shell script has downloaded the Gradle binary distribution, a 
+After the Gradle wrapper shell script has downloaded and cached the Gradle binary distribution, a 
 successful build will look like this on UNIX:
 
 	➜  java_stix git:(master) ./gradlew
