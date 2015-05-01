@@ -25,6 +25,7 @@ import org.mitre.stix.GenerateJAXBTask
 import org.mitre.stix.CreatePackageInfoTask
 import org.mitre.stix.GeneratedSourceTransformationTask
 import org.mitre.stix.CleanSchemaTask
+import org.mitre.stix.CalcChecksumTask
 
 apply plugin: "java"
 apply plugin: "groovy"
@@ -61,6 +62,9 @@ task createPackageInfo(type: CreatePackageInfoTask, dependsOn: generatedSourceTr
 }
 task cleanSchema(type: CleanSchemaTask) {
 	schemaVersion = project.schemaVersion
+}
+
+task calcChecksum(type: CalcChecksumTask) {
 }
 
 compileJava.dependsOn createPackageInfo

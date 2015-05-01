@@ -4,12 +4,16 @@
  */
 package org.mitre.stix
 
+import org.mitre.Checksum
+
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.GradleException
 
 import groovy.io.FileType
+
+import org.mitre.stix.Checksum
 
 import org.apache.tools.ant.taskdefs.condition.Os
 
@@ -30,8 +34,14 @@ class RetrieveSchemasTask extends DefaultTask {
 	def patch() {
 		def fileToBePatched = project.file("src/main/resources/schemas/v${schemaVersion}/cybox/objects/Archive_File_Object.xsd")
 		
-		println("    Patching ${fileToBePatched}")
-		ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: fileToBePatched)
+		if (new Checksum().calc(fileToBePatched) != "e986dddfa05a2404c155b7c2b93603e4af31b4e9") {
+			
+			println("    Patching ${fileToBePatched}")
+			
+			ant.patch(patchfile: "cybox_object_archive_file_object.patch", originalfile: fileToBePatched)
+		} else {
+			println("    ${fileToBePatched} already patched.")
+		}
 	}
 	
 	def pull() {
@@ -55,12 +65,10 @@ class RetrieveSchemasTask extends DefaultTask {
 		
 		if (project.fileTree("src/main/resources/schemas/v${schemaVersion}").isEmpty() || project.fileTree("src/main/resources/schemas/v${schemaVersion}/cybox").isEmpty()) {
 			pull()
-			patch()
-			if (project.fileTree("src/main/resources/schemas/v${schemaVersion}").isEmpty() || project.fileTree("src/main/resources/schemas/v${schemaVersion}/cybox").isEmpty()) {
-				throw new GradleException("    Build error occurred: You will need retrieve schemas by hand. See README.md file.");
-			}
 		} else {
 			println("    Schemas are present. Retrieval is not needed.")
 		}
+		
+		patch()
 	}
 }
