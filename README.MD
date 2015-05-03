@@ -241,9 +241,9 @@ the command line like so:
 	./gradlew --stacktrace --debug
 
 for a more detailed build.  I set an environment `CI_OPTS` variable with this 
-value for both Travis CI and CircleCi builds to be bettered informed as to why 
-the buiid is failing. So if you want see this level of build detail, click on the
-badges for either at the [top of this readme](#intro).
+value for CircleCi builds to be bettered informed as to why the buiid is 
+failing. Travis CI apparently cano't handle running in debug. So if you want 
+see this level of build detail, click on the CircelCi badge for at the [top of this readme](#intro).
 
 If the build goes well you will find the jars: 
 
