@@ -6,5 +6,5 @@ jdk:
 before_install:
   - chmod +x gradlew
 
-env: GRADLE_OPTS=-Dorg.gradle.daemon=true
-env: CI_OPTS=--stacktrace --debug
+env: GRADLE_OPTS="-Dorg.gradle.daemon=true"
+env: CI_OPTS="--stacktrace --debug"

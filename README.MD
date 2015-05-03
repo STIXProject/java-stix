@@ -1,4 +1,4 @@
-# java-stix 
+# <a name="intro"></a>java-stix 
 
 The Java bindings for STIX, the Structured Threat Information  eXpression 
 language used for representing structured cyber threat information.
@@ -7,11 +7,7 @@ java-stix is being developed under the official [STIXProject][stix project]
 
 For more information, see [http://stix.mitre.org/][stix].
 
-[![Circle 
-CI](https://circleci.com/gh/STIXProject/java-stix.svg?style=svg)](https://circle
-ci.com/gh/STIXProject/java-stix) [![Build 
-Status](https://travis-ci.org/STIXProject/java-stix.svg)](https://travis-ci.org/
-STIXProject/java-stix)
+[![Circle CI](https://circleci.com/gh/STIXProject/java-stix.svg?style=svg)](https://circleci.com/gh/STIXProject/java-stix) [![Build Status](https://travis-ci.org/STIXProject/java-stix.svg)](https://travis-ci.org/STIXProject/java-stix)
 
 ## <a name="overview"></a>Overview
 
@@ -157,9 +153,6 @@ It is really unnecessary to build by hand, if your intention is to use the
 java-stix in your project as [snapshot](#importing_into_eclipse) exist in the 
 Maven Central Snapshot repository, and soon releases will exist too. 
 
-If you want to build, you will need to have earlier [installed 
-Gradle](#need_gradle_installed). 
-
 First change directories into the project and enter on the command-line:
 
 	./gradlew
@@ -249,7 +242,8 @@ the command line like so:
 
 for a more detailed build.  I set an environment `CI_OPTS` variable with this 
 value for both Travis CI and CircleCi builds to be bettered informed as to why 
-the buiid is failing.
+the buiid is failing. So if you want see this level of build detail, click on the
+badges for either at the [top of this readme](#intro).
 
 If the build goes well you will find the jars: 
 
