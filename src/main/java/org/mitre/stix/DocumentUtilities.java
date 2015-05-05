@@ -81,6 +81,8 @@ public class DocumentUtilities {
 	public static Document toDocument(JAXBElement<?> jaxbElement,
 			boolean prettyPrint) {
 
+		Document document = null;
+		
 		try {
 			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
 					.newInstance();
@@ -89,7 +91,7 @@ public class DocumentUtilities {
 			documentBuilderFactory.isIgnoringComments();
 			documentBuilderFactory.setCoalescing(true);
 
-			Document document = documentBuilderFactory.newDocumentBuilder()
+			document = documentBuilderFactory.newDocumentBuilder()
 					.newDocument();
 
 			JAXBContext jaxbContext = JAXBContext.newInstance(jaxbElement
@@ -119,13 +121,13 @@ public class DocumentUtilities {
 
 			removeUnusedNamespaces(document);
 
-			return document;
-
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException(e);
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
 		}
+		
+		return document;
 	}
 
 	/**
