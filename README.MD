@@ -7,7 +7,7 @@ java-stix is being developed under the official [STIXProject][stix project]
 
 For more information, see [http://stix.mitre.org/][stix].
 
-[![Circle CI](https://circleci.com/gh/STIXProject/java-stix.svg?style=svg)](https://circleci.com/gh/STIXProject/java-stix) [![Build Status](https://travis-ci.org/STIXProject/java-stix.svg)](https://travis-ci.org/STIXProject/java-stix)
+[![Circle CI](https://circleci.com/gh/STIXProject/java-stix/tree/v1.1.1.svg?style=svg)](https://circleci.com/gh/STIXProject/java-stix/tree/v1.1.1) [![Build Status](https://travis-ci.org/STIXProject/java-stix.svg?branch=v1.1.1)](https://travis-ci.org/STIXProject/java-stix)
 
 ## <a name="overview"></a>Overview
 
