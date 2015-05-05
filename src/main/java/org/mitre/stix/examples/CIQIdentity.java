@@ -179,7 +179,7 @@ public class CIQIdentity {
 					.withId(new QName("http://example.com/", "package-"
 							+ UUID.randomUUID().toString(), "example"));
 
-			System.out.println(stixPackage.toXMLString());
+			System.out.println(stixPackage.toXMLString(true));
 
 			System.out.println(StringUtils.repeat("-", 120));
 
@@ -188,7 +188,7 @@ public class CIQIdentity {
 			System.out.println(StringUtils.repeat("-", 120));
 
 			System.out.println(STIXPackage.fromXMLString(stixPackage
-					.toXMLString()));
+					.toXMLString()).toXMLString(true));
 
 		} catch (DatatypeConfigurationException e) {
 			throw new RuntimeException(e);

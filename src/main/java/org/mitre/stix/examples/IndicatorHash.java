@@ -121,7 +121,7 @@ public class IndicatorHash {
 					.withId(new QName("http://example.com/", "package-"
 							+ UUID.randomUUID().toString(), "example"));
 
-			System.out.println(stixPackage.toXMLString());
+			System.out.println(stixPackage.toXMLString(true));
 
 			System.out.println(StringUtils.repeat("-", 120));
 

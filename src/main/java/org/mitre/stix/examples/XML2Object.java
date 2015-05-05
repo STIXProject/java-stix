@@ -44,7 +44,7 @@ public class XML2Object {
 
 			STIXPackage stixPackage = STIXPackage.fromXMLString(text);
 
-			text = stixPackage.toXMLString();
+			text = stixPackage.toXMLString(true);
 
 			System.out.println(text);
 
@@ -52,7 +52,7 @@ public class XML2Object {
 
 			STIXPackage stixPackageTwo = STIXPackage.fromXMLString(text);
 
-			System.out.println(stixPackageTwo.toXMLString());
+			System.out.println(stixPackageTwo.toXMLString(true));
 
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
