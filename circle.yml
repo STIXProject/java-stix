@@ -6,5 +6,5 @@ machine:
     CI_OPTS: --stacktrace --debug
 
 test:
-	override:
-		- ./gradlew build -x signArchives
+  override:
+    - ./gradlew build -x signArchives
