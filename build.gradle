@@ -8,13 +8,34 @@
  *
  * Run
  *
- *	gradle
+ *	./gradlew
  *
  * from the commnand-line and the build task will execute by default.
  *
  * The Jar will be built to 
  *
  * 	build/libs/stix-${version}.jar
+ * 
+ *
+ * Publishing archives:
+ *
+ * signingKeyId, signingPassword, secretKeyFile, ossrhUsername, and ossrhPassword properties
+ * should be defined outside of the repository either on the command-line via
+ * 
+ * ./gradlew -PsigningKeyId=value -PsigningPassword=value -PsecretKeyFile=value -PossrhUsername=value -PossrhPassword=value
+ *
+ * or via ~/.gradle/gradle.properties as 
+ *
+ * signingKeyId=value
+ * signingPassword=value
+ * secretKeyFile=value
+ * ossrhUsername=value
+ * ossrhPassword=value
+ *
+ * Check settings via:
+ *
+ * ./gradle checkProperties
+ *
  */
 
 import org.gradle.plugins.signing.Sign
@@ -73,7 +94,7 @@ task calcChecksum(type: CalcChecksumTask) {
 compileJava.dependsOn createPackageInfo
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '2.3'
+	gradleVersion = '2.4'
 }
 
 task javadocJar(type: Jar) {
@@ -87,6 +108,31 @@ task sourcesJar(type: Jar, dependsOn: javadoc) {
 	from 'LICENSE'
 	from 'README.md'
 	from sourceSets.main.allSource
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+	if (taskGraph.allTasks.any { it instanceof Sign}) {
+		allprojects {
+			ext."signing.keyId" = signingKeyId ?: ""
+			ext."signing.password" = signingPassword ?: ""
+			ext."signing.secretKeyRingFile" = secretKeyFile ?: ""
+		}
+	}
+}
+
+task checkProperties() {
+	println "signingKeyId ${signingKeyId ? '= ' + signingKeyId : 'is not set.'}" 
+	println "signingPassword ${signingPassword ? '= ' + signingPassword : 'is not set.'}"
+	println "secretKeyFile ${secretKeyFile ? '= ' + secretKeyFile : 'is not set.'}"
+	println "ossrhUsername ${ossrhUsername ? '= ' + ossrhUsername : 'is not set.'}"
+	println "ossrhPassword ${ossrhPassword ?'= ' +  ossrhPassword : 'is not set.'}"
+}
+
+signing {
+	required {
+		!version.contains("SNAPSHOT") && gradle.taskGraph.hasTask("uploadArchives")
+	}
+	sign configurations.archives
 }
 
 clean {
@@ -141,74 +187,48 @@ jar {
 	from 'LICENSE'
 }
 
-gradle.taskGraph.whenReady { taskGraph ->
-	if (taskGraph.allTasks.any { it instanceof Upload }) {
-		allprojects {
-			// signingKeyId, signingPassword, secretKeyFile, ossrhUsername, ossrhPassword
-			// should be define out of the repository either on the command-line via
-			//
-			// gradle -DsigningKeyId=value -DsigningPassword=value -DsecretKeyFile=value -DossrhUsername=value -DossrhPassword=value
-			//
-			// or via ~/.gradle/gradle.properties as 
-			//
-			// systemProp.signingKeyId=value
-			// systemProp.signingPassword=value
-			// systemProp.secretKeyFile=value
-			// systemProp.ossrhUsername=value
-			// systemProp.ossrhPassword=value
-			
-			ext."signing.keyId" = System.properties["signingKeyId"]
-			ext."signing.password" = System.properties["signingPassword"]
-			ext."signing.secretKeyRingFile" = System.properties["secretKeyFile"]
-			
-			ext."ossrhUsername" = System.properties["ossrhUsername"]
-			ext."ossrhPassword" = System.properties["ossrhPassword"]
-			
-			signing {
-				sign configurations.archives
-			}
-			
-			uploadArchives {
-				repositories {
-					mavenDeployer {
-						beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-						
-						repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-							authentication(userName: ossrhUsername, password: ossrhPassword)
+afterEvaluate { project -> 
+	uploadArchives {
+		repositories {
+			mavenDeployer {
+				beforeDeployment { MavenDeployment deployment -> 
+					signing.signPom(deployment)
+				}
+	
+				repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+					authentication(userName: ossrhUsername ?: "", password: ossrhPassword ?: "")
+				}
+				
+				snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+					authentication(userName: ossrhUsername ?: "", password: ossrhPassword ?: "")
+				}
+				
+				pom.project {
+					name "${archivesBaseName}"
+					packaging 'jar'
+					version "${project.version}"
+					// optionally artifactId can be defined here 
+					description "The JAXB Bindings for STIX v." + version
+					url "https://github.com/nemonik/java_stix"
+					
+					scm {
+						connection "https://github.com/nemonik/java_stix.git"
+						developerConnection "https://github.com/nemonik/java_stix.git"
+						url "https://github.com/nemonik/java_stix"
+					}
+					
+					licenses {
+						license {
+							name "The BSD 3-Clause License"
+							url "https://raw.githubusercontent.com/nemonik/java_stix/master/LICENSE"
 						}
-						
-						snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-							authentication(userName: ossrhUsername, password: ossrhPassword)
-						}
-						
-						pom.project {
-							name 'stix'
-							packaging 'jar'
-							version "${project.version}"
-							// optionally artifactId can be defined here 
-							description "The JAXB Bindings for STIX v." + version
-							url "https://github.com/nemonik/java_stix"
-							
-							scm {
-								connection "https://github.com/nemonik/java_stix.git"
-								developerConnection "https://github.com/nemonik/java_stix.git"
-								url "https://github.com/nemonik/java_stix"
-							}
-							
-							licenses {
-								license {
-									name "The BSD 3-Clause License"
-									url "https://raw.githubusercontent.com/nemonik/java_stix/master/LICENSE"
-								}
-							}
-							
-							developers {
-								developer {
-									id 'nemonik'
-									name 'Michael Joseph Walsh'
-									email 'java-stix-pom[ASCII character number 64]nemonik.com'
-								}
-							}
+					}
+					
+					developers {
+						developer {
+							id 'nemonik'
+							name 'Michael Joseph Walsh'
+							email 'java-stix-pom[ASCII character number 64]nemonik.com'
 						}
 					}
 				}
@@ -251,7 +271,9 @@ if (JavaVersion.current().isJava8Compatible()) {
 }
 
 artifacts {
-	archives javadocJar, sourcesJar
+	archives jar
+	archives sourcesJar
+	archives javadocJar
 }
 
 buildscript {
@@ -264,7 +286,6 @@ buildscript {
 	}
 
 	dependencies {
-		
 		// Needed for GeneratedSourceTransformationTask
 		classpath name: "org.eclipse.core.runtime_3.10.0.v20140318-2214"
 		classpath name: "org.eclipse.osgi_3.10.0.v20140606-1445"
