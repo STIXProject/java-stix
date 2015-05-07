@@ -9,4 +9,5 @@ before_install:
 env: GRADLE_OPTS=-Dorg.gradle.daemon=true
 env: CI_OPTS=--stacktrace
 
-script: ./gradlew build -x signArchives
+install: /bin/true
+script: "./gradlew build -x signArchives"
