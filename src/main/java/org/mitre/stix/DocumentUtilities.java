@@ -76,7 +76,7 @@ public class DocumentUtilities {
 	 *            JAXB representation of an XML Element
 	 * @param prettyPrint
 	 *            True for pretty print, otherwise false
-	 * @return
+	 * @return The Document representation
 	 */
 	public static Document toDocument(JAXBElement<?> jaxbElement,
 			boolean prettyPrint) {
