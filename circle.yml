@@ -4,3 +4,7 @@ machine:
   environment:
     GRADLE_OPTS: -Dorg.gradle.daemon=true
     CI_OPTS: --stacktrace --debug
+
+test:
+  override:
+    - ./gradlew build -x signArchives

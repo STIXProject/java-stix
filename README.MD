@@ -7,7 +7,7 @@ java-stix is being developed under the official [STIXProject][stix project]
 
 For more information, see [http://stix.mitre.org/][stix].
 
-[![Circle CI](https://circleci.com/gh/STIXProject/java-stix/tree/v1.1.1.svg?style=svg)](https://circleci.com/gh/STIXProject/java-stix/tree/v1.1.1) [![Build Status](https://travis-ci.org/STIXProject/java-stix.svg?branch=v1.1.1)](https://travis-ci.org/STIXProject/java-stix)
+[![Circle CI](https://circleci.com/gh/STIXProject/java-stix.svg?style=svg)](https://circleci.com/gh/STIXProject/java-stix) [![Build Status](https://travis-ci.org/STIXProject/java-stix.svg)](https://travis-ci.org/STIXProject/java-stix)
 
 ## <a name="overview"></a>Overview
 
@@ -157,27 +157,30 @@ First change directories into the project and enter on the command-line:
 
 	./gradlew
 
-as `build` is the default Gradle task.
+as `jar` is the default Gradle task.  To run the `build` and skip signing jars,
+do the following
+
+	./gradlew build -x signArchives
 
 After the Gradle wrapper shell script has downloaded and cached the Gradle 
 binary distribution, a successful build will look like something like this 
 on UNIX:
 
-	➜  java_stix git:(master) ./gradlew
+	➜  java_stix git:(master) ✗ gradle build -x signArchives
 	:buildSrc:compileJava UP-TO-DATE
-	:buildSrc:compileGroovy
+	:buildSrc:compileGroovy UP-TO-DATE
 	:buildSrc:processResources UP-TO-DATE
-	:buildSrc:classes
-	:buildSrc:jar
-	:buildSrc:assemble
+	:buildSrc:classes UP-TO-DATE
+	:buildSrc:jar UP-TO-DATE
+	:buildSrc:assemble UP-TO-DATE
 	:buildSrc:compileTestJava UP-TO-DATE
 	:buildSrc:compileTestGroovy UP-TO-DATE
 	:buildSrc:processTestResources UP-TO-DATE
 	:buildSrc:testClasses UP-TO-DATE
 	:buildSrc:test UP-TO-DATE
 	:buildSrc:check UP-TO-DATE
-	:buildSrc:build
-	:clean UP-TO-DATE
+	:buildSrc:build UP-TO-DATE
+	:clean
 	:retrieveSchemas
 	    Schemas are present. Retrieval is not needed.
 	    /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd already patched.
@@ -195,14 +198,13 @@ on UNIX:
 	:classes
 	:jar
 	:javadoc
-	/Users/walsh/Development/workspace/java_stix/src/main/java/org/mitre/stix/DocumentUtilities.java:81: warning - @return tag has no arguments.
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:299: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:287: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:299: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:287: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
@@ -211,11 +213,11 @@ on UNIX:
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/X509Data.java:132: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/X509Data.java:132: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:299: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:287: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
-	20 warnings
+	19 warnings
 	:javadocJar
 	:sourcesJar
 	:assemble
@@ -229,7 +231,7 @@ on UNIX:
 	
 	BUILD SUCCESSFUL
 	
-	Total time: 2 mins 58.614 secs
+	Total time: 3 mins 7.702 secs
 
 Ignore the javadoc tag warnings they have no impact on the build. Also, ignore 
 the warning about unchecked or unsafe operations as they are an artifact of 
