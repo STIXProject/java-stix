@@ -34,6 +34,12 @@
  *
  * Check settings via:
  *
+ * To publish a snapshot execute the "uploadArchives" task with "snapshot" property like so:
+ *
+ * ./gradlew uploadArchives -Psnaphot
+ *
+ * Otherwise you will deploy to staging.
+ *
  * ./gradle checkProperties
  *
  */
@@ -54,7 +60,7 @@ apply plugin: "eclipse"
 apply plugin: "maven"
 apply plugin: "signing"
 
-defaultTasks "build"
+defaultTasks "jar"
 
 version = "1.1.1"
 group = "org.mitre"
@@ -110,28 +116,31 @@ task sourcesJar(type: Jar, dependsOn: javadoc) {
 	from sourceSets.main.allSource
 }
 
+task checkProperties() {
+	doFirst {
+		println "signingKeyId ${hasProperty("signingKeyId") ? '= ' + signingKeyId : 'is not set.'}" 
+		println "signingPassword ${hasProperty("signingPassword") ? '= ' + signingPassword : 'is not set.'}"
+		println "secretKeyFile ${hasProperty("secretKeyFile") ? '= ' + secretKeyFile : 'is not set.'}"
+		println "ossrhUsername ${hasProperty("ossrhUsername") ? '= ' + ossrhUsername : 'is not set.'}"
+		println "ossrhPassword ${hasProperty("ossrhPassword") ?'= ' +  ossrhPassword : 'is not set.'}"
+	}
+}
+
 gradle.taskGraph.whenReady { taskGraph ->
+
+	println ">>>${taskGraph.allTasks}"
+
 	if (taskGraph.allTasks.any { it instanceof Sign}) {
 		allprojects {
-			ext."signing.keyId" = signingKeyId ?: ""
-			ext."signing.password" = signingPassword ?: ""
-			ext."signing.secretKeyRingFile" = secretKeyFile ?: ""
+			ext."signing.keyId" = hasProperty("signingKeyId") ? signingKeyId : ""
+			ext."signing.password" = hasProperty("signingPassword") ? signingPassword: ""
+			ext."signing.secretKeyRingFile" = hasProperty("secretKeyFile") ? secretKeyFile: ""
 		}
 	}
 }
 
-task checkProperties() {
-	println "signingKeyId ${signingKeyId ? '= ' + signingKeyId : 'is not set.'}" 
-	println "signingPassword ${signingPassword ? '= ' + signingPassword : 'is not set.'}"
-	println "secretKeyFile ${secretKeyFile ? '= ' + secretKeyFile : 'is not set.'}"
-	println "ossrhUsername ${ossrhUsername ? '= ' + ossrhUsername : 'is not set.'}"
-	println "ossrhPassword ${ossrhPassword ?'= ' +  ossrhPassword : 'is not set.'}"
-}
-
 signing {
-	required {
-		!version.contains("SNAPSHOT") && gradle.taskGraph.hasTask("uploadArchives")
-	}
+	required {!version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("uploadArchives") }
 	sign configurations.archives
 }
 
@@ -196,11 +205,11 @@ afterEvaluate { project ->
 				}
 	
 				repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-					authentication(userName: ossrhUsername ?: "", password: ossrhPassword ?: "")
+					authentication(userName: hasProperty("ossrhUsername") ? ossrhUsername : "", password: hasProperty("ossrhPassword") ? ossrhPassword: "")
 				}
 				
 				snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-					authentication(userName: ossrhUsername ?: "", password: ossrhPassword ?: "")
+					authentication(userName: hasProperty("ossrhUsername") ? ossrhUsername : "", password: hasProperty("ossrhPassword") ? ossrhPassword: "")
 				}
 				
 				pom.project {
