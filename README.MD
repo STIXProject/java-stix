@@ -162,7 +162,7 @@ After the Gradle wrapper shell script has downloaded and cached the Gradle
 binary distribution, a successful build will look like something like this 
 on UNIX:
 
-	➜  java_stix git:(master) ✗ gradle build -x signArchives
+	➜  java_stix git:(master) ✗ ./gradlew -x signArchives
 	:buildSrc:compileJava UP-TO-DATE
 	:buildSrc:compileGroovy UP-TO-DATE
 	:buildSrc:processResources UP-TO-DATE
@@ -286,7 +286,7 @@ integration.
 
 To build on Windows use the gradlew batch script like so:
 
-	$ .\gradlew.bat
+	$ .\gradlew.bat -x signArchives
 
 If the build goes well you will find the jars: 
 
