@@ -7,4 +7,4 @@ machine:
 
 test:
   override:
-    - ./gradlew build -x signArchives
+    - ./gradlew -x signArchives

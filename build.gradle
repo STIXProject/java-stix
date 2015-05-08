@@ -118,23 +118,20 @@ task sourcesJar(type: Jar, dependsOn: javadoc) {
 
 task checkProperties() {
 	doFirst {
-		println "signingKeyId ${hasProperty("signingKeyId") ? '= ' + signingKeyId : 'is not set.'}" 
-		println "signingPassword ${hasProperty("signingPassword") ? '= ' + signingPassword : 'is not set.'}"
-		println "secretKeyFile ${hasProperty("secretKeyFile") ? '= ' + secretKeyFile : 'is not set.'}"
-		println "ossrhUsername ${hasProperty("ossrhUsername") ? '= ' + ossrhUsername : 'is not set.'}"
-		println "ossrhPassword ${hasProperty("ossrhPassword") ?'= ' +  ossrhPassword : 'is not set.'}"
+		println "signingKeyId ${project.hasProperty("signingKeyId") ? '= ' + signingKeyId : 'is not set.'}" 
+		println "signingPassword ${project.hasProperty("signingPassword") ? '= ' + signingPassword : 'is not set.'}"
+		println "secretKeyFile ${project.hasProperty("secretKeyFile") ? '= ' + secretKeyFile : 'is not set.'}"
+		println "ossrhUsername ${project.hasProperty("ossrhUsername") ? '= ' + ossrhUsername : 'is not set.'}"
+		println "ossrhPassword ${project.hasProperty("ossrhPassword") ?'= ' +  ossrhPassword : 'is not set.'}"
 	}
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
-
-	println ">>>${taskGraph.allTasks}"
-
 	if (taskGraph.allTasks.any { it instanceof Sign}) {
 		allprojects {
-			ext."signing.keyId" = hasProperty("signingKeyId") ? signingKeyId : ""
-			ext."signing.password" = hasProperty("signingPassword") ? signingPassword: ""
-			ext."signing.secretKeyRingFile" = hasProperty("secretKeyFile") ? secretKeyFile: ""
+			ext."signing.keyId" = project.hasProperty("signingKeyId") ? signingKeyId : ""
+			ext."signing.password" = project.hasProperty("signingPassword") ? signingPassword: ""
+			ext."signing.secretKeyRingFile" = project.hasProperty("secretKeyFile") ? secretKeyFile: ""
 		}
 	}
 }
@@ -205,11 +202,11 @@ afterEvaluate { project ->
 				}
 	
 				repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-					authentication(userName: hasProperty("ossrhUsername") ? ossrhUsername : "", password: hasProperty("ossrhPassword") ? ossrhPassword: "")
+					authentication(userName: project.hasProperty("ossrhUsername") ? ossrhUsername : "", password: project.hasProperty("ossrhPassword") ? ossrhPassword: "")
 				}
 				
 				snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-					authentication(userName: hasProperty("ossrhUsername") ? ossrhUsername : "", password: hasProperty("ossrhPassword") ? ossrhPassword: "")
+					authentication(userName: project.hasProperty("ossrhUsername") ? ossrhUsername : "", password: project.hasProperty("ossrhPassword") ? ossrhPassword: "")
 				}
 				
 				pom.project {
