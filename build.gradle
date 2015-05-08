@@ -8,7 +8,7 @@
  *
  * Run
  *
- *	./gradlew
+ *	./gradlew -x signArchives
  *
  * from the commnand-line and the build task will execute by default.
  *
@@ -34,11 +34,14 @@
  *
  * Check settings via:
  *
- * To publish a snapshot execute the "uploadArchives" task with "snapshot" property like so:
+ * To publish a snapshot execute the "uploadArchives" task like so:
  *
- * ./gradlew uploadArchives -Psnaphot
+ * ./gradlew uploadArchives
  *
- * Otherwise you will deploy to staging.
+ * Otherwise you can publish a release to staging by executing the "uploadArchives" task 
+ * with "release" property like so:
+ *
+ * ./gradlew uploadArchives -Prelease
  *
  * ./gradle checkProperties
  *
@@ -60,7 +63,7 @@ apply plugin: "eclipse"
 apply plugin: "maven"
 apply plugin: "signing"
 
-defaultTasks "jar"
+defaultTasks "build"
 
 version = "1.1.1"
 group = "org.mitre"
@@ -68,7 +71,7 @@ archivesBaseName = "stix"
 
 project.ext.set("schemaVersion", version)
 
-if (project.hasProperty("snapshot")) {
+if (!has("release")) {
 	version = "${version}-SNAPSHOT"
 }
 
@@ -118,29 +121,99 @@ task sourcesJar(type: Jar, dependsOn: javadoc) {
 
 task checkProperties() {
 	doFirst {
-		println "signingKeyId ${hasProperty("signingKeyId") ? '= ' + signingKeyId : 'is not set.'}" 
-		println "signingPassword ${hasProperty("signingPassword") ? '= ' + signingPassword : 'is not set.'}"
-		println "secretKeyFile ${hasProperty("secretKeyFile") ? '= ' + secretKeyFile : 'is not set.'}"
-		println "ossrhUsername ${hasProperty("ossrhUsername") ? '= ' + ossrhUsername : 'is not set.'}"
-		println "ossrhPassword ${hasProperty("ossrhPassword") ?'= ' +  ossrhPassword : 'is not set.'}"
+		println "${project.hasProperty("signingKeyId") ? 'signingKeyId = ' + signingKeyId : 'No value has been specified for property \'signingKeyId\'.'}" 
+		println "${project.hasProperty("signingPassword") ? 'signingPassword = ' + signingPassword : 'No value has been specified for property \'signingKeyId\'.'}"
+		println "${project.hasProperty("secretKeyFile") ? 'secretKeyFile = ' + secretKeyFile : 'No value has been specified for property \'secretKeyFile\'.'}"
+		println "${project.hasProperty("ossrhUsername") ? 'ossrhUsername = ' + ossrhUsername : 'No value has been specified for property \'ossrhUsername\'.'}"
+		println "${project.hasProperty("ossrhPassword") ?'ossrhPassword = ' +  ossrhPassword : 'No value has been specified for property \'ossrhPassword\'.'}"
+	}
+}
+
+uploadArchives{
+	configuration = configurations.archives
+	repositories {
+		mavenDeployer {
+			beforeDeployment { MavenDeployment deployment ->
+				if (!project.hasProperty("ossrhUsername")) {
+					throw new GradleException("No value has been specified for property 'ossrhUsername'.")
+				}
+				
+				if (!project.hasProperty("ossrhPassword")) {
+					throw new GradleException("No value has been specified for property 'ossrhPassword'.")
+				}
+		
+				signing.signPom(deployment)
+			}
+			
+			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+				authentication(userName: project.hasProperty("ossrhUsername") ? ossrhUsername : "", password: project.hasProperty("ossrhPassword") ? ossrhPassword: "")
+			}
+			
+			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+				authentication(userName: project.hasProperty("ossrhUsername") ? ossrhUsername : "", password: project.hasProperty("ossrhPassword") ? ossrhPassword: "")
+			}
+			
+			pom.project {
+				name "${archivesBaseName}"
+				packaging 'jar'
+				version "${project.version}"
+				// optionally artifactId can be defined here 
+				description "The JAXB Bindings for STIX v." + version
+				url "https://github.com/nemonik/java_stix"
+				
+				scm {
+					connection "https://github.com/nemonik/java_stix.git"
+					developerConnection "https://github.com/nemonik/java_stix.git"
+					url "https://github.com/nemonik/java_stix"
+				}
+				
+				licenses {
+					license {
+						name "The BSD 3-Clause License"
+						url "https://raw.githubusercontent.com/nemonik/java_stix/master/LICENSE"
+					}
+				}
+				
+				developers {
+					developer {
+						id 'nemonik'
+						name 'Michael Joseph Walsh'
+						email 'java-stix-pom[ASCII character number 64]nemonik.com'
+					}
+				}
+			}
+		}
 	}
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
-
-	println ">>>${taskGraph.allTasks}"
-
 	if (taskGraph.allTasks.any { it instanceof Sign}) {
 		allprojects {
-			ext."signing.keyId" = hasProperty("signingKeyId") ? signingKeyId : ""
-			ext."signing.password" = hasProperty("signingPassword") ? signingPassword: ""
-			ext."signing.secretKeyRingFile" = hasProperty("secretKeyFile") ? secretKeyFile: ""
+			ext."signing.keyId" = project.hasProperty("signingKeyId") ? signingKeyId : ""
+			ext."signing.password" = project.hasProperty("signingPassword") ? signingPassword: ""
+			ext."signing.secretKeyRingFile" = project.hasProperty("secretKeyFile") ? secretKeyFile: ""
+		}
+	}
+		
+	if (taskGraph.hasTask(tasks.uploadArchives)) {
+		if (has("release")) {
+			if (!project.hasProperty("signingKeyId")) {
+				throw new GradleException("No value has been specified for property 'signingKeyId'.")
+			}
+			
+			if (!project.hasProperty("signingPassword")) {
+				throw new GradleException("No value has been specified for property 'signingPassword'.")
+			}
+			
+			if (!project.hasProperty("secretKeyFile")) {
+				throw new GradleException("No value has been specified for property 'secretKeyFile'.")
+			}
 		}
 	}
 }
 
 signing {
-	required {!version.endsWith("SNAPSHOT") && gradle.taskGraph.hasTask("uploadArchives") }
+	required {has("release") && gradle.taskGraph.hasTask(tasks.uploadArchives) }
 	sign configurations.archives
 }
 
@@ -194,56 +267,6 @@ jar {
 	}
 
 	from 'LICENSE'
-}
-
-afterEvaluate { project -> 
-	uploadArchives {
-		repositories {
-			mavenDeployer {
-				beforeDeployment { MavenDeployment deployment -> 
-					signing.signPom(deployment)
-				}
-	
-				repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-					authentication(userName: hasProperty("ossrhUsername") ? ossrhUsername : "", password: hasProperty("ossrhPassword") ? ossrhPassword: "")
-				}
-				
-				snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-					authentication(userName: hasProperty("ossrhUsername") ? ossrhUsername : "", password: hasProperty("ossrhPassword") ? ossrhPassword: "")
-				}
-				
-				pom.project {
-					name "${archivesBaseName}"
-					packaging 'jar'
-					version "${project.version}"
-					// optionally artifactId can be defined here 
-					description "The JAXB Bindings for STIX v." + version
-					url "https://github.com/nemonik/java_stix"
-					
-					scm {
-						connection "https://github.com/nemonik/java_stix.git"
-						developerConnection "https://github.com/nemonik/java_stix.git"
-						url "https://github.com/nemonik/java_stix"
-					}
-					
-					licenses {
-						license {
-							name "The BSD 3-Clause License"
-							url "https://raw.githubusercontent.com/nemonik/java_stix/master/LICENSE"
-						}
-					}
-					
-					developers {
-						developer {
-							id 'nemonik'
-							name 'Michael Joseph Walsh'
-							email 'java-stix-pom[ASCII character number 64]nemonik.com'
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 javadoc {

@@ -75,12 +75,12 @@ including OS X thereby removing the need to have Gradle installed.
 
 For a UNIX platform, you can run Gradle from the project root via:
 
-	./gradlew 
+	./gradlew -x signArchives
 
 This documentation centers on UNIX-centric Gradle command-line execution  for 
 brevity, but if you are on Windows you can run Gradle via:
 
-	.\gradlew.bat
+	.\gradlew.bat -x signArchives
 	
 
 Executing the `tasks` Gradle task will inform you of all the tasks runnable 
@@ -153,14 +153,10 @@ It is really unnecessary to build by hand, if your intention is to use the
 java-stix in your project as [snapshot](#importing_into_eclipse) exist in the 
 Maven Central Snapshot repository, and soon releases will exist too. 
 
-First change directories into the project and enter on the command-line:
+If you have not set up the signing properties you can instruct Gradle to skip 
+signing jars by doing the following:
 
-	./gradlew
-
-as `jar` is the default Gradle task.  To run the `build` and skip signing jars,
-do the following
-
-	./gradlew build -x signArchives
+	./gradlew -x signArchives
 
 After the Gradle wrapper shell script has downloaded and cached the Gradle 
 binary distribution, a successful build will look like something like this 
@@ -240,7 +236,7 @@ XJC being used to autogenerate the document object model.
 If you want more detail about the build you can pass `--stacktrace --debug` on 
 the command line like so:
 
-	./gradlew --stacktrace --debug
+	./gradlew -x signArchives --stacktrace --debug
 
 for a more detailed build.  I set an environment `CI_OPTS` variable with this 
 value for CircleCi builds to be bettered informed as to why the buiid is 
@@ -314,7 +310,7 @@ After running the Gradle build script, if you are using the Eclipse IDE you may
 want to run the following from the command-line to set up the Ecipse 
 environment:
 
-	./gradlew build cleanEclipse eclipse
+	./gradlew build cleanEclipse eclipse -x signArchives
 
 It entirely depends on how smart yoour Eclipse Gradle plugin is and how you 
 imported the project.  The above command will change your prject to essentially 
