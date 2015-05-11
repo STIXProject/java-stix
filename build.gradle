@@ -159,18 +159,18 @@ uploadArchives{
 				version "${project.version}"
 				// optionally artifactId can be defined here 
 				description "The JAXB Bindings for STIX v." + version
-				url "https://github.com/nemonik/java_stix"
+				url "https://github.com/STIXProject/java-stix"
 				
 				scm {
-					connection "https://github.com/nemonik/java_stix.git"
-					developerConnection "https://github.com/nemonik/java_stix.git"
-					url "https://github.com/nemonik/java_stix"
+					connection "https://github.com/STIXProject/java-stix.git"
+					developerConnection "https://github.com/STIXProject/java-stix.git"
+					url "https://github.com/STIXProject/java-stix"
 				}
 				
 				licenses {
 					license {
 						name "The BSD 3-Clause License"
-						url "https://raw.githubusercontent.com/nemonik/java_stix/master/LICENSE"
+						url "https://raw.githubusercontent.com/STIXProject/java-stix/master/LICENSE"
 					}
 				}
 				
