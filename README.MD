@@ -24,13 +24,33 @@ Releases of java-stix will comply with the Semantic Versioning specification at
 see TODO.txt for a tentative roadmap.  Releases will be announced on the [STIX 
 discussion list][list].
 
+## <a name="releases"></a>Releases
+
+Releases are distributed via the Maven Central Repository. 
+
+### <a name="maven_dependency_info"></a>Apache Maven:
+
+	<dependency>
+	  <groupId>org.mitre</groupId>
+	  <artifactId>stix</artifactId>
+	  <version>1.1.1</version>
+	</dependency>
+
+### <a name="gradle_dependency_info"></a>Gradle:
+
+	compile 'org.mitre:stix:1.1.1'
+
+### <a name="ivy__dependency_info"></a>Apache Ivy:
+
+	<dependency org="org.mitre" name="stix" rev="1.1.1" />
+
 ## <a name="snapshots"></a>Snapshots
 
 Snapshots are being pushed to 
 
-https://oss.sonatype.org/content/repositories/snapshots/org/mitre/stix/ 
+[https://oss.sonatype.org/content/repositories/snapshots/org/mitre/stix/](https://oss.sonatype.org/content/repositories/snapshots/org/mitre/stix/)
 
-So, users can simply retrieve java-stix directly via the Central Repository.
+Users using Apache Maven for example can simply retrieve java-stix directly via the Central Repository:
 
      <repositories>
        <repository>
@@ -49,7 +69,7 @@ So, users can simply retrieve java-stix directly via the Central Repository.
 		</dependency>
 	</dependencies>
 
-At a later date, release artifacts will appear in the Maven Central Repository.
+[Release](#releases) artifacts appear in the Maven Central Repository.
 
 # <a name="building"></a>Building
 
