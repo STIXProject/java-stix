@@ -199,11 +199,11 @@ on UNIX:
 	:clean
 	:retrieveSchemas
 	    Schemas are present. Retrieval is not needed.
-	    /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd already patched.
+	    /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.2-rc1/cybox/objects/Archive_File_Object.xsd already patched.
 	:createPrefixNamespaceBindings
-	    schemas/v1.1.1/external/open_ioc_2010/ioc.xsd claims the same prefix "tns" as schemas/v1.1.1/external/open_ioc_2010/ioc-TR.xsd
+	    schemas/v1.2-rc1/external/open_ioc_2010/ioc.xsd claims the same prefix "tns" as schemas/v1.2-rc1/external/open_ioc_2010/ioc-TR.xsd
 	:generateJAXB
-	    Generating JAXB model to /Users/walsh/Development/workspace/java_stix/src/generated/java for STIX Schema v1.1.1 found in /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.1.1
+	    Generating JAXB model to /Users/walsh/Development/workspace/java_stix/src/generated/java for STIX Schema v1.2-rc1 found in /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.2-rc1
 	:generatedSourceTransformation
 	:createPackageInfo
 	:compileJava
@@ -216,23 +216,23 @@ on UNIX:
 	:javadoc
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:287: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:349: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:319: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:339: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:287: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:319: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:339: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:349: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/SPKIData.java:115: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/X509Data.java:132: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/X509Data.java:132: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/X509Data.java:132: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:287: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:349: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:319: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:339: warning - Tag @link: reference not found: byte[]
 	19 warnings
 	:javadocJar
 	:sourcesJar
@@ -247,14 +247,14 @@ on UNIX:
 	
 	BUILD SUCCESSFUL
 	
-	Total time: 3 mins 7.702 secs
+	Total time: 6 mins 23.329 secs
 
 Ignore the javadoc tag warnings they have no impact on the build. Also, ignore 
 the warning about unchecked or unsafe operations as they are an artifact of 
 XJC being used to autogenerate the document object model.
 
-If you want more detail about the build you can pass `--stacktrace --debug` on 
-the command line like so:
+If you want more detail consider passing `-d`/`--debug` or `-i`/`--info` along with
+`--stacktrace` on the command line like so:
 
 	./gradlew -x signArchives --stacktrace --debug
 
@@ -280,15 +280,30 @@ path.
 
 To execute the tests:
 
-	./gradlew test
+	./gradlew -x signArchives test 
 
 Consider using `-d`/`--debug` or `-i`/`--info` for more details during test 
 execution like so:
 
-	./gradlew test -i
+	./gradlew -x signArchives test -i
 
 The `test` task will generated a report that can be found at 
 `build/reports/tests/index.html`.
+
+### <a name="examples"></a>Examples
+
+Examples exist in src/main/java/org/mitre/stix/examples
+
+	src/main/java/org/mitre/stix/examples/
+	├── CIQIdentity.java
+	├── CreationToolMetadata.java
+	├── IndicatorHash.java
+	├── XML2Object.java
+	└── XMLParser.java
+ 
+ To execute CIQIdentity on the command-line via Gradle, do the following:
+ 
+	 ./gradlew -PmainClass=org.mitre.stix.examples.CIQIdentity -x signArchives execute 
 
 ## <a name="addendum"></a>Addendum
 

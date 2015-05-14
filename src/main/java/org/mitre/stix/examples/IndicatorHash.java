@@ -97,7 +97,7 @@ public class IndicatorHash {
 							+ UUID.randomUUID().toString(), "example"))
 					.withTimestamp(now)
 					.withTitle("File Hash Example")
-					.withDescription(
+					.withDescriptions(
 							new StructuredTextType()
 									.withValue("An indicator containing a File observable with an associated hash"))
 					.withObservable(observable).withProducer(producer);
@@ -110,7 +110,7 @@ public class IndicatorHash {
 					});
 
 			STIXHeaderType stixHeader = new STIXHeaderType()
-					.withDescription(new StructuredTextType()
+					.withDescriptions(new StructuredTextType()
 							.withValue("Example"));
 
 			STIXPackage stixPackage = new STIXPackage()

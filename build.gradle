@@ -71,6 +71,7 @@ if (!has("release")) {
 	version = "${version}-SNAPSHOT"
 }
 
+
 task retrieveSchemas(type: RetrieveSchemasTask, dependsOn: clean) {
 	schemaVersion = project.schemaVersion
 }
@@ -94,9 +95,12 @@ task cleanSchema(type: CleanSchemaTask) {
 }
 
 task calcChecksum(type: CalcChecksumTask) {
+	schemaVersion = project.schemaVersion
 }
 
-compileJava.dependsOn createPackageInfo
+if (!has("skipPackageInfo")) {
+	compileJava.dependsOn createPackageInfo
+}
 
 task wrapper(type: Wrapper) {
 	gradleVersion = '2.4'
@@ -123,6 +127,13 @@ task checkProperties() {
 		println "${project.hasProperty("ossrhUsername") ? 'ossrhUsername = ' + ossrhUsername : 'No value has been specified for property \'ossrhUsername\'.'}"
 		println "${project.hasProperty("ossrhPassword") ?'ossrhPassword = ' +  ossrhPassword : 'No value has been specified for property \'ossrhPassword\'.'}"
 	}
+}
+
+//task execute(dependsOn: compileJava) {
+task execute(type:JavaExec) {
+	//ant.java(classname: project.hasProperty("mainClass") ? project.get("mainClass") : "org.mitre.stix.STIXSchema", fork: true, classpath: "${sourceSets.main.runtimeClasspath.asPath}")
+	main = project.mainClass
+	classpath = sourceSets.main.runtimeClasspath
 }
 
 uploadArchives{

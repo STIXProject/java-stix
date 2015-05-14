@@ -10,16 +10,13 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
-
-import javax.xml.bind.annotation.XmlType;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchema;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,7 +40,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -88,6 +84,10 @@ public class STIXSchema {
 	 */
 	private STIXSchema() {
 
+		@SuppressWarnings("unused")
+		Version test = this.getClass().getPackage()
+				.getAnnotation(Version.class);
+		
 		this.version = ((Version) this.getClass().getPackage()
 				.getAnnotation(Version.class)).schema();
 
@@ -273,6 +273,8 @@ public class STIXSchema {
 				.println(schema
 						.validate(new URL(
 								"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml")));
+		
+		System.out.println(schema.getVersion());
 	}
 
 	/**
