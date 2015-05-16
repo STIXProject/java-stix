@@ -117,7 +117,7 @@ public class CIQIdentity {
 					.withSpecification(specification);
 
 			InformationSourceType producer = new InformationSourceType()
-					.withDescription(
+					.withDescriptions(
 							new StructuredTextType()
 									.withValue("An indicator containing a File observable with an associated hash"))
 					.withTime(
@@ -153,7 +153,7 @@ public class CIQIdentity {
 							+ UUID.randomUUID().toString(), "example"))
 					.withTimestamp(now)
 					.withTitle("File Hash Example")
-					.withDescription(
+					.withDescriptions(
 							new StructuredTextType()
 									.withValue("An indicator containing a File observable with an associated hash"))
 					.withProducer(producer).withObservable(observable);
@@ -166,7 +166,7 @@ public class CIQIdentity {
 					});
 
 			STIXHeaderType header = new STIXHeaderType()
-					.withDescription(new StructuredTextType()
+					.withDescriptions(new StructuredTextType()
 							.withValue("Example"));
 
 			STIXPackage stixPackage = new STIXPackage()
