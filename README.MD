@@ -33,16 +33,16 @@ Releases are distributed via the Maven Central Repository.
 	<dependency>
 	  <groupId>org.mitre</groupId>
 	  <artifactId>stix</artifactId>
-	  <version>1.2-rc1</version>
+	  <version>1.2.0</version>
 	</dependency>
 
 ### <a name="gradle_dependency_info"></a>Gradle:
 
-	compile 'org.mitre:stix:1.2-rc1'
+	compile 'org.mitre:stix:1.2.0'
 
 ### <a name="ivy__dependency_info"></a>Apache Ivy:
 
-	<dependency org="org.mitre" name="stix" rev="1.2-rc1" />
+	<dependency org="org.mitre" name="stix" rev="1.2.0" />
 
 ## <a name="snapshots"></a>Snapshots
 
@@ -65,7 +65,7 @@ Users using Apache Maven for example can simply retrieve java-stix directly via 
 		<dependency>
 			<groupId>org.mitre</groupId>
 			<artifactId>stix</artifactId>
-			<version>1.2-rc1-SNAPSHOT</version>
+			<version>1.2.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
@@ -146,8 +146,8 @@ commands on the command line:
 
 	git submodule init
 	git submodule update --force
-	cd src/main/resources/schemas/v1.2-rc1
-	git checkout tags/v1.2-rc1
+	cd src/main/resources/schemas/v1.2.0
+	git checkout tags/v1.2.0
     
 Your not done.  You'll also need to retrieve the CybOX schemas.
 
@@ -200,11 +200,11 @@ on UNIX:
 	:clean
 	:retrieveSchemas
 	    Schemas are present. Retrieval is not needed.
-	    /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.2-rc1/cybox/objects/Archive_File_Object.xsd already patched.
+	    /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.2.0/cybox/objects/Archive_File_Object.xsd already patched.
 	:createPrefixNamespaceBindings
-	    schemas/v1.2-rc1/external/open_ioc_2010/ioc.xsd claims the same prefix "tns" as schemas/v1.2-rc1/external/open_ioc_2010/ioc-TR.xsd
+	    schemas/v1.2.0/external/open_ioc_2010/ioc.xsd claims the same prefix "tns" as schemas/v1.2.0/external/open_ioc_2010/ioc-TR.xsd
 	:generateJAXB
-	    Generating JAXB model to /Users/walsh/Development/workspace/java_stix/src/generated/java for STIX Schema v1.2-rc1 found in /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.2-rc1
+	    Generating JAXB model to /Users/walsh/Development/workspace/java_stix/src/generated/java for STIX Schema v1.2.0 found in /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.2.0
 	:generatedSourceTransformation
 	:createPackageInfo
 	:compileJava

@@ -6,4 +6,7 @@
 	url = https://github.com/STIXProject/schemas.git
 [submodule "src/main/resources/schemas/v1.2-rc1"]
 	path = src/main/resources/schemas/v1.2-rc1
-        url = https://github.com/STIXProject/schemas.git
+	url = https://github.com/STIXProject/schemas.git
+[submodule "src/main/resources/schemas/v1.2.0"]
+	path = src/main/resources/schemas/v1.2.0
+	url = https://github.com/STIXProject/schemas.git

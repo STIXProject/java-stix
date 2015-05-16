@@ -24,9 +24,7 @@ class STIXSchemaSpec extends spock.lang.Specification{
 		when:
  			def schema = STIXSchema.getInstance()
  		then:
- 			//schema.getVersion() =~ /(\d+)(\.)(\d+)(\.)(\d+)/
- 			println "Disabled as v1.2-rc1 is not in semantic versioning 2.0.0 form."
- 			true
+ 			schema.getVersion() =~ /(\d+)(\.)(\d+)(\.)(\d+)/
  	}
 	
 	def "Valid STIX XML retrieved from a URL validates at true"() {
