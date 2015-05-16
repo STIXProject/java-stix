@@ -84,10 +84,6 @@ public class STIXSchema {
 	 */
 	private STIXSchema() {
 
-		@SuppressWarnings("unused")
-		Version test = this.getClass().getPackage()
-				.getAnnotation(Version.class);
-		
 		this.version = ((Version) this.getClass().getPackage()
 				.getAnnotation(Version.class)).schema();
 

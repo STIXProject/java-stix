@@ -1,5 +1,5 @@
---- src/main/resources/schemas/v1.2-rc1/cybox/objects/Archive_File_Object.xsd	2014-12-10 15:08:05.000000000 -0500
-+++ src/main/resources/schemas/v1.2-rc1/cybox/objects/Patched_Archive_File_Object.xsd	2014-12-11 12:21:38.000000000 -0500
+--- src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd	2014-12-10 15:08:05.000000000 -0500
++++ src/main/resources/schemas/v1.1.1/cybox/objects/Patched_Archive_File_Object.xsd	2014-12-11 12:21:38.000000000 -0500
 @@ -39,16 +39,6 @@
                              <xs:documentation>The File_Count field specifies the number of files contained within the archive.</xs:documentation>
                          </xs:annotation>

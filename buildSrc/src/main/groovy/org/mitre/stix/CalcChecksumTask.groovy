@@ -12,6 +12,7 @@ import java.io.FileInputStream
 import java.security.MessageDigest
 
 public class Checksum {
+
 	def calc(File file) {
 		
 		def messageDigest = MessageDigest.getInstance("SHA1")
@@ -37,9 +38,9 @@ public class Checksum {
 }
 
 class CalcChecksumTask extends DefaultTask {
-
+	
 	@Input String schemaVersion
-
+	
 	CalcChecksumTask() {
 		description = "Calculates checksum for a file. For example: gradle -Pfilepath=src/main/resources/schemas/v${schemaVersion}/cybox/objects/Archive_File_Object.xsd calcChecksum"
 	}

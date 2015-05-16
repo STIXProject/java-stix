@@ -46,7 +46,7 @@ public class CreationToolMetadata {
 							new GregorianCalendar(TimeZone.getTimeZone("UTC")));
 
 			STIXHeaderType header = new STIXHeaderType()
-					.withDescriptions(new StructuredTextType().withValue("Example"))
+					.withDescription(new StructuredTextType().withValue("Example"))
 					.withInformationSource(
 							new InformationSourceType().withTools(new ToolsInformationType()
 									.withTools(new ToolInformationType()

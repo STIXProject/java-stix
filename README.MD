@@ -1,13 +1,13 @@
 # <a name="intro"></a>java-stix 
 
-The Java bindings for STIX, the Structured Threat Information  eXpression 
+The Java bindings for STIX, the Structured Threat Information eXpression 
 language used for representing structured cyber threat information.
 
 java-stix is being developed under the official [STIXProject][stix project]
 
 For more information, see [http://stix.mitre.org/][stix].
 
-[![Circle CI](https://circleci.com/gh/STIXProject/java-stix.svg?style=svg)](https://circleci.com/gh/STIXProject/java-stix) [![Build Status](https://travis-ci.org/STIXProject/java-stix.svg)](https://travis-ci.org/STIXProject/java-stix)
+[![Circle CI](https://circleci.com/gh/STIXProject/java-stix.svg?style=svg)](https://circleci.com/gh/STIXProject/java-stix) [![Build Status](https://travis-ci.org/STIXProject/java-stix.svg)](https://travis-ci.org/STIXProject/java-stix) [![Code Climate](https://codeclimate.com/github/STIXProject/java-stix/badges/gpa.svg)](https://codeclimate.com/github/STIXProject/java-stix) [![Test Coverage](https://codeclimate.com/github/STIXProject/java-stix/badges/coverage.svg)](https://codeclimate.com/github/STIXProject/java-stix/coverage)
 
 ## <a name="overview"></a>Overview
 
@@ -72,6 +72,8 @@ Users using Apache Maven for example can simply retrieve java-stix directly via 
 [Release](#releases) artifacts appear in the Maven Central Repository.
 
 # <a name="building"></a>Building
+
+java-stix builds under Java7, and Java8.
 
 ## <a name="cloning"></a>Clone the repository
 
@@ -155,7 +157,6 @@ While in the project:
 
 	git submodule init
 	git submodule update --force
-	cd cybox
 	git checkout 3442ebe50385d3bd0b3305952b90d296e0a1242c
 
 When Gradle build script first runs it will also patch the CybOX schemas so 
@@ -163,8 +164,7 @@ that the JAXB2 Simple Document Object Model can be generated. Once patched, it
 will remained patched locally.  If Gradle fails to retrieve the schemas, you 
 will need to patch the schemas by hand from the command-line.  The patch file, 
 `cybox_object_archive_object_patch` is in  the root of the project.  NetBeans 
-can also apply patches via
-`Team` -> `Patches` -> `Apply Diff Patch`. 
+can also apply patches via `Team` -> `Patches` -> `Apply Diff Patch`. 
 
 ## <a name="creating_document_object_model"></a>Creating the JAXB2 Document Object Model
 
@@ -281,12 +281,12 @@ path.
 
 To execute the tests:
 
-	./gradlew -x signArchives test 
+	./gradlew -x signArchives test
 
 Consider using `-d`/`--debug` or `-i`/`--info` for more details during test 
 execution like so:
 
-	./gradlew -x signArchives test -i
+	./gradlew -x signArchives -i
 
 The `test` task will generated a report that can be found at 
 `build/reports/tests/index.html`.
@@ -301,10 +301,10 @@ Examples exist in src/main/java/org/mitre/stix/examples
 	├── IndicatorHash.java
 	├── XML2Object.java
 	└── XMLParser.java
- 
- To execute CIQIdentity on the command-line via Gradle, do the following:
- 
-	 ./gradlew -PmainClass=org.mitre.stix.examples.CIQIdentity -x signArchives execute 
+
+To execute CIQIdentity on the command-line via Gradle, do the following:
+
+	./gradlew -PmainClass=org.mitre.stix.examples.CIQIdentity -x signArchives execute 
 
 ## <a name="addendum"></a>Addendum
 
@@ -322,7 +322,7 @@ integration.
 
 To build on Windows use the gradlew batch script like so:
 
-	$ .\gradlew.bat -x signArchives
+	.\gradlew.bat -x signArchives
 
 If the build goes well you will find the jars: 
 
