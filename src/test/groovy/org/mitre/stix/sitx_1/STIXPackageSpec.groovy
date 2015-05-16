@@ -53,7 +53,7 @@ import spock.lang.*
 
 class STIXPackageSpec extends spock.lang.Specification{
 
-	def "A STIXPpackage when created creates the expected XML String"() {
+	def "A STIXPackage when created creates the expected XML String"() {
 		setup:
 			XMLUnit.setIgnoreWhitespace(true)
 			XMLUnit.setIgnoreAttributeOrder(true)
@@ -188,9 +188,8 @@ class STIXPackageSpec extends spock.lang.Specification{
 			
 			def producer = new InformationSourceType()
 					.withDescription(
-							new StructuredTextType(
-									"An indicator containing a File observable with an associated hash",
-									null))
+							new StructuredTextType().withValue(
+									"An indicator containing a File observable with an associated hash"))
 					.withTime(
 							new TimeType()
 									.withProducedTime(new DateTimeWithPrecisionType(
@@ -225,9 +224,9 @@ class STIXPackageSpec extends spock.lang.Specification{
 					.withTimestamp(epoch)
 					.withTitle("File Hash Example")
 					.withDescription(
-							new StructuredTextType(
-									"An indicator containing a File observable with an associated hash",
-									null)).withProducer(producer)
+							new StructuredTextType().withValue(
+									"An indicator containing a File observable with an associated hash"))
+					.withProducer(producer)
 					.withObservable(observable)
 
 			def indicators = new IndicatorsType(
