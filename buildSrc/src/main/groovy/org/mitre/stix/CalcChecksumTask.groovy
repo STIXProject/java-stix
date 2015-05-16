@@ -5,12 +5,14 @@
 package org.mitre.stix
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
 import java.io.FileInputStream
 import java.security.MessageDigest
 
 public class Checksum {
+
 	def calc(File file) {
 		
 		def messageDigest = MessageDigest.getInstance("SHA1")
@@ -36,9 +38,11 @@ public class Checksum {
 }
 
 class CalcChecksumTask extends DefaultTask {
-
+	
+	@Input String schemaVersion
+	
 	CalcChecksumTask() {
-		description = "Calculates checksum for a file. For example: gradle -Pfilepath=src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd calcChecksum"
+		description = "Calculates checksum for a file. For example: gradle -Pfilepath=src/main/resources/schemas/v${schemaVersion}/cybox/objects/Archive_File_Object.xsd calcChecksum"
 	}
 	
 	@TaskAction

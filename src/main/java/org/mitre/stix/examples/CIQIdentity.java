@@ -118,9 +118,8 @@ public class CIQIdentity {
 
 			InformationSourceType producer = new InformationSourceType()
 					.withDescription(
-							new StructuredTextType(
-									"An indicator containing a File observable with an associated hash",
-									null))
+							new StructuredTextType()
+									.withValue("An indicator containing a File observable with an associated hash"))
 					.withTime(
 							new TimeType()
 									.withProducedTime(new DateTimeWithPrecisionType(
@@ -155,10 +154,9 @@ public class CIQIdentity {
 					.withTimestamp(now)
 					.withTitle("File Hash Example")
 					.withDescription(
-							new StructuredTextType(
-									"An indicator containing a File observable with an associated hash",
-									null)).withProducer(producer)
-					.withObservable(observable);
+							new StructuredTextType()
+									.withValue("An indicator containing a File observable with an associated hash"))
+					.withProducer(producer).withObservable(observable);
 
 			IndicatorsType indicators = new IndicatorsType(
 					new ArrayList<IndicatorBaseType>() {
@@ -187,8 +185,8 @@ public class CIQIdentity {
 
 			System.out.println(StringUtils.repeat("-", 120));
 
-			System.out.println(STIXPackage.fromXMLString(stixPackage
-					.toXMLString()).toXMLString(true));
+			System.out.println(STIXPackage.fromXMLString(
+					stixPackage.toXMLString()).toXMLString(true));
 
 		} catch (DatatypeConfigurationException e) {
 			throw new RuntimeException(e);

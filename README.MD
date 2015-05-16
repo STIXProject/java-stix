@@ -7,7 +7,7 @@ java-stix is being developed under the official [STIXProject][stix project]
 
 For more information, see [http://stix.mitre.org/][stix].
 
-[![Circle CI](https://circleci.com/gh/STIXProject/java-stix.svg?style=svg)](https://circleci.com/gh/STIXProject/java-stix) [![Build Status](https://travis-ci.org/STIXProject/java-stix.svg)](https://travis-ci.org/STIXProject/java-stix)
+[![Circle CI](https://circleci.com/gh/STIXProject/java-stix.svg?style=svg)](https://circleci.com/gh/STIXProject/java-stix) [![Build Status](https://travis-ci.org/STIXProject/java-stix.svg)](https://travis-ci.org/STIXProject/java-stix) [![Code Climate](https://codeclimate.com/github/STIXProject/java-stix/badges/gpa.svg)](https://codeclimate.com/github/STIXProject/java-stix) [![Test Coverage](https://codeclimate.com/github/STIXProject/java-stix/badges/coverage.svg)](https://codeclimate.com/github/STIXProject/java-stix/coverage)
 
 ## <a name="overview"></a>Overview
 
@@ -72,6 +72,8 @@ Users using Apache Maven for example can simply retrieve java-stix directly via 
 [Release](#releases) artifacts appear in the Maven Central Repository.
 
 # <a name="building"></a>Building
+
+java-stix builds under Java7, and Java8.
 
 ## <a name="cloning"></a>Clone the repository
 
@@ -253,8 +255,8 @@ Ignore the javadoc tag warnings they have no impact on the build. Also, ignore
 the warning about unchecked or unsafe operations as they are an artifact of 
 XJC being used to autogenerate the document object model.
 
-If you want more detail about the build you can pass `--stacktrace --debug` on 
-the command line like so:
+If you want more detail consider passing `-d`/`--debug` or `-i`/`--info` along with
+`--stacktrace` on the command line like so:
 
 	./gradlew -x signArchives --stacktrace --debug
 
@@ -280,15 +282,30 @@ path.
 
 To execute the tests:
 
-	./gradlew test
+	/gradlew -x signArchives test
 
 Consider using `-d`/`--debug` or `-i`/`--info` for more details during test 
 execution like so:
 
-	./gradlew test -i
+	./gradlew -x signArchives -i
 
 The `test` task will generated a report that can be found at 
 `build/reports/tests/index.html`.
+
+### <a name="examples"></a>Examples
+
+Examples exist in src/main/java/org/mitre/stix/examples
+
+	src/main/java/org/mitre/stix/examples/
+	├── CIQIdentity.java
+	├── CreationToolMetadata.java
+	├── IndicatorHash.java
+	├── XML2Object.java
+	└── XMLParser.java
+
+To execute CIQIdentity on the command-line via Gradle, do the following:
+
+	./gradlew -PmainClass=org.mitre.stix.examples.CIQIdentity -x signArchives execute 
 
 ## <a name="addendum"></a>Addendum
 
