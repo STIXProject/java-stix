@@ -348,7 +348,7 @@ environment:
 
 	./gradlew build cleanEclipse eclipse -x signArchives
 
-It entirely depends on how smart yoour Eclipse Gradle plugin is and how you 
+It entirely depends on how smart your Eclipse Gradle plugin is and how you 
 imported the project.  The above command will change your prject to essentially 
 a Java Project. If you run the command, then right-click on the Eclipse project 
 and select "Refresh" to bring in the dependencies and source of JAXB Document 
