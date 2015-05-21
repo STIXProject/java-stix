@@ -267,8 +267,7 @@ public class STIXSchema {
 
 		System.out
 				.println(schema
-						.validate(new URL(
-								"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml")));
+						.validate(new URL("https://raw.githubusercontent.com/STIXProject/python-stix/v1.1.1.5/examples/sample.xml")));
 		
 		System.out.println(schema.getVersion());
 	}
