@@ -83,11 +83,15 @@ public class STIXSchema {
 	 * Private constructor to permit a single STIXSchema to exists.
 	 */
 	private STIXSchema() {
+		
+		System.out.println("called STIXSchema constructor");
 
 		this.version = ((Version) this.getClass().getPackage()
 				.getAnnotation(Version.class)).schema();
 
-		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
+		System.out.println("Classloader for STIXShema is " + this.getClass().getClassLoader());
+		
+		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver(this.getClass().getClassLoader());
 		Resource[] schemaResources;
 
 		try {
@@ -136,6 +140,7 @@ public class STIXSchema {
 						}
 
 						LOGGER.fine("     adding: " + prefix + " :: " + url);
+						System.out.println("     adding: " + prefix + " :: " + url);
 
 						prefixSchemaBindings.put(prefix, url);
 					}
@@ -182,6 +187,8 @@ public class STIXSchema {
 	 *            The URL object for the XML to be validated.
 	 */
 	public boolean validate(URL url) {
+		
+		System.out.println("Called valdiate with URL: " + url);
 
 		String xmlText = null;
 
@@ -201,6 +208,8 @@ public class STIXSchema {
 	 *            A string of XML text to be validated
 	 */
 	public boolean validate(String xmlText) {
+		
+		System.out.println("Called valdiate with xmlText: " + xmlText);
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
@@ -264,11 +273,17 @@ public class STIXSchema {
 			SAXException, IOException {
 
 		STIXSchema schema = STIXSchema.getInstance();
+		
+		URL url = new URL(
+				"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml");
 
 		System.out
 				.println(schema
-						.validate(new URL(
-								"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml")));
+						.validate(url));
+		
+		String xmlText = IOUtils.toString(url.openStream());
+		
+		System.out .println(schema.validate(xmlText));
 		
 		System.out.println(schema.getVersion());
 	}
