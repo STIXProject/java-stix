@@ -33,16 +33,16 @@ Releases are distributed via the Maven Central Repository.
 	<dependency>
 	  <groupId>org.mitre</groupId>
 	  <artifactId>stix</artifactId>
-	  <version>1.2.0</version>
+	  <version>1.2.0.1</version>
 	</dependency>
 
 ### <a name="gradle_dependency_info"></a>Gradle:
 
-	compile 'org.mitre:stix:1.2.0'
+	compile 'org.mitre:stix:1.2.0.1'
 
 ### <a name="ivy__dependency_info"></a>Apache Ivy:
 
-	<dependency org="org.mitre" name="stix" rev="1.2.0" />
+	<dependency org="org.mitre" name="stix" rev="1.2.0.1" />
 
 ## <a name="snapshots"></a>Snapshots
 
@@ -65,7 +65,7 @@ Users using Apache Maven for example can simply retrieve java-stix directly via 
 		<dependency>
 			<groupId>org.mitre</groupId>
 			<artifactId>stix</artifactId>
-			<version>1.2.0-SNAPSHOT</version>
+			<version>1.2.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

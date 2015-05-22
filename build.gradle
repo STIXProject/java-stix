@@ -65,8 +65,6 @@ apply plugin: "signing"
 
 defaultTasks "build"
 
-project.ext.set("schemaVersion", version)
-
 if (!has("release")) {
 	version = "${version}-SNAPSHOT"
 }
@@ -131,6 +129,11 @@ task checkProperties() {
 task execute(type:JavaExec) {
 	main = project.mainClass
 	classpath = sourceSets.main.runtimeClasspath
+}
+
+task gatherDependencies(type: Copy) {
+	into "${buildDir}/dependencies"
+	from configurations.runtime
 }
 
 uploadArchives{
