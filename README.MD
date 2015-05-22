@@ -33,16 +33,16 @@ Releases are distributed via the Maven Central Repository.
 	<dependency>
 	  <groupId>org.mitre</groupId>
 	  <artifactId>stix</artifactId>
-	  <version>1.1.1</version>
+	  <version>1.1.1.1</version>
 	</dependency>
 
 ### <a name="gradle_dependency_info"></a>Gradle:
 
-	compile 'org.mitre:stix:1.1.1'
+	compile 'org.mitre:stix:1.1.1.1'
 
 ### <a name="ivy__dependency_info"></a>Apache Ivy:
 
-	<dependency org="org.mitre" name="stix" rev="1.1.1" />
+	<dependency org="org.mitre" name="stix" rev="1.1.1.1" />
 
 ## <a name="snapshots"></a>Snapshots
 
@@ -65,7 +65,7 @@ Users using Apache Maven for example can simply retrieve java-stix directly via 
 		<dependency>
 			<groupId>org.mitre</groupId>
 			<artifactId>stix</artifactId>
-			<version>1.1.1-SNAPSHOT</version>
+			<version>1.1.1.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
@@ -146,7 +146,7 @@ commands on the command line:
 
 	git submodule init
 	git submodule update --force
-	cd src/main/resources/schemas/v1.1.1
+	cd src/main/resources/schemas/v1.1.1.
 	git checkout tags/v1.1.1
     
 Your not done.  You'll also need to retrieve the CybOX schemas.

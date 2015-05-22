@@ -131,6 +131,11 @@ task execute(type:JavaExec) {
 	classpath = sourceSets.main.runtimeClasspath
 }
 
+task gatherDependencies(type: Copy) {
+	into "${buildDir}/dependencies"
+	from configurations.runtime
+}
+
 uploadArchives{
 	configuration = configurations.archives
 	repositories {
