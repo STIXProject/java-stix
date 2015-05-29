@@ -49,7 +49,7 @@ RUN apt-get update
 #RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential
 
 # To install the default OpenJDK environment
-RUN apt-get -y install default-jdk
+RUN apt-get -y install openjdk-9-jdk
 
 # To install the OpenJDK 7, comment out the above and uncomment the following.
 #RUN apt-get install -y openjdk-7-jdk
