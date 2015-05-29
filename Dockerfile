@@ -16,7 +16,7 @@
 #
 # Then create a container using the image you just created via:
 #
-# docker run -t -i java_stix_img /bin/bash
+# docker run -t -i java_stix_img_v1_1_1_1 /bin/bash
 #
 # To retreive the jar archives from the running docker container use following 
 # from the command-line of your docker host, not the container:
@@ -37,13 +37,10 @@
 ############################################################
 
 # Set base image
-FROM ubuntu
+FROM ubuntu:15.04
 
 # File Maintainer
 MAINTAINER Michael Joseph Walsh
-
-# Add the application resources URL
-#RUN echo "deb http://archive.ubuntu.com/ubuntu/ $(lsb_release -sc) main universe" >> /etc/apt/sources.list
 
 # Update the sources list
 RUN apt-get update
@@ -51,17 +48,17 @@ RUN apt-get update
 # Install cmd-line dev toolchain
 RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential
 
-# To install the OpenJDK environment
-#RUN apt-get install default-jdk
+# To install the default OpenJDK environment
+RUN apt-get -y install openjdk-8-jdk
 
 # To install the OpenJDK 7, comment out the above and uncomment the following.
-RUN apt-get install -y openjdk-7-jdk
+#RUN apt-get install -y openjdk-7-jdk
 
 # Optionally to install the Oracle JDK, comment out the above, uncomment the 
 # the next 3 lines, and then uncommment the preferred JDK version.
-#RUN apt-get install python-software-properties
-#RUN add-apt-repository ppa:webupd8team/java
-#RUN apt-get update
+#RUN apt-get -y install python-software-properties
+#RUN add-apt-repository -y ppa:webupd8team/java
+#RUN apt-get -y update
 
 #RUN apt-get install oracle-java7-installer
 #RUN apt-get install oracle-java8-installer
@@ -76,4 +73,4 @@ WORKDIR java-stix
 RUN git checkout -b v1.1.1.1 origin/v1.1.1.1
 
 # Build unsigned jar archives in debug to /java-stix/build/libs
-RUN ./gradlew -x signArchives -d 
+RUN ./gradlew -x signArchives -d
