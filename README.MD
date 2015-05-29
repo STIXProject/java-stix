@@ -33,16 +33,16 @@ Releases are distributed via the Maven Central Repository.
 	<dependency>
 	  <groupId>org.mitre</groupId>
 	  <artifactId>stix</artifactId>
-	  <version>1.2.0</version>
+	  <version>1.2.0.1</version>
 	</dependency>
 
 ### <a name="gradle_dependency_info"></a>Gradle:
 
-	compile 'org.mitre:stix:1.2.0'
+	compile 'org.mitre:stix:1.2.0.1'
 
 ### <a name="ivy__dependency_info"></a>Apache Ivy:
 
-	<dependency org="org.mitre" name="stix" rev="1.2.0" />
+	<dependency org="org.mitre" name="stix" rev="1.2.0.1" />
 
 ## <a name="snapshots"></a>Snapshots
 
@@ -65,7 +65,7 @@ Users using Apache Maven for example can simply retrieve java-stix directly via 
 		<dependency>
 			<groupId>org.mitre</groupId>
 			<artifactId>stix</artifactId>
-			<version>1.2.0-SNAPSHOT</version>
+			<version>1.2.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
@@ -348,7 +348,7 @@ environment:
 
 	./gradlew build cleanEclipse eclipse -x signArchives
 
-It entirely depends on how smart your Eclipse Gradle plugin is and how you 
+It entirely depends on how smart yoour Eclipse Gradle plugin is and how you 
 imported the project.  The above command will change your prject to essentially 
 a Java Project. If you run the command, then right-click on the Eclipse project 
 and select "Refresh" to bring in the dependencies and source of JAXB Document 

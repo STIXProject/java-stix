@@ -40,7 +40,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
 /**
@@ -88,8 +87,7 @@ public class STIXSchema {
 		this.version = ((Version) this.getClass().getPackage()
 				.getAnnotation(Version.class)).schema();
 
-		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver(
-				this.getClass().getClassLoader());
+		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver();
 		Resource[] schemaResources;
 
 		try {
@@ -169,16 +167,6 @@ public class STIXSchema {
 	}
 
 	/**
-	 * Override the default ValidationErrorHandler with one of your own.
-	 * 
-	 * @param customErrorHandler
-	 *            The Handler to use instead.
-	 */
-	public void setValidationErrorHandler(ErrorHandler customErrorHandler) {
-		validator.setErrorHandler(customErrorHandler);
-	}
-
-	/**
 	 * Returns the schema version
 	 * 
 	 * @return The STIX schema version
@@ -255,7 +243,6 @@ public class STIXSchema {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (SAXException e) {
-			System.out.println("---------\n" + e + "--------\n");
 			return false;
 		}
 
@@ -278,15 +265,11 @@ public class STIXSchema {
 
 		STIXSchema schema = STIXSchema.getInstance();
 
-		URL url = new URL(
-				"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml");
-
-		System.out.println(schema.validate(url));
-
-		String xmlText = IOUtils.toString(url.openStream());
-
-		System.out.println(schema.validate(xmlText));
-
+		System.out
+				.println(schema
+						.validate(new URL(
+								"https://raw.githubusercontent.com/STIXProject/python-stix/v1.2.0.0/examples/sample.xml")));
+		
 		System.out.println(schema.getVersion());
 	}
 
@@ -315,9 +298,11 @@ public class STIXSchema {
 	 */
 	public static String getName(Object obj) {
 		try {
-			return obj.getClass().getAnnotation(XmlRootElement.class).name();
+			return obj.getClass().getAnnotation(
+					XmlRootElement.class).name();
 		} catch (NullPointerException e) {
-			return obj.getClass().getAnnotation(XmlType.class).name();
+			return obj.getClass().getAnnotation(
+					XmlType.class).name();
 		}
 	}
 
