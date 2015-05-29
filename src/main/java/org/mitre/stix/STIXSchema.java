@@ -94,7 +94,7 @@ public class STIXSchema {
 
 		try {
 			schemaResources = patternResolver
-					.getResources("classpath*:schemas/v" + version
+					.getResources("classpath:schemas/v" + version
 							+ "/**/*.xsd");
 
 			prefixSchemaBindings = new HashMap<String, String>();
