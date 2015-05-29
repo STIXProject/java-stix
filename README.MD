@@ -319,7 +319,7 @@ this platform.  You will need additional dependencies normally found in UNIX,
 such as, GNU patch.  GNU Patch can be installed via either cygwin, Chocolatey, 
 or directly.  Then you'll need to work out permission elevation  issues so 
 Gradle can execute the command-line GNU patch command through Gradle's Ant 
-integration.
+integration. Alternatively, see the section on [building using the Dockerfil](#building_via_docker).
 
 To build on Windows use the gradlew batch script like so:
 
@@ -333,6 +333,36 @@ If the build goes well you will find the jars:
 
 where `${version}` is replaced with the `version` number in the Gradle build 
 script.  
+
+### <a name="building_via_docker"></a>Building via the Dockerfile
+
+If you have Docker installed, from the root of the project run 
+the following to create a container image for this Dockerfile via:
+
+	docker build -t java_stix_img_v1_2_0_1 . 
+
+Then create a container using the image you just created via:
+
+	docker run -t -i java_stix_img_v1_2_0_1 /bin/bash
+
+To retreive the jar archives from the running docker container use following 
+from the command-line of your docker host, not the container:
+
+	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT-javadoc.jar .
+	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT-sources.jar .
+	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT.jar .
+
+If the containder ID is not obvious, but you can also retrieve it via:
+
+	docker ps
+
+An example of retrieving the snapshot jar would be the following:
+
+	docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT.jar . 
+	
+By default the Docker container will build using OpenJdk 7.  You can modify
+the Dockerfile to other JVM's noted in the file.  Please, note Gradle targets 
+Java 1.7 compatibility regardless.
 
 ### <a name="importing_into_eclipse"></a>Importing the project into Eclipse
 
