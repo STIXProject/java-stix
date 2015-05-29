@@ -40,6 +40,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 
 /**
@@ -83,20 +84,17 @@ public class STIXSchema {
 	 * Private constructor to permit a single STIXSchema to exists.
 	 */
 	private STIXSchema() {
-		
-		System.out.println("called STIXSchema constructor");
 
 		this.version = ((Version) this.getClass().getPackage()
 				.getAnnotation(Version.class)).schema();
 
-		System.out.println("Classloader for STIXShema is " + this.getClass().getClassLoader());
-		
-		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver(this.getClass().getClassLoader());
+		ResourcePatternResolver patternResolver = new PathMatchingResourcePatternResolver(
+				this.getClass().getClassLoader());
 		Resource[] schemaResources;
 
 		try {
 			schemaResources = patternResolver
-					.getResources("classpath*:schemas/v" + version
+					.getResources("classpath:schemas/v" + version
 							+ "/**/*.xsd");
 
 			prefixSchemaBindings = new HashMap<String, String>();
@@ -140,7 +138,6 @@ public class STIXSchema {
 						}
 
 						LOGGER.fine("     adding: " + prefix + " :: " + url);
-						System.out.println("     adding: " + prefix + " :: " + url);
 
 						prefixSchemaBindings.put(prefix, url);
 					}
@@ -172,6 +169,16 @@ public class STIXSchema {
 	}
 
 	/**
+	 * Override the default ValidationErrorHandler with one of your own.
+	 * 
+	 * @param customErrorHandler
+	 *            The Handler to use instead.
+	 */
+	public void setValidationErrorHandler(ErrorHandler customErrorHandler) {
+		validator.setErrorHandler(customErrorHandler);
+	}
+
+	/**
 	 * Returns the schema version
 	 * 
 	 * @return The STIX schema version
@@ -187,8 +194,6 @@ public class STIXSchema {
 	 *            The URL object for the XML to be validated.
 	 */
 	public boolean validate(URL url) {
-		
-		System.out.println("Called valdiate with URL: " + url);
 
 		String xmlText = null;
 
@@ -208,8 +213,6 @@ public class STIXSchema {
 	 *            A string of XML text to be validated
 	 */
 	public boolean validate(String xmlText) {
-		
-		System.out.println("Called valdiate with xmlText: " + xmlText);
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
@@ -252,6 +255,7 @@ public class STIXSchema {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (SAXException e) {
+			System.out.println("---------\n" + e + "--------\n");
 			return false;
 		}
 
@@ -273,18 +277,16 @@ public class STIXSchema {
 			SAXException, IOException {
 
 		STIXSchema schema = STIXSchema.getInstance();
-		
+
 		URL url = new URL(
 				"https://raw.githubusercontent.com/STIXProject/schemas/master/samples/STIX_Domain_Watchlist.xml");
 
-		System.out
-				.println(schema
-						.validate(url));
-		
+		System.out.println(schema.validate(url));
+
 		String xmlText = IOUtils.toString(url.openStream());
-		
-		System.out .println(schema.validate(xmlText));
-		
+
+		System.out.println(schema.validate(xmlText));
+
 		System.out.println(schema.getVersion());
 	}
 
@@ -313,11 +315,9 @@ public class STIXSchema {
 	 */
 	public static String getName(Object obj) {
 		try {
-			return obj.getClass().getAnnotation(
-					XmlRootElement.class).name();
+			return obj.getClass().getAnnotation(XmlRootElement.class).name();
 		} catch (NullPointerException e) {
-			return obj.getClass().getAnnotation(
-					XmlType.class).name();
+			return obj.getClass().getAnnotation(XmlType.class).name();
 		}
 	}
 
