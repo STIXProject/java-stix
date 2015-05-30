@@ -236,6 +236,7 @@ sourceSets {
 			srcDir("src/main/resources")
 			exclude "*.xjb"
 			exclude "**/v1.2-rc1"
+			exclude "**/v1.1.1"
 		}
 	}
 }
