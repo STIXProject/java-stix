@@ -322,7 +322,7 @@ this platform.  You will need additional dependencies normally found in UNIX,
 such as, GNU patch.  GNU Patch can be installed via either cygwin, Chocolatey, 
 or directly.  Then you'll need to work out permission elevation  issues so 
 Gradle can execute the command-line GNU patch command through Gradle's Ant 
-integration. Alternatively, see the section on [building using the Dockerfil](#building_via_docker).
+integration. Alternatively, see the section on [building using the Dockerfile](#building_via_docker).
 
 To build on Windows use the gradlew batch script like so:
 
