@@ -146,8 +146,9 @@ commands on the command line:
 
 	git submodule init
 	git submodule update --force
-	cd src/main/resources/schemas/v1.1.1.
+	cd src/main/resources/schemas/v1.1.1
 	git checkout tags/v1.1.1
+
     
 Your not done.  You'll also need to retrieve the CybOX schemas.
 
@@ -155,8 +156,10 @@ Your not done.  You'll also need to retrieve the CybOX schemas.
 
 While in the project:
 
+	cd src/main/resources/schemas/v1.1.1
 	git submodule init
 	git submodule update --force
+	cd cybox
 	git checkout 3442ebe50385d3bd0b3305952b90d296e0a1242c
 
 When Gradle build script first runs it will also patch the CybOX schemas so 
