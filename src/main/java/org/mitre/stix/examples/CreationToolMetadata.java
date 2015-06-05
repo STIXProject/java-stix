@@ -56,7 +56,7 @@ public class CreationToolMetadata {
 
 			STIXPackage stixPackage = new STIXPackage()
 					.withSTIXHeader(header)
-					.withVersion("1.1.1")
+					.withVersion("1.2.0")
 					.withTimestamp(now)
 					.withId(new QName("http://example.com/", "package-"
 							+ UUID.randomUUID().toString(), "example"));

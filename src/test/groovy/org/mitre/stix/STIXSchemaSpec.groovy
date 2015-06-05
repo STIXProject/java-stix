@@ -9,6 +9,7 @@
 import org.mitre.stix.STIXSchema
 import org.apache.commons.io.IOUtils
 import org.mitre.stix.stix_1.STIXPackage
+import com.github.zafarkhaja.semver.Version
  
 class STIXSchemaSpec extends spock.lang.Specification{ 
 
@@ -24,7 +25,7 @@ class STIXSchemaSpec extends spock.lang.Specification{
 		when:
  			def schema = STIXSchema.getInstance()
  		then:
- 			schema.getVersion() =~ /(\d+)(\.)(\d+)(\.)(\d+)/
+ 			Version.valueOf(schema.getVersion())
  	}
 	
 	def "Valid STIX XML retrieved from a URL validates at true"() {
