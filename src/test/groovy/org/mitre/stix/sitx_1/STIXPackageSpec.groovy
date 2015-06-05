@@ -61,7 +61,7 @@ class STIXPackageSpec extends spock.lang.Specification{
 			def controlXML = """<?xml version="1.0" encoding="UTF-8"?>
     <stix:STIX_Package
         id="example:package-0ebcdf8d-88a0-42ea-9047-0cb2922fdaa9"
-        timestamp="1970-01-01T00:00:00.000Z" version="1.2.0"
+        timestamp="1970-01-01T00:00:00.000Z" version="1.2"
         xmlns="http://xml/metadataSharing.xsd"
         xmlns:FileObj="http://cybox.mitre.org/objects#FileObject-2"
         xmlns:cybox="http://cybox.mitre.org/cybox-2"
@@ -138,7 +138,7 @@ class STIXPackageSpec extends spock.lang.Specification{
     </stix:STIX_Package>"""
 			
 		when: "A STIXPackage is created, converted to Document representation, and then serialize to an XML String"
-			def version = "1.2.0"
+			def version = "1.2"
 			
 			def c = new GregorianCalendar(TimeZone.getTimeZone("UTC"))
 			c.setTimeInMillis(0)

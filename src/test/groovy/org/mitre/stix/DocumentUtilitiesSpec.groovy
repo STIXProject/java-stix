@@ -28,7 +28,7 @@ import spock.lang.*
 
 class DocumentUtilitiesSpec extends spock.lang.Specification{
 
-	@Shared def version = "1.2.0"
+	@Shared def version = "1.2"
 		
 	@Shared def controlXML = """<?xml version="1.0" encoding="UTF-8"?>
 <stix:STIX_Package
