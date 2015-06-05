@@ -138,7 +138,7 @@ class STIXPackageSpec extends spock.lang.Specification{
     </stix:STIX_Package>"""
 			
 		when: "A STIXPackage is created, converted to Document representation, and then serialize to an XML String"
-			def version = "1.2.0"
+			def version = "1.2"
 			
 			def c = new GregorianCalendar(TimeZone.getTimeZone("UTC"))
 			c.setTimeInMillis(0)
