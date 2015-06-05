@@ -172,7 +172,7 @@ public class CIQIdentity {
 			STIXPackage stixPackage = new STIXPackage()
 					.withSTIXHeader(header)
 					.withIndicators(indicators)
-					.withVersion("1.2.0")
+					.withVersion("1.2")
 					.withTimestamp(now)
 					.withId(new QName("http://example.com/", "package-"
 							+ UUID.randomUUID().toString(), "example"));
