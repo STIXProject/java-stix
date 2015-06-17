@@ -46,7 +46,7 @@ MAINTAINER Michael Joseph Walsh
 RUN apt-get update
 
 # Install cmd-line dev toolchain
-#RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential
+RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential
 
 # To install the default OpenJDK environment
 RUN apt-get -y install openjdk-8-jdk
