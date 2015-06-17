@@ -46,9 +46,11 @@ MAINTAINER Michael Joseph Walsh
 RUN apt-get update
 
 # Install cmd-line dev toolchain
-RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential
+RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential software-properties-common
 
 # To install the default OpenJDK environment
+RUN add-apt-repository -y ppa:openjdk-r/ppa
+RUN apt-get -y update 
 RUN apt-get -y install openjdk-8-jdk
 
 # To install the OpenJDK 7, comment out the above and uncomment the following.
