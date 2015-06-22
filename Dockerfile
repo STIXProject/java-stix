@@ -16,14 +16,14 @@
 #
 # Then create a container using the image you just created via:
 #
-# docker run -t -i java_stix_img_v1_2_0_1 /bin/bash
+# docker run -t -i java_stix_img_v1_1_1_1 /bin/bash
 #
 # To retreive the jar archives from the running docker container use following 
 # from the command-line of your docker host, not the container:
 #
-# docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT-javadoc.jar .
-# docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT-sources.jar .
-# docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT.jar .
+# docker cp <container id>:/java-stix/build/libs/stix-1.1.1.1-SNAPSHOT-javadoc.jar .
+# docker cp <container id>:/java-stix/build/libs/stix-1.1.1.1-SNAPSHOT-sources.jar .
+# docker cp <container id>:/java-stix/build/libs/stix-1.1.1.1-SNAPSHOT.jar .
 #
 # If the containder ID is not obvious, but you can also retrieve it via:
 #
@@ -31,7 +31,7 @@
 #
 # An example of retrieving the snapshot jar would be the following:
 #
-# ➜  /tmp  docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT.jar . 
+# ➜  /tmp  docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.1.1.1-SNAPSHOT.jar . 
 #
 #
 ############################################################
@@ -43,7 +43,7 @@ FROM ubuntu:15.04
 MAINTAINER Michael Joseph Walsh
 
 # Update the sources list
-RUN apt-get update
+RUN apt-get -y update
 
 # Install cmd-line dev toolchain
 RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential software-properties-common
@@ -65,14 +65,14 @@ RUN apt-get -y install openjdk-8-jdk
 #RUN apt-get install oracle-java7-installer
 #RUN apt-get install oracle-java8-installer
 
-# Clone the java-stix repo
-RUN git clone https://github.com/STIXProject/java-stix.git
+# Clone java-stix repo at the current branch into the container
+COPY . java-stix
 
 # Open the java-stix project
 WORKDIR java-stix
 
-# Checkout the v1.2.0.1 branch
-RUN git checkout -b v1.2.0.1 origin/v1.2.0.1
-
 # Build unsigned jar archives in debug to /java-stix/build/libs
-RUN ./gradlew -x signArchives -d 
+RUN ./gradlew -x signArchives -d
+
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
