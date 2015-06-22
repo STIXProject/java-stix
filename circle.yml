@@ -2,7 +2,7 @@ machine:
   java:
     version: oraclejdk7
   environment:
-    GRADLE_OPTS: -Dorg.gradle.daemon=true  -Xmx1024m -Xms256m
+    GRADLE_OPTS: -Dorg.gradle.daemon=true
     CI_OPTS: --stacktrace --debug
 
 test:
