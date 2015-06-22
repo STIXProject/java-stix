@@ -6,7 +6,7 @@ jdk:
 before_install:
   - chmod +x gradlew
 
-env: GRADLE_OPTS=-Dorg.gradle.daemon=true -Xmx1024m -Xms256m
+env: GRADLE_OPTS="-Dorg.gradle.daemon=true -Xmx1024m -Xms256m"
 env: CI_OPTS=--stacktrace
 
 install: /bin/true
