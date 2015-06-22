@@ -43,7 +43,7 @@ FROM ubuntu:15.04
 MAINTAINER Michael Joseph Walsh
 
 # Update the sources list
-RUN apt-get update
+RUN apt-get -y update
 
 # Install cmd-line dev toolchain
 RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential software-properties-common
@@ -65,14 +65,14 @@ RUN apt-get -y install openjdk-8-jdk
 #RUN apt-get install oracle-java7-installer
 #RUN apt-get install oracle-java8-installer
 
-# Clone the java-stix repo
-RUN git clone https://github.com/STIXProject/java-stix.git
+# Clone java-stix repo at the current branch into the container
+COPY . java-stix
 
 # Open the java-stix project
 WORKDIR java-stix
 
-# Checkout the v1.1.1.1 branch
-RUN git checkout -b v1.1.1.1 origin/v1.1.1.1
-
 # Build unsigned jar archives in debug to /java-stix/build/libs
 RUN ./gradlew -x signArchives -d
+
+# Clean up APT when done.
+RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
