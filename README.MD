@@ -24,9 +24,10 @@ Releases of java-stix will comply with the Semantic Versioning specification at
 see TODO.txt for a tentative roadmap.  Releases will be announced on the [STIX 
 discussion list][list]. A java-stix for a particular schema release will match the 
 STIX schema version in Semantic Versioning form. Follow up patched releases of 
-java-stix for a particular schema release will add and increment a 4th digit. For
-example, the first patch release for java-stix `v1.2.0` would be `v1.2.0.1`. Patches 
-will be worked in a branch prior to being tagged and released.
+java-stix for a particular schema release will add, and follow on patches will
+increment a 4th digit. For example, the first patch release for java-stix `v1.2.0` 
+would be `v1.2.0.1`. Patches will be worked in a branch prior to being tagged and
+released.
 
 ## <a name="releases"></a>Releases
 
