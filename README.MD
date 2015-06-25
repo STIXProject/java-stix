@@ -1,6 +1,6 @@
 # <a name="intro"></a>java-stix 
 
-The Java bindings for STIX, the Structured Threat Information  eXpression 
+The Java bindings for STIX, the Structured Threat Information eXpression 
 language used for representing structured cyber threat information.
 
 java-stix is being developed under the official [STIXProject][stix project]
@@ -27,6 +27,14 @@ STIX schema version in Semantic Versioning form. Follow up patches of java-stix
 for a particular schema release will increment a 4th digit. For example, the first 
 patch release for java-stix `v1.2.0` would be `v1.2.0.1`. Patches will be worked 
 in a branch prior to being tagged and released.
+
+## <a name="question"></a>Got a Question or Problem?
+
+If you have questions about how to use java-stix, please direct these to the [STIX discussion list][list].
+
+## <a name="contribute"></a>Contributing to java-stix?
+
+We'd welcome you contributing to java-stix. Read the [CONTRIBUTE.MD](CONTRIBUTE.MD) for guidlines.
 
 ## <a name="releases"></a>Releases
 
