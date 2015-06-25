@@ -34,7 +34,7 @@ If you have questions about how to use java-stix, please direct these to the [ST
 
 ## <a name="contribute"></a>Contributing to java-stix?
 
-We'd welcome you contributing to java-stix. Read the [CONTRIBUTE.MD](CONTRIBUTE.MD) for guidlines.
+We'd welcome you contributing to java-stix. Read the [CONTRIBUTING.MD](CONTRIBUTING.MD) for guidlines.
 
 ## <a name="releases"></a>Releases
 
