@@ -94,8 +94,7 @@ public class STIXSchema {
 
 		try {
 			schemaResources = patternResolver
-					.getResources("classpath:schemas/v" + version
-							+ "/**/*.xsd");
+					.getResources("classpath:schemas/v" + version + "/**/*.xsd");
 
 			prefixSchemaBindings = new HashMap<String, String>();
 
@@ -192,8 +191,12 @@ public class STIXSchema {
 	 * 
 	 * @param url
 	 *            The URL object for the XML to be validated.
+	 * @return boolean True If the xmlText validates against the schema
+	 * @throws SAXException
+	 *             If the a validation ErrorHandler has not been set, and
+	 *             validation throws a SAXException
 	 */
-	public boolean validate(URL url) {
+	public boolean validate(URL url) throws SAXException {
 
 		String xmlText = null;
 
@@ -211,8 +214,12 @@ public class STIXSchema {
 	 * 
 	 * @param xmlText
 	 *            A string of XML text to be validated
+	 * @return boolean True If the xmlText validates against the schema
+	 * @throws SAXException
+	 *             If the a validation ErrorHandler has not been set, and
+	 *             validation throws a SAXException
 	 */
-	public boolean validate(String xmlText) {
+	public boolean validate(String xmlText) throws SAXException {
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
@@ -251,12 +258,15 @@ public class STIXSchema {
 		try {
 			validator.validate(new StreamSource(new ByteArrayInputStream(
 					xmlText.getBytes(StandardCharsets.UTF_8))));
-
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (SAXException e) {
-			System.out.println("---------\n" + e + "--------\n");
-			return false;
+			if (this.validator.getErrorHandler() != null) {
+				return false;
+			} else {
+				//re-throw the SAXException
+				throw e;
+			}
 		}
 
 		return true;

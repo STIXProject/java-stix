@@ -32,6 +32,7 @@ import org.mitre.stix.indicator_2.Indicator;
 import org.mitre.stix.stix_1.IndicatorsType;
 import org.mitre.stix.stix_1.STIXHeaderType;
 import org.mitre.stix.stix_1.STIXPackage;
+import org.xml.sax.SAXException;
 
 /**
  * Build a STIX Indicator document containing a File observable with an
@@ -129,6 +130,8 @@ public class IndicatorHash {
 
 		} catch (DatatypeConfigurationException e) {
 			throw new RuntimeException(e);
+		} catch (SAXException e) {
+			e.printStackTrace();
 		}
 	}
 }

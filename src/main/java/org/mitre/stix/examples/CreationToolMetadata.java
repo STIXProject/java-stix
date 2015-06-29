@@ -20,6 +20,7 @@ import org.mitre.stix.common_1.InformationSourceType;
 import org.mitre.stix.common_1.StructuredTextType;
 import org.mitre.stix.stix_1.STIXHeaderType;
 import org.mitre.stix.stix_1.STIXPackage;
+import org.xml.sax.SAXException;
 
 /**
  * Build a STIX Document with Tool Information
@@ -69,6 +70,8 @@ public class CreationToolMetadata {
 
 		} catch (DatatypeConfigurationException e) {
 			throw new RuntimeException(e);
+		} catch (SAXException e) {
+			e.printStackTrace();
 		}
 	}
 }
