@@ -256,15 +256,19 @@ public class STIXSchema {
 		}
 
 		try {
-			validator.validate(new StreamSource(new ByteArrayInputStream(
-					xmlText.getBytes(StandardCharsets.UTF_8))));
+			// synchronized to avoid org.xml.sax.SAXException: FWK005 parse may
+			// not be called while parsing.
+			synchronized (this) {
+				validator.validate(new StreamSource(new ByteArrayInputStream(
+						xmlText.getBytes(StandardCharsets.UTF_8))));
+			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} catch (SAXException e) {
 			if (this.validator.getErrorHandler() != null) {
 				return false;
 			} else {
-				//re-throw the SAXException
+				// re-throw the SAXException
 				throw e;
 			}
 		}
