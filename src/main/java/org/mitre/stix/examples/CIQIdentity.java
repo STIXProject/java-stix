@@ -43,6 +43,7 @@ import org.mitre.stix.indicator_2.Indicator;
 import org.mitre.stix.stix_1.IndicatorsType;
 import org.mitre.stix.stix_1.STIXHeaderType;
 import org.mitre.stix.stix_1.STIXPackage;
+import org.xml.sax.SAXException;
 
 /**
  * An example of how to add CIQ Identity information to a STIX Indicator.
@@ -190,6 +191,8 @@ public class CIQIdentity {
 
 		} catch (DatatypeConfigurationException e) {
 			throw new RuntimeException(e);
+		} catch (SAXException e) {
+			e.printStackTrace();
 		}
 	}
 }

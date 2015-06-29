@@ -304,6 +304,7 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 						[
 							imports: 
 							[
+								"org.xml.sax.SAXException"
 							],
 							template:
 								"""\
@@ -311,9 +312,12 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 	 * Validates the XML representation of this \${name} instance
 	 * Returning true indicating a successful validation, false if not.
 	 * 
-	 * @return boolean
+	 * @return boolean True If it validates against the schema
+	 * @throws SAXException
+	 *             If the a validation ErrorHandler has not been set, and
+	 *             validation throws a SAXException
 	 */
-	public boolean validate() {
+	public boolean validate() throws SAXException {
 		return STIXSchema.getInstance().validate(toXMLString());
 	}
 """
