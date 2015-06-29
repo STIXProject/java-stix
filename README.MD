@@ -25,7 +25,7 @@ see TODO.txt for a tentative roadmap.  Releases will be announced on the [STIX
 discussion list][list]. A java-stix for a particular schema release will match the 
 STIX schema version in Semantic Versioning form. Follow up patches of java-stix 
 for a particular schema release will increment a 4th digit. For example, the first 
-patch release for java-stix `v1.2.0` would be `v1.2.0.1`. Patches will be worked 
+patch release for java-stix `v1.2.0` would be `v1.2.0.2`. Patches will be worked 
 in a branch prior to being tagged and released.
 
 ## <a name="releases"></a>Releases
@@ -37,16 +37,16 @@ Releases are distributed via the Maven Central Repository.
 	<dependency>
 	  <groupId>org.mitre</groupId>
 	  <artifactId>stix</artifactId>
-	  <version>1.2.0.1</version>
+	  <version>1.2.0.2</version>
 	</dependency>
 
 ### <a name="gradle_dependency_info"></a>Gradle:
 
-	compile 'org.mitre:stix:1.2.0.1'
+	compile 'org.mitre:stix:1.2.0.2'
 
 ### <a name="ivy__dependency_info"></a>Apache Ivy:
 
-	<dependency org="org.mitre" name="stix" rev="1.2.0.1" />
+	<dependency org="org.mitre" name="stix" rev="1.2.0.2" />
 
 ## <a name="snapshots"></a>Snapshots
 
@@ -69,7 +69,7 @@ Users using Apache Maven for example can simply retrieve java-stix directly via 
 		<dependency>
 			<groupId>org.mitre</groupId>
 			<artifactId>stix</artifactId>
-			<version>1.2.0.1-SNAPSHOT</version>
+			<version>1.2.0.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
@@ -356,9 +356,9 @@ Then create a container using the image you just created via:
 To retreive the jar archives from the running docker container use following 
 from the command-line of your docker host, not the container:
 
-	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT-javadoc.jar .
-	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT-sources.jar .
-	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT.jar .
+	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT-javadoc.jar .
+	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT-sources.jar .
+	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT.jar .
 
 If the containder ID is not obvious, but you can also retrieve it via:
 
@@ -366,7 +366,7 @@ If the containder ID is not obvious, but you can also retrieve it via:
 
 An example of retrieving the snapshot jar would be the following:
 
-	docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT.jar . 
+	docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT.jar . 
 	
 By default the Docker container will build using OpenJdk 7.  You can modify
 the Dockerfile to other JVM's noted in the file.  Please, note Gradle targets 
