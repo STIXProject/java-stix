@@ -21,9 +21,9 @@
 # To retrieve the jar archives from the running docker container use following 
 # from the command-line of your docker host, not the container:
 #
-# docker cp <container id>:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT-javadoc.jar .
-# docker cp <container id>:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT-sources.jar .
-# docker cp <container id>:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT.jar .
+# docker cp <container id>:/java-stix/build/libs/stix-1.1.1.2-SNAPSHOT-javadoc.jar .
+# docker cp <container id>:/java-stix/build/libs/stix-1.1.1.2-SNAPSHOT-sources.jar .
+# docker cp <container id>:/java-stix/build/libs/stix-1.1.1.2-SNAPSHOT.jar .
 #
 # If the containder ID is not obvious, but you can also retrieve it via:
 #
@@ -31,7 +31,7 @@
 #
 # An example of retrieving the snapshot jar would be the following:
 #
-# ➜  /tmp  docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.1.1.1-SNAPSHOT.jar . 
+# ➜  /tmp  docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.1.1.2-SNAPSHOT.jar . 
 #
 #
 ############################################################
