@@ -1,6 +1,6 @@
 # <a name="intro"></a>java-stix 
 
-The Java bindings for STIX, the Structured Threat Information  eXpression 
+The Java bindings for STIX, the Structured Threat Information eXpression 
 language used for representing structured cyber threat information.
 
 java-stix is being developed under the official [STIXProject][stix project]
@@ -25,8 +25,16 @@ see TODO.txt for a tentative roadmap.  Releases will be announced on the [STIX
 discussion list][list]. A java-stix for a particular schema release will match the 
 STIX schema version in Semantic Versioning form. Follow up patches of java-stix 
 for a particular schema release will increment a 4th digit. For example, the first 
-patch release for java-stix `v1.1.1` would be `v1.1.1.1`. Patches will be worked 
+patch release for java-stix `v1.2.0` would be `v1.2.0.2`. Patches will be worked 
 in a branch prior to being tagged and released.
+
+## <a name="question"></a>Got a Question or Problem?
+
+If you have questions about how to use java-stix, please direct these to the [STIX discussion list][list].
+
+## <a name="contribute"></a>Contributing to java-stix?
+
+We'd welcome you contributing to java-stix. Read the [CONTRIBUTING.MD](CONTRIBUTING.MD) for guidlines.
 
 ## <a name="releases"></a>Releases
 
@@ -37,16 +45,16 @@ Releases are distributed via the Maven Central Repository.
 	<dependency>
 	  <groupId>org.mitre</groupId>
 	  <artifactId>stix</artifactId>
-	  <version>1.1.1.1</version>
+	  <version>1.2.0.2</version>
 	</dependency>
 
 ### <a name="gradle_dependency_info"></a>Gradle:
 
-	compile 'org.mitre:stix:1.1.1.1'
+	compile 'org.mitre:stix:1.2.0.2'
 
 ### <a name="ivy__dependency_info"></a>Apache Ivy:
 
-	<dependency org="org.mitre" name="stix" rev="1.1.1.1" />
+	<dependency org="org.mitre" name="stix" rev="1.2.0.2" />
 
 ## <a name="snapshots"></a>Snapshots
 
@@ -69,7 +77,7 @@ Users using Apache Maven for example can simply retrieve java-stix directly via 
 		<dependency>
 			<groupId>org.mitre</groupId>
 			<artifactId>stix</artifactId>
-			<version>1.1.1.1-SNAPSHOT</version>
+			<version>1.2.0.2-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
@@ -150,21 +158,20 @@ commands on the command line:
 
 	git submodule init
 	git submodule update --force
-	cd src/main/resources/schemas/v1.1.1
-	git checkout tags/v1.1.1
+	cd src/main/resources/schemas/v1.2.0
+	git checkout tags/v1.2.0
 
-    
 Your not done.  You'll also need to retrieve the CybOX schemas.
 
 ### <a name="cybox_schemas"></a>The CybOX schemas
 
 While in the project:
 
-	cd src/main/resources/schemas/v1.1.1
+	cd src/main/resources/schemas/v1.2.0
 	git submodule init
 	git submodule update --force
 	cd cybox
-	git checkout 3442ebe50385d3bd0b3305952b90d296e0a1242c
+	git checkout 97beb32c376a9223e91b52cb3e4c8d2af6baf786
 
 When Gradle build script first runs it will also patch the CybOX schemas so 
 that the JAXB2 Simple Document Object Model can be generated. Once patched, it 
@@ -208,40 +215,42 @@ on UNIX:
 	:clean
 	:retrieveSchemas
 	    Schemas are present. Retrieval is not needed.
-	    /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.1.1/cybox/objects/Archive_File_Object.xsd already patched.
+	    /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.2.0/cybox/objects/Archive_File_Object.xsd already patched.
 	:createPrefixNamespaceBindings
-	    schemas/v1.1.1/external/open_ioc_2010/ioc.xsd claims the same prefix "tns" as schemas/v1.1.1/external/open_ioc_2010/ioc-TR.xsd
+	    schemas/v1.2.0/external/open_ioc_2010/ioc.xsd claims the same prefix "tns" as schemas/v1.2.0/external/open_ioc_2010/ioc-TR.xsd
 	:generateJAXB
-	    Generating JAXB model to /Users/walsh/Development/workspace/java_stix/src/generated/java for STIX Schema v1.1.1 found in /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.1.1
+	    Generating JAXB model to /Users/walsh/Development/workspace/java_stix/src/generated/java for STIX Schema v1.2.0 found in /Users/walsh/Development/workspace/java_stix/src/main/resources/schemas/v1.2.0
 	:generatedSourceTransformation
 	:createPackageInfo
 	:compileJava
+	warning: [options] bootstrap class path not set in conjunction with -source 1.7
 	Note: Some input files use unchecked or unsafe operations.
 	Note: Recompile with -Xlint:unchecked for details.
+	1 warning
 	:compileGroovy UP-TO-DATE
 	:processResources
 	:classes
 	:jar
 	:javadoc
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:287: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:341: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:311: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:287: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:311: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:341: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/SPKIData.java:115: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/X509Data.java:132: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/X509Data.java:132: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/X509Data.java:132: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:277: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:287: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:361: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:341: warning - Tag @link: reference not found: byte[]
+	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:311: warning - Tag @link: reference not found: byte[]
 	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:331: warning - Tag @link: reference not found: byte[]
-	/Users/walsh/Development/workspace/java_stix/src/generated/java/org/w3/_2000/_09/xmldsig/ObjectFactory.java:351: warning - Tag @link: reference not found: byte[]
 	19 warnings
 	:javadocJar
 	:sourcesJar
@@ -256,7 +265,7 @@ on UNIX:
 	
 	BUILD SUCCESSFUL
 	
-	Total time: 3 mins 7.702 secs
+	Total time: 3 mins 45.121 secs
 
 Ignore the javadoc tag warnings they have no impact on the build. Also, ignore 
 the warning about unchecked or unsafe operations as they are an artifact of 
@@ -346,18 +355,18 @@ script.
 If you have Docker installed, from the root of the project run 
 the following to create a container image for this Dockerfile via:
 
-	docker build -t java_stix_img_v1_2_0_1 . 
+	docker build -t nemonik/java-stix . 
 
 Then create a container using the image you just created via:
 
-	docker run -t -i java_stix_img_v1_2_0_1 /bin/bash
+	docker run -t -i nemonik/java-stix /bin/bash
 
 To retreive the jar archives from the running docker container use following 
 from the command-line of your docker host, not the container:
 
-	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT-javadoc.jar .
-	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT-sources.jar .
-	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT.jar .
+	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT-javadoc.jar .
+	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT-sources.jar .
+	docker cp <container id>:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT.jar .
 
 If the containder ID is not obvious, but you can also retrieve it via:
 
@@ -365,7 +374,7 @@ If the containder ID is not obvious, but you can also retrieve it via:
 
 An example of retrieving the snapshot jar would be the following:
 
-	docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.2.0.1-SNAPSHOT.jar . 
+	docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT.jar . 
 	
 By default the Docker container will build using OpenJdk 7.  You can modify
 the Dockerfile to other JVM's noted in the file.  Please, note Gradle targets 
