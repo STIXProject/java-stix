@@ -12,19 +12,19 @@
  *
  * from the commnand-line and the build task will execute by default.
  *
- * The Jar will be built to 
+ * The Jar will be built to
  *
- * 	build/libs/stix-${version}.jar
- * 
+ *      build/libs/stix-${version}.jar
+ *
  *
  * Publishing archives:
  *
  * signingKeyId, signingPassword, secretKeyFile, ossrhUsername, and ossrhPassword properties
  * should be defined outside of the repository either on the command-line via
- * 
+ *
  * ./gradlew -PsigningKeyId=value -PsigningPassword=value -PsecretKeyFile=value -PossrhUsername=value -PossrhPassword=value
  *
- * or via ~/.gradle/gradle.properties as 
+ * or via ~/.gradle/gradle.properties as
  *
  * signingKeyId=value
  * signingPassword=value
@@ -38,7 +38,7 @@
  *
  * ./gradlew uploadArchives
  *
- * Otherwise you can publish a release to staging by executing the "uploadArchives" task 
+ * Otherwise you can publish a release to staging by executing the "uploadArchives" task
  * with "release" property like so:
  *
  * ./gradlew uploadArchives -Prelease
@@ -151,22 +151,21 @@ uploadArchives{
 				if (!project.hasProperty("ossrhUsername")) {
 					throw new GradleException("No value has been specified for property 'ossrhUsername'.")
 				}
-				
+
 				if (!project.hasProperty("ossrhPassword")) {
 					throw new GradleException("No value has been specified for property 'ossrhPassword'.")
 				}
-		
 				signing.signPom(deployment)
 			}
-			
+
 			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
 				authentication(userName: project.hasProperty("ossrhUsername") ? ossrhUsername : "", password: project.hasProperty("ossrhPassword") ? ossrhPassword: "")
 			}
-			
+
 			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
 				authentication(userName: project.hasProperty("ossrhUsername") ? ossrhUsername : "", password: project.hasProperty("ossrhPassword") ? ossrhPassword: "")
 			}
-			
+
 			pom.project {
 				name "${project.name}"
 				packaging 'jar'
@@ -174,21 +173,26 @@ uploadArchives{
 				// optionally artifactId can be defined here 
 				description "The Java bindings for STIX v." + version
 				url "https://github.com/STIXProject/java-stix"
-				
+
 				scm {
 					connection "https://github.com/STIXProject/java-stix.git"
 					developerConnection "https://github.com/STIXProject/java-stix.git"
 					url "https://github.com/STIXProject/java-stix"
 				}
-				
+
 				licenses {
 					license {
 						name "The BSD 3-Clause License"
 						url "https://raw.githubusercontent.com/STIXProject/java-stix/master/LICENSE"
 					}
 				}
-				
+
 				developers {
+					developer {
+						id 'stix'
+						name 'STIX Project, The MITRE Corporation'
+						email 'stix[ASCII character number 64]mitre.org'
+					},
 					developer {
 						id 'nemonik'
 						name 'Michael Joseph Walsh'
@@ -208,17 +212,17 @@ gradle.taskGraph.whenReady { taskGraph ->
 			ext."signing.secretKeyRingFile" = project.hasProperty("secretKeyFile") ? secretKeyFile: ""
 		}
 	}
-		
+
 	if (taskGraph.hasTask(tasks.uploadArchives)) {
 		if (has("release")) {
 			if (!project.hasProperty("signingKeyId")) {
 				throw new GradleException("No value has been specified for property 'signingKeyId'.")
 			}
-			
+
 			if (!project.hasProperty("signingPassword")) {
 				throw new GradleException("No value has been specified for property 'signingPassword'.")
 			}
-			
+
 			if (!project.hasProperty("secretKeyFile")) {
 				throw new GradleException("No value has been specified for property 'secretKeyFile'.")
 			}
@@ -261,13 +265,13 @@ dependencies {
 	compile "org.apache.httpcomponents:httpclient-cache:4.3.5"
 	compile "org.apache.httpcomponents:httpmime:4.3.5"
 	compile "org.apache.httpcomponents:fluent-hc:4.3.5"
-	
+
 	compile "org.springframework:spring-core:4.1.4.RELEASE"
-	
+
 	compile "commons-io:commons-io:2.4"
-	
+
 	compile "commons-lang:commons-lang:2.6"
-	
+
 	testCompile "org.codehaus.groovy:groovy:2.4.3"
 	testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
 	testCompile "xmlunit:xmlunit:1.6"
@@ -295,7 +299,7 @@ javadoc {
 	include "**/org/mitre/**/*"
 	include "**/org/purl/**/*"
 	include "**/org/w3/**/*"
-	
+
 	options.overview = "src/main/javadoc/overview.html";
 	options.showAll()
 	options.encoding("UTF-8")
@@ -305,7 +309,7 @@ javadoc {
 	options.windowTitle("java-stix v." + version)
 	options.docTitle("java-stix v." + version)
 	options.footer("Copyright (c) 2015, The MITRE Corporation. All rights reserved.")
-	
+
 	doFirst {
 		javadoc.title = "java-stix v." + version
 		javadoc.options.docTitle = javadoc.title
@@ -335,7 +339,7 @@ buildscript {
 		jcenter()
 		mavenCentral()
 		mavenLocal()
-		
+
 		flatDir { dirs "libs" }
 	}
 
@@ -351,16 +355,16 @@ buildscript {
 		classpath name: "org.eclipse.core.resources_3.9.0.v20140514-1307"
 		classpath name: "org.eclipse.jdt.core_3.10.0.v20140604-1726"
 		classpath name: "org.eclipse.equinox.registry_3.5.400.v20140428-1507"
-		
+
 		// Needed for GenerateJAXBTask
 		classpath "com.sun.xml.bind:jaxb-xjc:2.2.5-2"
 		classpath "com.sun.xml.bind:jaxb-impl:2.2.5-2"
 		classpath "javax.xml.bind:jaxb-api:2.2.+"
-		
+
 		classpath "org.jvnet.jaxb2_commons:jaxb2-basics:0.6.5"
 		classpath "org.jvnet.jaxb2_commons:jaxb2-basics-ant:0.6.5"
 		classpath "org.jvnet.jaxb2_commons:jaxb2-fluent-api:3.0"
-		classpath "org.jvnet.jaxb2_commons:jaxb2-value-constructor:3.0"	
+		classpath "org.jvnet.jaxb2_commons:jaxb2-value-constructor:3.0"
 		classpath "org.jvnet.jaxb2_commons:jaxb2-default-value:1.1"
 		classpath "org.jvnet.jaxb2_commons:jaxb2-namespace-prefix:1.1"
 	}
