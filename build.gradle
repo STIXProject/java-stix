@@ -193,11 +193,6 @@ uploadArchives{
 						id 'stix'
 						name 'STIX Project, The MITRE Corporation'
 						email 'stix[ASCII character number 64]mitre.org'
-					},
-					developer {
-						id 'nemonik'
-						name 'Michael Joseph Walsh'
-						email 'java-stix-pom[ASCII character number 64]nemonik.com'
 					}
 				}
 			}
