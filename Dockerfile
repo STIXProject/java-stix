@@ -8,17 +8,17 @@
 # @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
 #
 # WHAT TO DO:
-# 
-# If you have Docker installed, from the root of the project run 
+#
+# If you have Docker installed, from the root of the project run
 # the following to create a container image for this Dockerfile via:
 #
-# docker build -t nemonik/java-stix . 
+# docker build -t stix/java-stix .
 #
 # Then create a container using the image you just created via:
 #
-# docker run -t -i nemonik/java-stix /bin/bash
+# docker run -t -i stix/java-stix /bin/bash
 #
-# To retreive the jar archives from the running docker container use following 
+# To retreive the jar archives from the running docker container use following
 # from the command-line of your docker host, not the container:
 #
 # docker cp <container id>:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT-javadoc.jar .
@@ -31,7 +31,7 @@
 #
 # An example of retrieving the snapshot jar would be the following:
 #
-# ➜  /tmp  docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT.jar . 
+# ➜  /tmp  docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT.jar .
 #
 #
 ############################################################
@@ -40,7 +40,7 @@
 FROM ubuntu:15.04
 
 # File Maintainer
-MAINTAINER Michael Joseph Walsh
+MAINTAINER STIX Project, The MITRE Corporation
 
 # Update the sources list
 RUN apt-get -y update
@@ -50,13 +50,13 @@ RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential s
 
 # To install the default OpenJDK environment
 RUN add-apt-repository -y ppa:openjdk-r/ppa
-RUN apt-get -y update 
+RUN apt-get -y update
 RUN apt-get -y install openjdk-8-jdk
 
 # To install the OpenJDK 7, comment out the above and uncomment the following.
 #RUN apt-get install -y openjdk-7-jdk
 
-# Optionally to install the Oracle JDK, comment out the above, uncomment the 
+# Optionally to install the Oracle JDK, comment out the above, uncomment the
 # the next 3 lines, and then uncommment the preferred JDK version.
 #RUN apt-get -y install python-software-properties
 #RUN add-apt-repository -y ppa:webupd8team/java
