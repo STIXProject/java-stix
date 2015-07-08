@@ -347,11 +347,11 @@ script.
 If you have Docker installed, from the root of the project run 
 the following to create a container image for this Dockerfile via:
 
-	docker build -t java_stix_img_v1_2_0_1 . 
+	docker build --rm -t stix/java-stix . 
 
 Then create a container using the image you just created via:
 
-	docker run -t -i java_stix_img_v1_2_0_1 /bin/bash
+	docker run -it --rm --name java-stix stix/java-stix /bin/bash
 
 To retreive the jar archives from the running docker container use following 
 from the command-line of your docker host, not the container:

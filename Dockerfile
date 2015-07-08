@@ -37,33 +37,13 @@
 ############################################################
 
 # Set base image
-FROM ubuntu:15.04
+FROM  dockerbase/java7
 
 # File Maintainer
 MAINTAINER STIX Project, The MITRE Corporation
 
 # Update the sources list
 RUN apt-get -y update
-
-# Install cmd-line dev toolchain
-RUN apt-get install -y tar git curl nano wget dialog net-tools build-essential software-properties-common
-
-# To install the default OpenJDK environment
-RUN add-apt-repository -y ppa:openjdk-r/ppa
-RUN apt-get -y update
-RUN apt-get -y install openjdk-8-jdk
-
-# To install the OpenJDK 7, comment out the above and uncomment the following.
-#RUN apt-get install -y openjdk-7-jdk
-
-# Optionally to install the Oracle JDK, comment out the above, uncomment the
-# the next 3 lines, and then uncommment the preferred JDK version.
-#RUN apt-get -y install python-software-properties
-#RUN add-apt-repository -y ppa:webupd8team/java
-#RUN apt-get -y update
-
-#RUN apt-get install oracle-java7-installer
-#RUN apt-get install oracle-java8-installer
 
 # Clone java-stix repo at the current branch into the container
 COPY . java-stix
