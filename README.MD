@@ -368,9 +368,7 @@ An example of retrieving the snapshot jar would be the following:
 
 	docker cp 83ad9afb6096:/java-stix/build/libs/stix-1.2.0.2-SNAPSHOT.jar . 
 	
-By default the Docker container will build using OpenJdk 7.  You can modify
-the Dockerfile to other JVM's noted in the file.  Please, note Gradle targets 
-Java 1.7 compatibility regardless.
+By default the Docker container will build using OpenJdk 7.
 
 ### <a name="importing_into_eclipse"></a>Importing the project into Eclipse
 
