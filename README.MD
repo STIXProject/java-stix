@@ -1,17 +1,15 @@
 # <a name="intro"></a>java-stix 
 
-The Java bindings for STIX, the Structured Threat Information  eXpression 
+The Java bindings for STIX, the Structured Threat Information eXpression 
 language used for representing structured cyber threat information.
 
-java-stix is being developed under the official [STIXProject][stix project]
-
-For more information, see [http://stix.mitre.org/][stix].
+java-stix is being developed under the official [STIXProject][stix project].
 
 [![Circle CI](https://circleci.com/gh/STIXProject/java-stix.svg?style=svg)](https://circleci.com/gh/STIXProject/java-stix) [![Build Status](https://travis-ci.org/STIXProject/java-stix.svg)](https://travis-ci.org/STIXProject/java-stix)
 
 ## <a name="overview"></a>Overview
 
-A primary goal of java-stix is to remain faithful to both the STIX 
+A primary goal of java-stix is to remain faithful to both the Structured Threat Information eXpression (STIX™) 
 specifications and customary Java practices. java-stix is designed to be 
 intuitive both to Java developers and JAXB XML developers, provide convenience 
 methods to the XJC generated JAXB model, but  obviously is not a one-for-one 
@@ -21,8 +19,7 @@ replacement for the [python-stix][python stix] API.
 
 Releases of java-stix will comply with the Semantic Versioning specification at 
 [http://semver.org/][semver]. Java-stix is currently under active development; 
-see TODO.txt for a tentative roadmap.  Releases will be announced on the [STIX 
-discussion list][list]. A java-stix for a particular schema release will match the 
+see TODO.txt for a tentative roadmap. A java-stix for a particular schema release will match the 
 STIX schema version in Semantic Versioning form. Follow up patches of java-stix 
 for a particular schema release will increment a 4th digit. For example, the first 
 patch release for java-stix `v1.2.0` would be `v1.2.0.1`. Patches will be worked 
