@@ -47,9 +47,11 @@ Releases are distributed via the Maven Central Repository.
 
 ## <a name="snapshots"></a>Snapshots
 
-Snapshots are being pushed to 
+Snapshots when pushed are being pushed to 
 
 [https://oss.sonatype.org/content/repositories/snapshots/org/mitre/stix/](https://oss.sonatype.org/content/repositories/snapshots/org/mitre/stix/)
+
+Sonatype often will reap snapshots without warning and they'll simply disappear.  Recently no snapshots have been pushed, and none presently exist.  [Search Maven Central][search maven central] to find official releases.
 
 Users using Apache Maven for example can simply retrieve java-stix directly via the Central Repository:
 
@@ -399,6 +401,7 @@ JavaEE Support plugin][netbeans gradle]. With the plugin installed, open the
 project and right-click on the project root and select `build` from the `task` 
 panel.
 
+[search maven central]: http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.mitre%22%20AND%20a%3A%22stix%22
 [stix project]: http://stixproject.github.io/
 [stix]: http://stix.mitre.org/
 [python stix]: https://github.com/STIXProject/python-stix
