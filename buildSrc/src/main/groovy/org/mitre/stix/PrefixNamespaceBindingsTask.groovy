@@ -39,9 +39,9 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 		
 		// ignore these namespaces cuz they are orphans
 		def notPartOfThisCompilation = [
-			"schemas/v${schemaVersion}/cybox/external/cpe_2.3/cpe-naming_2.3.xsd",
-			"schemas/v${schemaVersion}/cybox/external/cpe_2.3/cpe-language_2.3.xsd",
-			"schemas/v${schemaVersion}/cybox/external/oasis_ciq_3.0/xlink-2003-12-31.xsd"
+			"schemas" + File.separator + "v${schemaVersion}" + File.separator + "cybox" + File.separator + "external" + File.separator + "cpe_2.3" + File.separator + "cpe-naming_2.3.xsd",
+			"schemas" + File.separator + "v${schemaVersion}" + File.separator + "cybox" + File.separator + "external" + File.separator + "cpe_2.3" + File.separator + "cpe-language_2.3.xsd",
+			"schemas" + File.separator + "v${schemaVersion}" + File.separator + "cybox" + File.separator + "external" + File.separator + "oasis_ciq_3.0" + File.separator + "xlink-2003-12-31.xsd"
 		]
 		
 		// fix paths for present platform
@@ -67,7 +67,9 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 		
 		schemas.each {schema ->
 			
-			def schemaLocation = "schemas/v${schemaVersion}" + schema.getAbsolutePath().split("schemas/v${schemaVersion}")[1]
+		// leemeng fix split for windows
+		//	def schemaLocation = "schemas/v${schemaVersion}" + schema.getAbsolutePath().split("schemas/v${schemaVersion}")[1]
+			def schemaLocation = "schemas" + File.separator + "v${schemaVersion}" + schema.getAbsolutePath().split("v${schemaVersion}")[1]
 			
 			if (!notPartOfThisCompilation.contains(schemaLocation)) {
 				
@@ -123,7 +125,6 @@ class PrefixNamespaceBindingsTask extends DefaultTask {
 	// Dynamically creates the src/main/resources/namespace-prefix.xjb file used by XJC jaxb2-namespace-prefix plugin
 	@TaskAction
 	def create() {
-		
 		def prefixSchemaBindings = get()
 		
 		def dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");

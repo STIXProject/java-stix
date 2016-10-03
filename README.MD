@@ -133,6 +133,11 @@ Afterward, the cybOX schemas are patched for the flaw described in [cybOX
 Schema issue #340][issue 340].  Until the issue is resolved please be aware of 
 the patch. The [patch][patch 340] is found at the root of the project.
 
+To fix UTF-8 errors, go to src/main/resources/schemas/v1.2.0 to replace all the .xsd file content: 
+1. é with e'
+2. ‘ and ’ with '
+3. “ and ” with "
+
 ## <a name="re_retrieving_schemas"></a>Re-retrieving the schemas
 
 If you should need to re-retrieve the schemas have the Gradle build script do 

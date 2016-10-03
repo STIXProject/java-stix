@@ -331,7 +331,9 @@ class GeneratedSourceTransformationTask extends DefaultTask {
 				
 				def uri = file.toURI()
 				def name = file.getName().split(/\./)[0]
-				def pkg = file.getParent().replaceAll(project.file("src/generated/java").path, "").substring(1).replaceAll(System.getProperty("file.separator"),'.')
+				
+				// leemeng to support Windows file separator
+				def pkg = file.getParent().replace(project.file("src/generated/java").path, "").substring(1).replace(System.getProperty("file.separator"),'.')
 				
 				def source = project.file(uri).readLines().iterator().join(lineSeperator)
 				
