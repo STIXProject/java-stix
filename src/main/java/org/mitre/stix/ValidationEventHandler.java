@@ -5,26 +5,29 @@
 package org.mitre.stix;
 
 import javax.xml.bind.ValidationEvent;
+import java.util.logging.Logger;
 
 public class ValidationEventHandler implements javax.xml.bind.ValidationEventHandler {
+	private static final Logger LOGGER = Logger.getLogger(ValidationErrorHandler.class.getName());
+
 	/* (non-Javadoc)
 	 * @see javax.xml.bind.ValidationEventHandler#handleEvent(javax.xml.bind.ValidationEvent)
 	 */
 	public boolean handleEvent(ValidationEvent event) {
-		System.out.println("");
-		System.out.println("EventT");
-		System.out.println("\tSeverity: " + event.getSeverity());
-		System.out.println("\tMessage: " + event.getMessage());
-		System.out.println("\tLinked Excpetion: " + event.getLinkedException());
-		System.out.println("\tLocator");
-		System.out.println("\tLine Number: "
+		LOGGER.info("");
+		LOGGER.info("EventT");
+		LOGGER.info("\tSeverity: " + event.getSeverity());
+		LOGGER.info("\tMessage: " + event.getMessage());
+		LOGGER.info("\tLinked Excpetion: " + event.getLinkedException());
+		LOGGER.info("\tLocator");
+		LOGGER.info("\tLine Number: "
 				+ event.getLocator().getLineNumber());
-		System.out.println("\tColumn Number: "
+		LOGGER.info("\tColumn Number: "
 				+ event.getLocator().getColumnNumber());
-		System.out.println("\tOffset: " + event.getLocator().getOffset());
-		System.out.println("\tObject: " + event.getLocator().getObject());
-		System.out.println("\tNode: " + event.getLocator().getNode());
-		System.out.println("\tURL: " + event.getLocator().getURL());
+		LOGGER.info("\tOffset: " + event.getLocator().getOffset());
+		LOGGER.info("\tObject: " + event.getLocator().getObject());
+		LOGGER.info("\tNode: " + event.getLocator().getNode());
+		LOGGER.info("\tURL: " + event.getLocator().getURL());
 		return true;
 	}
 }
