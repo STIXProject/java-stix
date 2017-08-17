@@ -43,22 +43,37 @@ public class DocumentUtilities {
 	private static final String XML_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
 	private static final String XML_NAMESPACE = "http://www.w3.org/2000/xmlns/";
 
-	private static final JAXBContext STIX_CONTEXT = initDefaultContext();
+	public static JAXBContext stixJaxbContext() {
+        // Here is safe lazy initialization trick, revealed in the book:
+        // Java Concurrency in Practice, Goetz, 2006. Chapter 16.2.3
+        return ContextHolder.instance;
+    }
 
-	private static JAXBContext initDefaultContext(){
-		try {
-			return JAXBContext.newInstance("org.mitre.stix.stix_1");
-		} catch(JAXBException e) {
-			throw new RuntimeException("Exception initializing default JAXBContext" , e);
-		}
-	}
+    private static class ContextHolder {
+        public static final JAXBContext instance = initDefaultContext();
+
+        private static JAXBContext initDefaultContext(){
+            try {
+                return JAXBContext.newInstance("org.mitre.stix.stix_1");
+            } catch(JAXBException e) {
+                throw new RuntimeException("Exception initializing default JAXBContext" , e);
+            }
+        }
+
+    }
 
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger
 			.getLogger(DocumentUtilities.class.getName());
 
 	/**
-	 * Returns a pretty printed String for a JAXBElement
+	 * Returns a pretty printed String for a JAXBElement.
+     *
+     * <p>
+     *     !!!NOTE!!!
+     *     This method is optimized for use with elements from STIX schema.
+     *     Use of elements from other schemas may cause serious overhead and perform slowly.
+     * </p>
 	 *
 	 * @param jaxbElement
 	 *            JAXB representation of an Xml Element to be printed.
@@ -69,7 +84,13 @@ public class DocumentUtilities {
 	}
 
 	/**
-	 * Returns Document that is not formatted for a JAXBElement
+	 * Returns Document that is not formatted for a JAXBElement.
+     *
+     * <p>
+     *     !!!NOTE!!!
+     *     This method is optimized for use with elements from STIX schema.
+     *     Use of elements from other schemas may cause serious overhead and perform slowly.
+     * </p>
 	 *
 	 * @param jaxbElement
 	 *            JAXB representation of an XML Element
@@ -107,7 +128,7 @@ public class DocumentUtilities {
 			String packName = jaxbElement.getDeclaredType().getPackage().getName();
 			JAXBContext jaxbContext;
 			if (packName.startsWith("org.mitre")){
-				jaxbContext = STIX_CONTEXT;
+				jaxbContext = stixJaxbContext();
 			} else {
 				jaxbContext = JAXBContext.newInstance(packName);
 			}
