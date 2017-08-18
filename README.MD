@@ -294,7 +294,7 @@ path.
 
 To execute the tests:
 
-	/gradlew -x signArchives test
+	./gradlew -x signArchives test
 
 Consider using `-d`/`--debug` or `-i`/`--info` for more details during test 
 execution like so:
