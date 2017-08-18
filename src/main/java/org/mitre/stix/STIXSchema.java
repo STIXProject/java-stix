@@ -56,28 +56,25 @@ public class STIXSchema {
 
 	private String version;
 
-	private static STIXSchema instance;
-
 	private Map<String, String> prefixSchemaBindings;
 
 	private Validator validator;
 
 	private javax.xml.validation.Schema schema;
 
+	private static class SchemaHolder {
+		public static final STIXSchema instance = new STIXSchema();
+	}
+
 	/**
 	 * Returns STIXSchema object representing the STIX schema.
 	 * 
 	 * @return Always returns a STIXSchema object representing the STIX schema.
 	 */
-	public synchronized static STIXSchema getInstance() {
-
-		if (instance != null) {
-			return instance;
-		} else {
-			instance = new STIXSchema();
-		}
-
-		return instance;
+	public static STIXSchema getInstance() {
+		// Here is safe lazy initialization trick, revealed in the book:
+		// Java Concurrency in Practice, Goetz, 2006. Chapter 16.2.3
+		return SchemaHolder.instance;
 	}
 
 	/**

@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
 
 /**
  * A collection of utility helper methods.
- * 
+ *
  * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>)
  */
 public class DocumentUtilities {
@@ -43,13 +43,38 @@ public class DocumentUtilities {
 	private static final String XML_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
 	private static final String XML_NAMESPACE = "http://www.w3.org/2000/xmlns/";
 
+	public static JAXBContext stixJaxbContext() {
+        // Here is safe lazy initialization trick, revealed in the book:
+        // Java Concurrency in Practice, Goetz, 2006. Chapter 16.2.3
+        return ContextHolder.instance;
+    }
+
+    private static class ContextHolder {
+        public static final JAXBContext instance = initDefaultContext();
+
+        private static JAXBContext initDefaultContext(){
+            try {
+                return JAXBContext.newInstance("org.mitre.stix.stix_1");
+            } catch(JAXBException e) {
+                throw new RuntimeException("Exception initializing default JAXBContext" , e);
+            }
+        }
+
+    }
+
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = Logger
 			.getLogger(DocumentUtilities.class.getName());
 
 	/**
-	 * Returns a pretty printed String for a JAXBElement
-	 * 
+	 * Returns a pretty printed String for a JAXBElement.
+     *
+     * <p>
+     *     !!!NOTE!!!
+     *     This method is optimized for use with elements from STIX schema.
+     *     Use of elements from other schemas may cause serious overhead and perform slowly.
+     * </p>
+	 *
 	 * @param jaxbElement
 	 *            JAXB representation of an Xml Element to be printed.
 	 * @return String containing the XML mark-up.
@@ -59,8 +84,14 @@ public class DocumentUtilities {
 	}
 
 	/**
-	 * Returns Document that is not formatted for a JAXBElement
-	 * 
+	 * Returns Document that is not formatted for a JAXBElement.
+     *
+     * <p>
+     *     !!!NOTE!!!
+     *     This method is optimized for use with elements from STIX schema.
+     *     Use of elements from other schemas may cause serious overhead and perform slowly.
+     * </p>
+	 *
 	 * @param jaxbElement
 	 *            JAXB representation of an XML Element
 	 * @return Document.
@@ -71,7 +102,7 @@ public class DocumentUtilities {
 
 	/**
 	 * Returns a Document for a JAXBElement
-	 * 
+	 *
 	 * @param jaxbElement
 	 *            JAXB representation of an XML Element
 	 * @param prettyPrint
@@ -82,7 +113,7 @@ public class DocumentUtilities {
 			boolean prettyPrint) {
 
 		Document document = null;
-		
+
 		try {
 			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
 					.newInstance();
@@ -94,8 +125,13 @@ public class DocumentUtilities {
 			document = documentBuilderFactory.newDocumentBuilder()
 					.newDocument();
 
-			JAXBContext jaxbContext = JAXBContext.newInstance(jaxbElement
-					.getDeclaredType().getPackage().getName());
+			String packName = jaxbElement.getDeclaredType().getPackage().getName();
+			JAXBContext jaxbContext;
+			if (packName.startsWith("org.mitre")){
+				jaxbContext = stixJaxbContext();
+			} else {
+				jaxbContext = JAXBContext.newInstance(packName);
+			}
 
 			Marshaller marshaller = jaxbContext.createMarshaller();
 
@@ -126,13 +162,13 @@ public class DocumentUtilities {
 		} catch (JAXBException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		return document;
 	}
 
 	/**
 	 * Returns a String for a JAXBElement
-	 * 
+	 *
 	 * @param jaxbElement
 	 *            JAXB representation of an XML Element to be printed.
 	 * @param prettyPrint
@@ -151,10 +187,10 @@ public class DocumentUtilities {
 	/**
 	 * Returns String that is not formatted for a Document object representing the
 	 * entire XML document.
-	 * 
+	 *
 	 * @param document
 	 *            Document object representing the entire XML document
-	 * 
+	 *
 	 * @return Pretty printed String containing the XML mark-up.
 	 */
 	public static String toXMLString(Document document) {
@@ -164,12 +200,12 @@ public class DocumentUtilities {
 	/**
 	 * Returns a String for a Document object representing the entire XML
 	 * document.
-	 * 
+	 *
 	 * @param document
 	 *            Document object representing the entire XML document
 	 * @param prettyPrint
 	 *            True for pretty print, otherwise false
-	 * 
+	 *
 	 * @return String containing the XML mark-up.
 	 */
 	public static String toXMLString(Document document, boolean prettyPrint) {
@@ -219,12 +255,12 @@ public class DocumentUtilities {
 
 	/**
 	 * Used to traverse an XML document.
-	 * 
+	 *
 	 * @param element
 	 *            Represents an element in an XML document.
 	 * @param visitor
 	 *            Code to be executed.
-	 * 
+	 *
 	 */
 	private final static void traverse(Element element, ElementVisitor visitor) {
 
@@ -248,12 +284,12 @@ public class DocumentUtilities {
 	 * (http://java.net/
 	 * jira/browse/JAXB-103?focusedCommentId=64411&page=com.atlassian
 	 * .jira.plugin.system.issuetabpanels%3Acomment-tabpanel#action_64411).
-	 * 
+	 *
 	 * This helper method based on Reboot's
 	 * (http://stackoverflow.com/users/392730/reboot) response to a
 	 * stackoverflow question on the subject. I've modified it slightly, but it
 	 * will prune down the namespaces to only those used.
-	 * 
+	 *
 	 * @param document
 	 *            Document object representing the entire XML document
 	 */
@@ -353,7 +389,7 @@ public class DocumentUtilities {
 
 	/**
 	 * Creates a Document from XML String
-	 * 
+	 *
 	 * @param xml
 	 *            The XML String
 	 * @return The Document representation
@@ -392,7 +428,7 @@ public class DocumentUtilities {
 
 	/**
 	 * Strips formatting from an XML String
-	 * 
+	 *
 	 * @param xml
 	 *            The XML String to reformatted
 	 * @return The XML String as on line.
