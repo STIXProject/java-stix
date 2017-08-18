@@ -68,12 +68,12 @@ public class DocumentUtilities {
 
 	/**
 	 * Returns a pretty printed String for a JAXBElement.
-     *
-     * <p>
-     *     !!!NOTE!!!
-     *     This method is optimized for use with elements from STIX schema.
-     *     Use of elements from other schemas may cause serious overhead and perform slowly.
-     * </p>
+	 *
+	 * <p>
+	 *     !!!NOTE!!!
+	 *     This method is optimized for use with elements from STIX schema.
+	 *     Use of elements from other schemas may cause serious overhead and perform slowly.
+	 * </p>
 	 *
 	 * @param jaxbElement
 	 *            JAXB representation of an Xml Element to be printed.
@@ -85,12 +85,12 @@ public class DocumentUtilities {
 
 	/**
 	 * Returns Document that is not formatted for a JAXBElement.
-     *
-     * <p>
-     *     !!!NOTE!!!
-     *     This method is optimized for use with elements from STIX schema.
-     *     Use of elements from other schemas may cause serious overhead and perform slowly.
-     * </p>
+	 *
+	 * <p>
+	 *     !!!NOTE!!!
+	 *     This method is optimized for use with elements from STIX schema.
+	 *     Use of elements from other schemas may cause serious overhead and perform slowly.
+	 * </p>
 	 *
 	 * @param jaxbElement
 	 *            JAXB representation of an XML Element
