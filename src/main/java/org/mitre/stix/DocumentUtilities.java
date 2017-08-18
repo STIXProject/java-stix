@@ -59,7 +59,6 @@ public class DocumentUtilities {
                 throw new RuntimeException("Exception initializing default JAXBContext" , e);
             }
         }
-
     }
 
 	@SuppressWarnings("unused")
@@ -354,7 +353,6 @@ public class DocumentUtilities {
 					namespaces.add(namespace);
 				}
 			}
-
 		});
 
 		traverse(element, new ElementVisitor() {
@@ -383,7 +381,6 @@ public class DocumentUtilities {
 					element.removeAttributeNS(XML_NAMESPACE, localName);
 				}
 			}
-
 		});
 	}
 
