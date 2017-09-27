@@ -8,20 +8,23 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.SAXException;
 
+import java.util.logging.Logger;
+
 /**
  * Parsing and validating error handler
  * 
  * @author nemonik (Michael Joseph Walsh <github.com@nemonik.com>) *
  */
 public class ValidationErrorHandler implements ErrorHandler {
-
+	private static final Logger LOGGER = Logger.getLogger(ValidationErrorHandler.class.getName());
+	
 	private void log(String type, SAXParseException e) {
-		System.err.println("SAXParseException " + type);
-		System.err.println("\tPublic ID: " + e.getPublicId());
-		System.err.println("\tSystem ID: " + e.getSystemId());
-		System.err.println("\tLine     : " + e.getLineNumber());
-		System.err.println("\tColumn   : " + e.getColumnNumber());
-		System.err.println("\tMessage  : " + e.getMessage());
+		LOGGER.warning("SAXParseException " + type);
+		LOGGER.warning("\tPublic ID: " + e.getPublicId());
+		LOGGER.warning("\tSystem ID: " + e.getSystemId());
+		LOGGER.warning("\tLine     : " + e.getLineNumber());
+		LOGGER.warning("\tColumn   : " + e.getColumnNumber());
+		LOGGER.warning("\tMessage  : " + e.getMessage());
 	}
 
 	/* (non-Javadoc)
